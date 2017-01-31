@@ -52,12 +52,12 @@ switch $tcl_platform(os) {
         set ARDUINO_SKETCHBOOK $env(ARDUINO_SKETCHBOOK)
     }
     default { ; # DOS
-# change the provided names to DOS-convention to avoid spaces and special
-# characters in the path names...
-set ARDUINO_HOME       \
-    [file attributes [string trim $env(ARDUINO_HOME) \"] -shortname]
-set ARDUINO_SKETCHBOOK \
-    [file attributes [string trim $env(ARDUINO_SKETCHBOOK) \"] -shortname]
+        # change the provided names to DOS-convention to avoid spaces and special
+        # characters in the path names...
+        set ARDUINO_HOME       \
+            [file attributes [string trim $env(ARDUINO_HOME) \"] -shortname]
+        set ARDUINO_SKETCHBOOK \
+            [file attributes [string trim $env(ARDUINO_SKETCHBOOK) \"] -shortname]
     }
 }
 
@@ -74,13 +74,14 @@ switch $tcl_platform(os) {
         set AVR_TOOLS  $env(AVR_TOOLS)
     }
     default { ; # DOS
-set AVR_TOOLS "$ARDUINO_HOME/hardware/tools/avr/bin"
+        set AVR_TOOLS "$ARDUINO_HOME/hardware/tools/avr/bin"
     }
 }
 set CC   "$AVR_TOOLS/avr-gcc"
 set CXX  "$AVR_TOOLS/avr-g++"
 set AR   "$AVR_TOOLS/avr-ar"
 set LINK "$AVR_TOOLS/avr-gcc"
+
 set OBJCOPY "$AVR_TOOLS/avr-objcopy"
 set OBJDUMP "$AVR_TOOLS/avr-objdump"
 
