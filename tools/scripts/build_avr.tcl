@@ -46,12 +46,20 @@ set ARDUINO_LIBS       [lindex $argv 1]
 set ARDUINO_DEFS       [lindex $argv 2]
 
 #=============================================================================
+switch $tcl_platform(os) {
+    "Darwin" { ; # Mac OS X
+        set ARDUINO_HOME       $env(ARDUINO_HOME)
+        set ARDUINO_SKETCHBOOK $env(ARDUINO_SKETCHBOOK)
+    }
+    default { ; # DOS
 # change the provided names to DOS-convention to avoid spaces and special
 # characters in the path names...
 set ARDUINO_HOME       \
     [file attributes [string trim $env(ARDUINO_HOME) \"] -shortname]
 set ARDUINO_SKETCHBOOK \
     [file attributes [string trim $env(ARDUINO_SKETCHBOOK) \"] -shortname]
+    }
+}
 
 set BOARD_MCU          $env(BOARD_MCU)
 set BOARD_VARIANT      $env(BOARD_VARIANT)
@@ -61,12 +69,18 @@ set BOARD_CORE         "arduino"
 # set the CYGWIN environment variable to avoid warnings about DOS file names
 set env(CYGWIN) nodosfilewarning
 
+switch $tcl_platform(os) {
+    "Darwin" { ; # Mac OS X
+        set AVR_TOOLS  $env(AVR_TOOLS)
+    }
+    default { ; # DOS
 set AVR_TOOLS "$ARDUINO_HOME/hardware/tools/avr/bin"
+    }
+}
 set CC   "$AVR_TOOLS/avr-gcc"
 set CXX  "$AVR_TOOLS/avr-g++"
 set AR   "$AVR_TOOLS/avr-ar"
 set LINK "$AVR_TOOLS/avr-gcc"
-
 set OBJCOPY "$AVR_TOOLS/avr-objcopy"
 set OBJDUMP "$AVR_TOOLS/avr-objdump"
 
