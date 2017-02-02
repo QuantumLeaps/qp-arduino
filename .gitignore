@@ -57,3 +57,5 @@ output/
 doxygen/html/
 lint/*.txt
 lint/MISRA_Exemplar_Suite_test/*.txt
+
+.DS_Store

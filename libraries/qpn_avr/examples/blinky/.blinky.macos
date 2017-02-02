@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="4.0.0">
+ <item name="license">GPL</item>
+ <group name="locked"/>
+ <group name="settings">
+  <item name="tabs">1</item>
+  <item name="windows">0</item>
+  <item name="grid">3</item>
+  <item name="backups">0</item>
+ </group>
+ <group name="windows">
+  <item id=".::blinky.ino">0,0,800,445</item>
+  <item id="AOs::Blinky::SM">0,0,811,512,*</item>
+ </group>
+ <group name="search">
+  <item name="options">4129280</item>
+  <item name="replace">1</item>
+ </group>
+ <group name="vars">
+  <item id="PROJECT">blinky</item>
+  <item id="ARDUINO_HOME">/Applications/Arduino.app/Contents/Java</item>
+  <item id="ARDUINO_SKETCHBOOK">/Users/sutch/Documents/Arduino</item>
+  <item id="AVR_TOOLS">/usr/local/bin</item>
+  <item id="BOARD_MCU">atmega328p</item>
+  <item id="BOARD_VARIANT">standard</item>
+  <item id="BOARD_F_MHZ">16</item>
+  <item id="BOARD_COM">/dev/cu.usbmodem1411</item>
+  <item id="BOARD_BAUD">115200</item>
+ </group>
+ <group name="tools">
+  <group name="tool">
+   <item name="icon">3</item>
+   <item name="title">build</item>
+   <item name="command">tclsh</item>
+   <item name="args">&quot;$ARDUINO_SKETCHBOOK/tools/scripts/build_avr.tcl&quot; $PROJECT &quot;qpn_avr&quot;</item>
+   <item name="dir">.</item>
+   <item name="options">3</item>
+  </group>
+  <group name="tool">
+   <item name="icon">5</item>
+   <item name="title">clean</item>
+   <item name="command">find</item>
+   <item name="args">bin -mindepth 1 -delete</item>
+   <item name="dir">.</item>
+   <item name="options">2</item>
+  </group>
+  <group name="tool">
+   <item name="icon">6</item>
+   <item name="title">upload</item>
+   <item name="command">tclsh</item>
+   <item name="args">&quot;$ARDUINO_SKETCHBOOK/tools/scripts/upload_avr.tcl&quot;</item>
+   <item name="dir">.</item>
+   <item name="options">2</item>
+  </group>
+  <group name="tool">
+   <item name="icon">8</item>
+   <item name="title">serialterm</item>
+   <item name="command">sh</item>
+   <item name="args">&quot;$ARDUINO_SKETCHBOOK/tools/scripts/serialterm.sh&quot;</item>
+   <item name="dir"></item>
+   <item name="options">2</item>
+  </group>
+  <group name="tool">
+   <item name="icon">5</item>
+   <item name="title">clean all</item>
+   <item name="command">find</item>
+   <item name="args">bin lib -mindepth 1 -delete</item>
+   <item name="dir">.</item>
+   <item name="options">2</item>
+  </group>
+ </group>
+</session>
