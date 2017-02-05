@@ -1,1 +1,1 @@
-osascript -e 'tell application "Terminal" to do script "screen /dev/cu.usbmodem1411 9600"' 
+osascript -e 'tell application "Terminal" to do script "screen $BOARD_COM 9600"' 
