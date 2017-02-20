@@ -4,8 +4,8 @@
 * @ingroup qep
 * @cond
 ******************************************************************************
-* Last updated for version 5.8.0
-* Last updated on  2015-11-18
+* Last updated for version 5.8.1
+* Last updated on  2017-02-19
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -32,8 +32,8 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* Web:   www.state-machine.com
-* Email: info@state-machine.com
+* http:www.state-machine.com
+* mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
 */

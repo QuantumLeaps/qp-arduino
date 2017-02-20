@@ -3,8 +3,8 @@
 * @brief QP-nano public interface adapted for Arduino
 * @cond
 ******************************************************************************
-* Last updated for version 5.8.0
-* Last updated on  2016-11-18
+* Last updated for version 5.8.1
+* Last updated on  2017-02-19
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -31,8 +31,8 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* Web:   www.state-machine.com
-* Email: info@state-machine.com
+* http:www.state-machine.com
+* mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
 */
@@ -109,33 +109,16 @@ extern "C" {
 * major version number, Y is a 1-digit minor version number, and Z is
 * a 1-digit release number.
 */
-#define QP_VERSION      580
+#define QP_VERSION      581
 
 /*! The current QP version number string of the form X.Y.Z, where X is
 * a 1-digit major version number, Y is a 1-digit minor version number,
 * and Z is a 1-digit release number.
 */
-#define QP_VERSION_STR  "5.8.0"
+#define QP_VERSION_STR  "5.8.1"
 
-/*! Tamperproof current QP release (5.8.0) and date (16-11-07) */
-#define QP_RELEASE      0x9FF9038BU
-
-
-/****************************************************************************/
-/*! The current QP version as a decimal constant XYZ, where X is a 1-digit
-* major version number, Y is a 1-digit minor version number, and Z is
-* a 1-digit release number.
-*/
-#define QP_VERSION      580
-
-/*! The current QP version number string of the form X.Y.Z, where X is
-* a 1-digit major version number, Y is a 1-digit minor version number,
-* and Z is a 1-digit release number.
-*/
-#define QP_VERSION_STR  "5.8.0"
-
-/*! Tamperproof current QP release (5.8.0) and date (16-11-07) */
-#define QP_RELEASE      0x9FF9038BU
+/*! Tamperproof current QP release (5.8.1) and date (17-02-19) */
+#define QP_RELEASE      0x9A8AA20AU
 
 
 /****************************************************************************/
