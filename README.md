@@ -110,7 +110,7 @@ http://www.state-machine.com/arduino
 Specifically, the Application Note: "Event-Driven Arduino Programming
 with QP and QM" is available from:
 
-http://www.state-machine.com/doc/AN_Event-Driven_Arduino-1.6.x.pdf
+https://state-machine.com/doc/AN_Event-Driven_Arduino_QP-nano.pdf
 
 
 Support Questions
