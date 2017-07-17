@@ -1,3 +1,5 @@
+![QP framework](https://state-machine.com/img/qpn-arduino_banner.jpg)
+
 This README provides a quick overview of QP-nano for Arduino.
 Please refer to the companion webiste to this project at:
 

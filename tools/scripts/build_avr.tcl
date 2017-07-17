@@ -1,7 +1,7 @@
 ##############################################################################
 # Product: TCL script for building Arduino sketches
 # Last updated for: Arduino 1.6.8
-# Date of the Last Update: 2016-04-02
+# Date of the Last Update: 2017-04-02
 #
 #                    Q u a n t u m     L e a P s
 #                    ---------------------------
@@ -23,8 +23,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 # Contact information:
-# Web:     http://www.state-machine.com
-# Support: http://sourceforge.net/p/qpc/discussion/668726
+# Web:     https://www.state-machine.com/arduino
+# Support: https://sourceforge.net/p/qpc/discussion/668726
 ##############################################################################
 #
 # usage
@@ -36,7 +36,7 @@
 
 if { $argc < 2 } {
     puts "usage: tclsh avrmake.tcl <PROJECT> \"<LIBS>\"" \[\"<DEFINES>\"\]
-    puts "example: tclsh avrmake.tcl blinky atmega328p 16 \"qpn_avr\"" \"QK_PREEMPTIVE\"
+    puts "example: tclsh avrmake.tcl blinky atmega328p 16 \"qpn_avr\""
 
     exit 1
 }
