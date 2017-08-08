@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<session version="3.3.0">
+<session version="4.0.3">
  <item name="license">GPL</item>
  <group name="locked"/>
  <group name="settings">
   <item name="tabs">1</item>
   <item name="windows">0</item>
   <item name="grid">3</item>
+  <item name="backups">0</item>
  </group>
  <group name="windows">
   <item id=".::dpp.ino">0,0,800,445</item>
-  <item id="AOs::Philo::SM">0,0,800,445,*</item>
-  <item id="AOs::Table::SM">0,0,640,480</item>
+  <item id="AOs::Philo::SM">0,0,892,660,*</item>
+  <item id="AOs::Table::SM">252,0,640,480</item>
  </group>
  <group name="search">
   <item name="options">4129280</item>
@@ -32,7 +33,7 @@
    <item name="title">build</item>
    <item name="command">&quot;%ARDUINO_SKETCHBOOK%\tools\utils\tclsh.exe&quot;</item>
    <item name="args">&quot;%ARDUINO_SKETCHBOOK%\tools\scripts\build_avr.tcl&quot; %PROJECT% &quot;qpn_avr&quot;</item>
-   <item name="initial">.</item>
+   <item name="dir">.</item>
    <item name="options">3</item>
   </group>
   <group name="tool">
@@ -40,7 +41,7 @@
    <item name="title">clean</item>
    <item name="command">&quot;%ARDUINO_SKETCHBOOK%\tools\utils\rm.exe&quot;</item>
    <item name="args">bin\*</item>
-   <item name="initial">.</item>
+   <item name="dir">.</item>
    <item name="options">2</item>
   </group>
   <group name="tool">
@@ -48,7 +49,7 @@
    <item name="title">upload</item>
    <item name="command">&quot;%ARDUINO_SKETCHBOOK%\tools\scripts\upload_avr.bat&quot;</item>
    <item name="args">%PROJECT%</item>
-   <item name="initial">.</item>
+   <item name="dir">.</item>
    <item name="options">2</item>
   </group>
   <group name="tool">
@@ -56,7 +57,7 @@
    <item name="title">serialterm</item>
    <item name="command">&quot;%ARDUINO_SKETCHBOOK%\tools\utils\serialterm.exe&quot;</item>
    <item name="args">%BOARD_COM% %BOARD_BAUD%</item>
-   <item name="initial"></item>
+   <item name="dir"></item>
    <item name="options">4</item>
   </group>
   <group name="tool">
@@ -64,7 +65,7 @@
    <item name="title">clean all</item>
    <item name="command">&quot;%ARDUINO_SKETCHBOOK%\tools\utils\rm.exe&quot;</item>
    <item name="args">bin\* lib\*</item>
-   <item name="initial"></item>
+   <item name="dir"></item>
    <item name="options">2</item>
   </group>
  </group>

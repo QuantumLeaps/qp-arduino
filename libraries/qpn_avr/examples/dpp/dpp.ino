@@ -36,6 +36,11 @@ enum {
 
 //============================================================================
 // declare all AO classes...
+
+#if ((QP_VERSION < 591) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8)))
+#error qpn version 5.9.1 or higher required
+#endif
+
 /*${AOs::Philo} ............................................................*/
 typedef struct Philo {
 /* protected: */

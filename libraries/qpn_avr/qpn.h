@@ -3,8 +3,8 @@
 * @brief QP-nano public interface adapted for Arduino
 * @cond
 ******************************************************************************
-* Last updated for version 5.8.2
-* Last updated on  2017-02-22
+* Last updated for version 5.9.6
+* Last updated on  2017-08-07
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -31,7 +31,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* http:www.state-machine.com
+* https://state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -109,16 +109,16 @@ extern "C" {
 * major version number, Y is a 1-digit minor version number, and Z is
 * a 1-digit release number.
 */
-#define QP_VERSION      582
+#define QP_VERSION      596
 
 /*! The current QP version number string of the form X.Y.Z, where X is
 * a 1-digit major version number, Y is a 1-digit minor version number,
 * and Z is a 1-digit release number.
 */
-#define QP_VERSION_STR  "5.8.2"
+#define QP_VERSION_STR  "5.9.6"
 
-/*! Tamperproof current QP release (5.8.2) and date (2017-02-08) */
-#define QP_RELEASE      0x9A8C4FB9U
+/*! Tamperproof current QP release (5.9.6) and date (2017-08-04) */
+#define QP_RELEASE      0x9A315E6BU
 
 
 /****************************************************************************/
