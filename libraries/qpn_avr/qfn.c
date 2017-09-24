@@ -4,8 +4,8 @@
 * @ingroup qfn
 * @cond
 ******************************************************************************
-* Last updated for version 5.8.1
-* Last updated on  2016-12-16
+* Last updated for version 5.9.8
+* Last updated on  2017-09-20
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -32,7 +32,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* http://www.state-machine.com
+* https://state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -126,15 +126,11 @@ void QActive_ctor(QActive * const me, QStateHandler initial) {
 * __task__ context.
 *
 * @param[in,out] me     pointer (see @ref oop)
-* @param[in]     margin number of required free slots in the queue
-*                       after posting the event.
+* @param[in]     margin number of required free slots in the queue after
+*                       posting the event. The special value #QF_NO_MARGIN
+*                       means that this function will assert if posting fails.
 * @param[in]     sig    signal of the event to be posted
 * @param[in]     par    parameter of the event to be posted
-*
-* @note The zero value of the 'margin' parameter is special and denotes
-* situation when the post() operation is assumed to succeed (event delivery
-* guarantee). An assertion fires, when the event cannot be delivered in
-* this case.
 *
 * @usage
 * @include qfn_postx.c
@@ -153,8 +149,9 @@ bool QActive_postX_(QActive * const me, uint_fast8_t margin,
     QF_INT_DISABLE();
 
     /* margin available? */
-    if ((qlen - me->nUsed) > margin) {
-
+    if (((margin == QF_NO_MARGIN) && (qlen > me->nUsed))
+        || ((qlen - me->nUsed) > margin))
+    {
         /* insert event into the ring buffer (FIFO) */
         QF_ROM_QUEUE_AT_(acb, me->head).sig = (QSignal)sig;
 #if (Q_PARAM_SIZE != 0)
@@ -183,7 +180,7 @@ bool QActive_postX_(QActive * const me, uint_fast8_t margin,
     }
     else {
         /* can tolerate dropping evts? */
-        Q_ASSERT_ID(310, margin != (uint_fast8_t)0);
+        Q_ASSERT_ID(310, margin != QF_NO_MARGIN);
 
         margin = (uint_fast8_t)false; /* posting failed */
     }
@@ -204,15 +201,11 @@ bool QActive_postX_(QActive * const me, uint_fast8_t margin,
 * __ISR__ context.
 *
 * @param[in,out] me     pointer (see @ref oop)
-* @param[in]     margin number of required free slots in the queue
-*                       after posting the event.
+* @param[in]     margin number of required free slots in the queue after
+*                       posting the event. The special value #QF_NO_MARGIN
+*                       means that this function will assert if posting fails.
 * @param[in]     sig    signal of the event to be posted
 * @param[in]     par    parameter of the event to be posted
-*
-* @note The zero value of the 'margin' parameter is special and denotes
-* situation when the post() operation is assumed to succeed (event delivery
-* guarantee). An assertion fires, when the event cannot be delivered in
-* this case.
 *
 * @usage
 * @include qfn_postx.c
@@ -242,8 +235,9 @@ bool QActive_postXISR_(QActive * const me, uint_fast8_t margin,
 #endif
 
     /* margin available? */
-    if ((qlen - me->nUsed) > margin) {
-
+    if (((margin == QF_NO_MARGIN) && (qlen > me->nUsed))
+        || ((qlen - me->nUsed) > margin))
+    {
         /* insert event into the ring buffer (FIFO) */
         QF_ROM_QUEUE_AT_(acb, me->head).sig = (QSignal)sig;
 #if (Q_PARAM_SIZE != 0)
@@ -264,7 +258,7 @@ bool QActive_postXISR_(QActive * const me, uint_fast8_t margin,
     }
     else {
         /* can tolerate dropping evts? */
-        Q_ASSERT_ID(410, margin != (uint_fast8_t)0);
+        Q_ASSERT_ID(410, margin != QF_NO_MARGIN);
         margin = (uint_fast8_t)false; /* posting failed */
     }
 
@@ -317,7 +311,7 @@ void QF_init(uint_fast8_t maxActive) {
     QK_attr_.intNest = (uint_fast8_t)0;
 #endif
 
-#ifdef QK_MUTEX
+#ifdef QK_SCHED_LOCK
     QK_attr_.lockPrio   = (uint_fast8_t)0;
     QK_attr_.lockHolder = (uint_fast8_t)0;
 #endif
@@ -487,5 +481,4 @@ void QActive_disarmX(QActive * const me, uint_fast8_t const tickRate) {
     QF_INT_ENABLE();
 }
 #endif /* #if (QF_TIMEEVT_CTR_SIZE != 0) */
-
 

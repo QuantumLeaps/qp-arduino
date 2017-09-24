@@ -3,8 +3,8 @@
 * @brief QP-nano public interface adapted for Arduino
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.6
-* Last updated on  2017-08-07
+* Last updated for version 5.9.8
+* Last updated on  2017-09-20
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
@@ -109,16 +109,16 @@ extern "C" {
 * major version number, Y is a 1-digit minor version number, and Z is
 * a 1-digit release number.
 */
-#define QP_VERSION      596
+#define QP_VERSION      598
 
 /*! The current QP version number string of the form X.Y.Z, where X is
 * a 1-digit major version number, Y is a 1-digit minor version number,
 * and Z is a 1-digit release number.
 */
-#define QP_VERSION_STR  "5.9.6"
+#define QP_VERSION_STR  "5.9.8"
 
-/*! Tamperproof current QP release (5.9.6) and date (2017-08-04) */
-#define QP_RELEASE      0x9A315E6BU
+/*! Tamperproof current QP release (5.9.8) and date (2017-09-15) */
+#define QP_RELEASE      0x9A206E79U
 
 
 /****************************************************************************/
@@ -590,15 +590,15 @@ typedef struct {
     uint_fast8_t prio;
 
     /*! offset to where next event will be inserted into the buffer */
-    uint_fast8_t volatile head;
+    uint_fast8_t head;
 
     /*! offset of where next event will be extracted from the buffer */
-    uint_fast8_t volatile tail;
+    uint_fast8_t tail;
 
     /*! number of events currently present in the queue
     * (events in the ring buffer + 1 event in the state machine)
     */
-    uint_fast8_t volatile nUsed;
+    uint_fast8_t nUsed;
 
 } QActive;
 
@@ -631,6 +631,12 @@ typedef struct {
 /*! protected "constructor" of an QActive active object. */
 void QActive_ctor(QActive * const me, QStateHandler initial);
 
+
+/*! special value of margin that causes asserting failure in case
+* event posting fails.
+*/
+#define QF_NO_MARGIN ((uint_fast8_t)0xFF)
+
 #if (Q_PARAM_SIZE != 0)
     /*! Polymorphically posts an event to an active object (FIFO)
     * with delivery guarantee (task context).
@@ -652,7 +658,7 @@ void QActive_ctor(QActive * const me, QStateHandler initial);
     #define QACTIVE_POST(me_, sig_, par_) \
         ((void)(*((QActiveVtbl const *)( \
             QF_ACTIVE_CAST((me_))->super.vptr))->post)( \
-                QF_ACTIVE_CAST((me_)), (uint_fast8_t)0, \
+                QF_ACTIVE_CAST((me_)), QF_NO_MARGIN, \
                 (enum_t)(sig_), (QParam)(par_)))
 
     /*! Polymorphically posts an event to an active object (FIFO)
@@ -665,12 +671,15 @@ void QActive_ctor(QActive * const me, QStateHandler initial);
     *
     * @param[in,out] me_     pointer (see @ref oop)
     * @param[in]     margin_ the minimum free slots in the queue, which
-    *                        must still be available after posting the event
+    *                must still be available after posting the event.
+    *                The special value #QF_NO_MARGIN causes asserting failure
+    *                in case event allocation fails.
     * @param[in]     sig_    signal of the event to post
     * @param[in]     par_    parameter of the event to post.
     *
-    * @returns 'true' if the posting succeeded, and 'false' if the posting
-    * failed due to insufficient margin of free slots available in the queue.
+    * @returns
+    * 'true' if the posting succeeded, and 'false' if the posting failed
+    * due to insufficient margin of free slots available in the queue.
     *
     * @usage
     * @include qfn_postx.c
@@ -700,7 +709,7 @@ void QActive_ctor(QActive * const me, QStateHandler initial);
     #define QACTIVE_POST_ISR(me_, sig_, par_) \
         ((void)(*((QActiveVtbl const *)( \
             QF_ACTIVE_CAST((me_))->super.vptr))->postISR)( \
-                QF_ACTIVE_CAST((me_)), (uint_fast8_t)0, \
+                QF_ACTIVE_CAST((me_)), QF_NO_MARGIN, \
                 (enum_t)(sig_), (QParam)(par_)))
 
     /*! Polymorphically posts an event to an active object (FIFO)
@@ -713,12 +722,15 @@ void QActive_ctor(QActive * const me, QStateHandler initial);
     *
     * @param[in,out] me_     pointer (see @ref oop)
     * @param[in]     margin_ the minimum free slots in the queue, which
-    *                        must still be available after posting the event
+    *                must still be available after posting the event.
+    *                The special value #QF_NO_MARGIN causes asserting failure
+    *                in case event allocation fails.
     * @param[in]     sig_    signal of the event to post
     * @param[in]     par_    parameter of the event to post.
     *
-    * @returns 'true' if the posting succeeded, and 'false' if the posting
-    * failed due to insufficient margin of free slots available in the queue.
+    * @returns
+    * 'true' if the posting succeeded, and 'false' if the posting failed
+    * due to insufficient margin of free slots available in the queue.
     *
     * @usage
     * @include qfn_postx.c
