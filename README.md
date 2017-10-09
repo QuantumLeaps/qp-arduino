@@ -34,7 +34,7 @@ to install using Homebrew (must have Homebrew installed):
 
   > ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   > brew tap osx-cross/avr
-  > brew install avr-libc
+  > brew install avr-gcc
   > brew install avrdude --with-usb
 
 2. Install Arduino for Mac OS X by placing the Arduino application in the
@@ -82,7 +82,7 @@ a QM model, which is a file with the extension .qm., such as
 modeling tool take Arduino programming to the next level. Instead of
 coding the state machines by hand, you draw them with the free QM
 modeling tool, attach simple action code to states and transitions, and
-you generate the complete Arduino sketch automatically-—literally by a
+you generate the complete Arduino sketch automatically-â€”literally by a
 press of a button.
 
 
