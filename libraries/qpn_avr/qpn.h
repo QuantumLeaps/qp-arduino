@@ -3,14 +3,14 @@
 * @brief QP-nano public interface adapted for Arduino
 * @cond
 ******************************************************************************
-* Last updated for version 5.9.8
-* Last updated on  2017-09-20
+* Last updated for version 6.2.0
+* Last updated on  2018-04-09
 *
 *                    Q u a n t u m     L e a P s
 *                    ---------------------------
 *                    innovating embedded systems
 *
-* Copyright (C) Quantum Leaps, www.state-machine.com.
+* Copyright (C) 2005-2018 Quantum Leaps, www.state-machine.com.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -31,7 +31,7 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://state-machine.com
+* https://www.state-machine.com
 * mailto:info@state-machine.com
 ******************************************************************************
 * @endcond
@@ -109,16 +109,16 @@ extern "C" {
 * major version number, Y is a 1-digit minor version number, and Z is
 * a 1-digit release number.
 */
-#define QP_VERSION      598
+#define QP_VERSION      620
 
 /*! The current QP version number string of the form X.Y.Z, where X is
 * a 1-digit major version number, Y is a 1-digit minor version number,
 * and Z is a 1-digit release number.
 */
-#define QP_VERSION_STR  "5.9.8"
+#define QP_VERSION_STR  "6.2.0"
 
-/*! Tamperproof current QP release (5.9.8) and date (2017-09-15) */
-#define QP_RELEASE      0x9A206E79U
+/*! Tamperproof current QP release (6.2.0) and date (2018-03-16) */
+#define QP_RELEASE      0x9485F3D3U
 
 
 /****************************************************************************/
@@ -518,7 +518,7 @@ extern char_t const Q_ROM QP_versionStr[6];
 #if (QF_TIMEEVT_CTR_SIZE == 0)
     /* no time events */
 #elif (QF_TIMEEVT_CTR_SIZE == 1)
-    typedef uint_fast8_t QTimeEvtCtr;
+    typedef uint8_t QTimeEvtCtr;
 #elif (QF_TIMEEVT_CTR_SIZE == 2)
     /*! type of the Time Event counter, which determines the dynamic
     * range of the time delays measured in clock ticks.
@@ -529,13 +529,13 @@ extern char_t const Q_ROM QP_versionStr[6];
     * #QF_TIMEEVT_CTR_SIZE. The other possible values of this type are
     * as follows: @n
     * none when (QF_TIMEEVT_CTR_SIZE not defined or == 0), @n
-    * uint_fast8_t  when (QF_TIMEEVT_CTR_SIZE == 1); @n
-    * uint_fast16_t when (QF_TIMEEVT_CTR_SIZE == 2); and @n
-    * uint_fast32_t when (QF_TIMEEVT_CTR_SIZE == 4).
+    * uint8_t  when (QF_TIMEEVT_CTR_SIZE == 1); @n
+    * uint16_t when (QF_TIMEEVT_CTR_SIZE == 2); and @n
+    * uint32_t when (QF_TIMEEVT_CTR_SIZE == 4).
     */
-    typedef uint_fast16_t QTimeEvtCtr;
+    typedef uint16_t QTimeEvtCtr;
 #elif (QF_TIMEEVT_CTR_SIZE == 4)
-    typedef uint_fast32_t QTimeEvtCtr;
+    typedef uint32_t QTimeEvtCtr;
 #else
     #error "QF_TIMER_SIZE defined incorrectly, expected 1, 2, or 4"
 #endif
@@ -578,7 +578,7 @@ extern char_t const Q_ROM QP_versionStr[6];
 * the __first__ member of the derived struct.
 * @include qfn_qactive.c
 */
-typedef struct {
+typedef struct QActive {
     QHsm super; /**< derives from the ::QHsm base class */
 
 #if (QF_TIMEEVT_CTR_SIZE != 0)
@@ -587,18 +587,18 @@ typedef struct {
 #endif /* (QF_TIMEEVT_CTR_SIZE != 0) */
 
     /*! priority of the active object (1..8) */
-    uint_fast8_t prio;
+    uint8_t prio;
 
     /*! offset to where next event will be inserted into the buffer */
-    uint_fast8_t head;
+    uint8_t volatile head;
 
     /*! offset of where next event will be extracted from the buffer */
-    uint_fast8_t tail;
+    uint8_t volatile tail;
 
     /*! number of events currently present in the queue
     * (events in the ring buffer + 1 event in the state machine)
     */
-    uint_fast8_t nUsed;
+    uint8_t volatile nUsed;
 
 } QActive;
 
@@ -955,6 +955,12 @@ void QV_onIdle(void);
     #define Q_ALLEGE_ID(id_, test_)     ((void)(test_))
     #define Q_ERROR()                   ((void)0)
     #define Q_ERROR_ID(id_)             ((void)0)
+    #define Q_REQUIRE(test_)            ((void)0)
+    #define Q_REQUIRE_ID(id_, test_)    ((void)0)
+    #define Q_ENSURE(test_)             ((void)0)
+    #define Q_ENSURE_ID(id_, test_)     ((void)0)
+    #define Q_INVARIANT(test_)          ((void)0)
+    #define Q_INVARIANT_ID(id_, test_)  ((void)0)
 
 #else  /* Q_NASSERT not defined--assertion checking enabled */
 
