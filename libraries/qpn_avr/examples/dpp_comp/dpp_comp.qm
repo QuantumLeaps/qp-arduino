@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.1.2" links="0">
+<model version="4.4.0" links="0">
  <documentation>This is the Dining Philosopher Problem (DPP) example for the Arduino-UNO board. In this implemetnation, the Philosophers (Philos) are not active objects, but rather state-machine &quot;Orthogonal Components&quot; of the Table active object.
 
 The example demonstrates:
@@ -104,7 +104,7 @@ for (n = 0U; n &lt; N_PHILO; ++n) {
      <tran trig="EAT">
       <action>Q_ERROR();</action>
       <tran_glyph conn="2,16,3,-1,14">
-       <action box="0,-2,13,4"/>
+       <action box="0,-2,13,5"/>
       </tran_glyph>
      </tran>
      <tran trig="TICK">
@@ -120,7 +120,7 @@ for (n = 0U; n &lt; N_PHILO; ++n) { // for all &quot;Philo&quot; components...
     }
 }</action>
       <tran_glyph conn="2,22,3,-1,14">
-       <action box="0,-2,12,2"/>
+       <action box="0,-2,13,3"/>
       </tran_glyph>
      </tran>
      <state name="serving">
@@ -229,23 +229,23 @@ if ((me-&gt;isHungry[m] != 0U) &amp;&amp; (me-&gt;fork[n] == FREE)) {
       <tran trig="EAT">
        <action>Q_ERROR();</action>
        <tran_glyph conn="4,44,3,-1,15">
-        <action box="0,-2,12,4"/>
+        <action box="0,-2,12,5"/>
        </tran_glyph>
       </tran>
       <tran trig="PAUSE" target="../../3">
-       <tran_glyph conn="4,48,3,1,36,6,-2">
+       <tran_glyph conn="4,48,3,1,36,10,-2">
         <action box="0,-2,7,2"/>
        </tran_glyph>
       </tran>
       <state_glyph node="4,26,34,24">
-       <entry box="1,2,27,2"/>
+       <entry box="1,2,28,3"/>
       </state_glyph>
      </state>
      <state name="paused">
       <entry>BSP_displayPaused(1U);</entry>
       <exit>BSP_displayPaused(0U);</exit>
       <tran trig="SERVE" target="../../2">
-       <tran_glyph conn="4,64,3,1,38,-20,-4">
+       <tran_glyph conn="4,68,3,1,38,-24,-4">
         <action box="0,-2,7,2"/>
        </tran_glyph>
       </tran>
@@ -257,7 +257,7 @@ BSP_displayPhilStat(n, &quot;hungry  &quot;);
 /* philo ID must be in range and he must be not hungry */
 Q_ASSERT((n &lt; N_PHILO) &amp;&amp; (me-&gt;isHungry[n] == 0U));
 me-&gt;isHungry[n] = 1U;</action>
-       <tran_glyph conn="4,67,3,-1,15">
+       <tran_glyph conn="4,71,3,-1,15">
         <action box="0,-2,10,2"/>
        </tran_glyph>
       </tran>
@@ -275,18 +275,18 @@ Q_ASSERT((me-&gt;fork[n] == USED) &amp;&amp; (me-&gt;fork[m] == USED));
 
 me-&gt;fork[m] = FREE;
 me-&gt;fork[n] = FREE;</action>
-       <tran_glyph conn="4,70,3,-1,15">
+       <tran_glyph conn="4,74,3,-1,15">
         <action box="0,-2,6,2"/>
        </tran_glyph>
       </tran>
-      <state_glyph node="4,52,34,20">
-       <entry box="1,2,18,4"/>
-       <exit box="1,6,18,4"/>
+      <state_glyph node="4,54,34,22">
+       <entry box="1,2,19,5"/>
+       <exit box="1,7,18,5"/>
       </state_glyph>
      </state>
-     <state_glyph node="2,6,42,68"/>
+     <state_glyph node="2,6,42,72"/>
     </state>
-    <state_diagram size="50,76"/>
+    <state_diagram size="50,80"/>
    </statechart>
   </class>
   <operation name="Table_ctor" type="void" visibility="0x00" properties="0x01">
@@ -454,11 +454,11 @@ void QV_onIdle(void) {   // called with interrupts DISABLED
 //............................................................................
 void Q_onAssert(char const Q_ROM * const module, int line) {
     // implement the error-handling policy for your application!!!
-    //Serial.print(F(&quot;Assert: &quot;));
+    Serial.print(F(&quot;ASSERT:&quot;));
     Serial.print(reinterpret_cast&lt;const __FlashStringHelper *&gt;(module));
     Serial.println(line, DEC);
-    delay(200);
-
+    delay(500);
+    for (;;) {}
     QF_INT_DISABLE(); // disable all interrupts
     QF_RESET();  // reset the CPU
 }

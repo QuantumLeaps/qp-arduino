@@ -2,7 +2,7 @@ QP-nano FRAMEWORK EXCEPTION FOR ARDUINO
 
 Version 1.1, 22 June 2016
 
-Copyright (c) Quantum Leaps, LLC. <http://state-machine.com/>
+Copyright (c) 2016 Quantum Leaps, LLC. <https://www.state-machine.com/>
 
 Everyone is permitted to copy and distribute verbatim copies of this
 license document, but changing it is not allowed.
@@ -20,10 +20,10 @@ programs to use, in this way, the QP-nano Framework code covered
 by this Exception.
 
 0. Definitions.
-"QP-nano Framework for Arduino" is a lightweight state machine
-framework as well as supporting build scripts and examples, as
-distributed in the QP-nano framework adaptation for Arduino at
-<https://sourceforge.net/projects/qpc/files/QP-nano_Arduino/>.
+"QP-nano Framework for Arduino" is a lightweight real-time framework,
+as well as all supporting ports and examples, as distributed from:
+<https://sourceforge.net/projects/qpc/files> and
+<https://github.com/QuantumLeaps>
 
 "Arduino-Certified Board" means any board with an Arduino-supported
 CPU that bears an official Arduino logo and/or is officially

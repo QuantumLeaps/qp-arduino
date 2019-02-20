@@ -1,14 +1,14 @@
 @echo off
 :: ===========================================================================
 :: Product: Batch script for uploading Arduino sketches
-:: Last updated for: Arduino 1.6.x
-:: Date of the Last Update: 2016-08-14
+:: Last updated for: Arduino 1.8.8
+:: Date of the Last Update: 2019-02-19
 ::
-::                    Q u a n t u m     L e a P s
-::                    ---------------------------
-::                    innovating embedded systems
+::                    Q u a n t u m  L e a P s
+::                    ------------------------
+::                    Modern Embedded Software
 ::
-:: Copyright (C) Quantum Leaps, LLC. All rights reserved.
+:: Copyright (C) 2005-2019  Quantum Leaps, LLC. All rights reserved.
 ::
 :: This program is open source software: you can redistribute it and/or
 :: modify it under the terms of the GNU General Public License as published
@@ -24,7 +24,7 @@
 :: along with this program. If not, see <http://www.gnu.org/licenses/>.
 ::
 :: Contact information:
-:: http://sourceforge.net/p/qpc/discussion/668726
+:: https://sourceforge.net/p/qpc/discussion/668726
 :: ===========================================================================
 
 setlocal

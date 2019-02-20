@@ -3,14 +3,14 @@
 * @brief QP-nano public interface adapted for Arduino
 * @cond
 ******************************************************************************
-* Last updated for version 6.3.0
-* Last updated on  2018-05-10
+* Last updated for version 6.4.0
+* Last updated on  2019-02-19
 *
-*                    Q u a n t u m     L e a P s
-*                    ---------------------------
-*                    innovating embedded systems
+*                    Q u a n t u m  L e a P s
+*                    ------------------------
+*                    Modern Embedded Software
 *
-* Copyright (C) 2005-2018 Quantum Leaps, www.state-machine.com.
+* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -109,16 +109,16 @@ extern "C" {
 * major version number, Y is a 1-digit minor version number, and Z is
 * a 1-digit release number.
 */
-#define QP_VERSION      630
+#define QP_VERSION      640U
 
 /*! The current QP version number string of the form X.Y.Z, where X is
 * a 1-digit major version number, Y is a 1-digit minor version number,
 * and Z is a 1-digit release number.
 */
-#define QP_VERSION_STR  "6.3.0"
+#define QP_VERSION_STR  "6.4.0"
 
-/*! Tamperproof current QP release (6.3.0) and date (2018-05-10) */
-#define QP_RELEASE      0x946859A9U
+/*! Tamperproof current QP release (6.4.0) and date (2019-02-10) */
+#define QP_RELEASE      0x8EA03F5FU
 
 
 /****************************************************************************/
@@ -268,7 +268,10 @@ struct QHsmVtbl {
 * events to it:
 * @include qepn_qhsm_use.c
 */
-#define QHSM_INIT(me_) ((*(me_)->vptr->init)((me_)))
+#define QHSM_INIT(me_) do {      \
+    Q_ASSERT((me_)->vptr);       \
+    (*(me_)->vptr->init)((me_)); \
+} while (0)
 
 /*! Polymorphically dispatches an event to a HSM. */
 /**
@@ -498,11 +501,6 @@ extern char_t const Q_ROM QP_versionStr[6];
 
 /*! get the current QP-nano version number string of the form "X.Y.Z" */
 #define QP_getVersion() (QP_versionStr)
-
-
-/****************************************************************************/
-/*! Helper macro to calculate static dimension of a 1-dim array @a array_ */
-#define Q_DIM(array_) (sizeof(array_) / sizeof((array_)[0]))
 
 
 /*##########################################################################*/
@@ -916,6 +914,7 @@ extern uint8_t const Q_ROM QF_invPow2Lkup[9];
 */
 #define QV_COOPERATIVE  1
 
+/****************************************************************************/
 /*! Ready set of QV-nano. */
 extern uint_fast8_t volatile QV_readySet_;
 
@@ -947,6 +946,7 @@ void QV_onIdle(void);
 
 #ifdef Q_NASSERT /* Q_NASSERT defined--assertion checking disabled */
 
+    /* provide dummy (empty) definitions that don't generate any code... */
     #define Q_DEFINE_THIS_FILE
     #define Q_DEFINE_THIS_MODULE(name_)
     #define Q_ASSERT(test_)             ((void)0)
@@ -955,12 +955,6 @@ void QV_onIdle(void);
     #define Q_ALLEGE_ID(id_, test_)     ((void)(test_))
     #define Q_ERROR()                   ((void)0)
     #define Q_ERROR_ID(id_)             ((void)0)
-    #define Q_REQUIRE(test_)            ((void)0)
-    #define Q_REQUIRE_ID(id_, test_)    ((void)0)
-    #define Q_ENSURE(test_)             ((void)0)
-    #define Q_ENSURE_ID(id_, test_)     ((void)0)
-    #define Q_INVARIANT(test_)          ((void)0)
-    #define Q_INVARIANT_ID(id_, test_)  ((void)0)
 
 #else  /* Q_NASSERT not defined--assertion checking enabled */
 
@@ -1189,7 +1183,7 @@ void Q_onAssert(char_t const Q_ROM * const module, int_t location);
 */
 #define Q_INVARIANT_ID(id_, test_) Q_ASSERT_ID((id_), (test_))
 
-/*! Compile-time assertion. */
+/*! Static (compile-time) assertion. */
 /**
 * @description
 * This type of assertion deliberately causes a compile-time error when
@@ -1199,11 +1193,16 @@ void Q_onAssert(char_t const Q_ROM * const module, int_t location);
 *
 * @param[in] test_ Compile-time Boolean expression
 */
-#define Q_ASSERT_COMPILE(test_) \
-    extern int_t Q_assert_compile[(test_) ? 1 : -1]
+#define Q_ASSERT_STATIC(test_) \
+    extern int_t Q_assert_static[(test_) ? 1 : -1]
+
+#define Q_ASSERT_COMPILE(test_) Q_ASSERT_STATIC(test_)
+
+/*! Helper macro to calculate static dimension of a 1-dim @p array_ */
+#define Q_DIM(array_) (sizeof(array_) / sizeof((array_)[0]))
 
 
-/****************************************************************************/
+/*##########################################################################*/
 /****************************************************************************/
 /* QP API compatibility layer */
 #ifndef QP_API_VERSION

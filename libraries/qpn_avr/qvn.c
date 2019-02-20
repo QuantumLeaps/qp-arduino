@@ -1,6 +1,6 @@
 /**
 * @file
-* @brief QV-nano implementation (adapted for Arduino).
+* @brief QV-nano implementation.
 * @ingroup qvn
 * @cond
 ******************************************************************************
@@ -45,10 +45,6 @@ Q_DEFINE_THIS_MODULE("qvn")
 #ifndef qvn_h
     #error "Source file included in a project NOT based on the QV-nano kernel"
 #endif /* qvn_h */
-
-#if (!defined(QV_COOPERATIVE)) || defined(QK_PREEMPTIVE)
-    #error "The cooperative QV kernel is not configured properly"
-#endif
 
 /****************************************************************************/
 /**

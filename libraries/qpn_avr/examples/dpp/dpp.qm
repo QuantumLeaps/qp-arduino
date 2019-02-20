@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.1.2" links="0">
+<model version="4.4.0" links="0">
  <documentation>This is the Dining Philosopher Problem (DPP) example for the Arduino-UNO board. The example demonstrates:
 
 1. Multiple active objects (5 Philosophers and 1 Table AO)
@@ -363,11 +363,11 @@ ISR(TIMER2_COMPA_vect) {
         switch (Serial.read()) { // read the incoming byte
             case 'p':
             case 'P':
-                QACTIVE_POST_ISR(&amp;AO_Table.super, PAUSE_SIG, 0U);
+                QACTIVE_POST_ISR(&amp;AO_Table, PAUSE_SIG, 0U);
                 break;
             case 's':
             case 'S':
-                QACTIVE_POST_ISR(&amp;AO_Table.super, SERVE_SIG, 0U);
+                QACTIVE_POST_ISR(&amp;AO_Table, SERVE_SIG, 0U);
                 break;
         }
     }
@@ -397,6 +397,11 @@ void QV_onIdle(void) {   // called with interrupts DISABLED
 //............................................................................
 void Q_onAssert(char const Q_ROM * const file, int line) {
     // implement the error-handling policy for your application!!!
+    Serial.print(F(&quot;ASSERTION:&quot;));
+    Serial.print(file);
+    Serial.print(line, DEC);
+    for (uint32_t volatile i = 100000; i &gt; 0; --i) {
+    }
     QF_INT_DISABLE(); // disable all interrupts
     QF_RESET();  // reset the CPU
 }
