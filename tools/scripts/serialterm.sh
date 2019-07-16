@@ -1,1 +1,0 @@
-osascript -e 'tell application "Terminal" to do script "screen $BOARD_COM 9600"' 
