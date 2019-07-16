@@ -3,8 +3,8 @@
 * @brief QP-nano public interface adapted for Arduino
 * @cond
 ******************************************************************************
-* Last updated for version 6.4.0
-* Last updated on  2019-02-19
+* Last updated for version 6.5.0
+* Last updated on  2019-03-28
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -105,20 +105,20 @@ extern "C" {
 /* #include "qepn.h" */  /* QEP-nano platform-independent public interface */
 
 /****************************************************************************/
-/*! The current QP version as a decimal constant XYZ, where X is a 1-digit
+/*! The current QP version as a decimal constant XXYZ, where XX is a 2-digit
 * major version number, Y is a 1-digit minor version number, and Z is
 * a 1-digit release number.
 */
-#define QP_VERSION      640U
+#define QP_VERSION      650U
 
-/*! The current QP version number string of the form X.Y.Z, where X is
-* a 1-digit major version number, Y is a 1-digit minor version number,
+/*! The current QP version number string of the form XX.Y.Z, where XX is
+* a 2-digit major version number, Y is a 1-digit minor version number,
 * and Z is a 1-digit release number.
 */
-#define QP_VERSION_STR  "6.4.0"
+#define QP_VERSION_STR  "6.5.0"
 
-/*! Tamperproof current QP release (6.4.0) and date (2019-02-10) */
-#define QP_RELEASE      0x8EA03F5FU
+/*! Tamperproof current QP release (6.5.0) and date (2019-03-31) */
+#define QP_RELEASE      0x8E8DC8C5U
 
 
 /****************************************************************************/
@@ -497,7 +497,7 @@ enum {
 
 /****************************************************************************/
 /*! the current QP version number string in ROM, based on QP_VERSION_STR */
-extern char_t const Q_ROM QP_versionStr[6];
+extern char_t const Q_ROM QP_versionStr[7];
 
 /*! get the current QP-nano version number string of the form "X.Y.Z" */
 #define QP_getVersion() (QP_versionStr)

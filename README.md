@@ -114,4 +114,4 @@ https://www.state-machine.com/doc/AN_Event-Driven_Arduino_QP-nano.pdf
 Support Questions
 =================
 Please submit any questions or comments to the free QP support forum at:
-http://sourceforge.net/p/qpc/discussion/668726
+https://sourceforge.net/p/qpc/discussion/668726
