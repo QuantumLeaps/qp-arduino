@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.4.0" links="0">
+<model version="4.5.1" links="0">
  <documentation>This is the Dining Philosopher Problem (DPP) example for the Arduino-UNO board. The example demonstrates:
 
 1. Multiple active objects (5 Philosophers and 1 Table AO)
@@ -9,7 +9,7 @@
  <framework name="qpn"/>
  <package name="AOs" stereotype="0x02">
   <class name="Philo" superclass="qpn::QActive">
-   <statechart>
+   <statechart properties="0x01">
     <initial target="../1">
      <initial_glyph conn="2,3,5,1,20,5,-4">
       <action box="0,-2,6,2"/>
@@ -77,7 +77,7 @@ QACTIVE_POST(QF_ACTIVE_CAST(&amp;AO_Table), DONE_SIG, me-&gt;super.prio);</exit>
   <class name="Table" superclass="qpn::QActive">
    <attribute name="fork[N_PHILO]" type="uint8_t" visibility="0x02" properties="0x00"/>
    <attribute name="isHungry[N_PHILO]" type="uint8_t" visibility="0x02" properties="0x00"/>
-   <statechart>
+   <statechart properties="0x01">
     <initial target="../1/1">
      <action>uint8_t n;
 for (n = 0U; n &lt; N_PHILO; ++n) {
