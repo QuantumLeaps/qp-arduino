@@ -19,13 +19,17 @@ dialog box. Once you identify the `<Sketchbook>` folder, you simply unzip
 the whole `qp-<ver>_arduino-1.8.x.zip` archive to this folder.
 
 ----
-# Provided Libraries
+# Provided Libraries and Tools
 
 The archive `qp-<ver>_arduino-1.8.x.zip` contains two external libraries
 for Arduino:
 
 - `qpcpp_sam` -- QP/C++ framework for SAM-based Arduinos
 - `qpn_avr`   -- QP-nano framework for AVR-based Arduinos
+
+The archive also contains the QM modeling tool for Windows
+
+- `qm`        -- QM modeling tool for Windows 32/64-bit
 
 After the installation, your Arduino `<Sketchbook>` folder should look
 as follows:
@@ -58,10 +62,22 @@ as follows:
      | | | +-qpn.h            - QP-nano library header file
      | | | +-...              - QP-nano library sources
      | | +-library.properties - QP-nano library properties
+     | |
+     | +-qm/                  - QM modeling tool for Windows
+     | | +-bin/               - QM binaries (executable and DLLs)
+     | | | +-qm.exe           - QM executable for Windows
+     | | +-Resources/         - QM resources
+     | | | +-...
      |
      +-README.md              - this file
      +-QP-Arduino-Playground  - web link to QP on Arduino Playground
      +-QP-Arduino_GPL_Exception.txt - GPL exception for QP on Arduino
+
+
+NOTE: The QP-Arduino archive contains QM for Windows only. But QM is also
+available for Linux and MacOS hosts. If you wish to work on those operating
+systems, you will need to install QM separately, as described at:
+https://www.state-machine.com/qm/gs.html 
 
 
 ----

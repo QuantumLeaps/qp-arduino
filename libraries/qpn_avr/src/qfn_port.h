@@ -1,10 +1,10 @@
 /**
 * @file
-* @brief QF-nano port AVR ATmega, cooperative QV-nano kernel, GNU-AVR toolset
+* @brief QF-nano port Arduino-AVR, cooperative QV-nano kernel, GNU-AVR toolset
 * @cond
 ******************************************************************************
-* Last Updated for Version: 6.5.1
-* Date of the Last Update:  2019-07-16
+* Last Updated for Version: 6.6.0
+* Date of the Last Update:  2019-11-09
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -31,14 +31,15 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 *
 * Contact information:
-* https://www.state-machine.com
-* mailto:info@state-machine.com
+* <www.state-machine.com>
+* <info@state-machine.com>
 ******************************************************************************
 * @endcond
 */
-#ifndef qfn_port_h
-#define qfn_port_h
+#ifndef QFN_PORT_H
+#define QFN_PORT_H
 
+/* GNU-AVR PROGMEM utilities for compatiblity with GNU-AVR C++ */
 #define Q_ROM                PROGMEM
 #define Q_ROM_BYTE(rom_var_) pgm_read_byte_near(&(rom_var_))
 #define Q_ROM_PTR(rom_var_)  pgm_read_word_near(&(rom_var_))
@@ -70,9 +71,7 @@
 /* QF CPU reset for AVR */
 #define QF_RESET()       __asm__ __volatile__ ("jmp 0x0000" ::)
 
-#include <avr/pgmspace.h>    /* accessing data in program memory (PROGMEM) */
-#include <avr/interrupt.h>   /* AVR interrupt support */
-#include <avr/io.h>          /* SREG/SMCR definitions */
+#include "Arduino.h"     /* Main include file for the Arduino SDK */
 
 #include <stdint.h>      /* Exact-width types. WG14/N843 C99 Standard */
 #include <stdbool.h>     /* Boolean type.      WG14/N843 C99 Standard */
@@ -93,4 +92,4 @@
 * instructins. You should NEVER separate these two lines.
 */
 
-#endif /* qfn_port_h */
+#endif /* QFN_PORT_H */

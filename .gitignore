@@ -36,6 +36,7 @@ lint*.txt
 JLink*.*
 version-*
 
+qm/
 eclipse/
 test/
 test_ports/

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.5.1" links="0">
+<model version="4.6.0" links="0">
  <documentation>This is the Blinky example for the Arduino-UNO board, which blinks the on-board LED (L) once per second. The example demonstrates:
 
 1. One active object class &quot;Blinky&quot; (inside the package &quot;AOs&quot;)
@@ -43,12 +43,11 @@
  </package>
  <directory name=".">
   <file name="blinky.ino">
-   <text>#include &quot;qpn.h&quot;     // QP-nano framework
-#include &quot;Arduino.h&quot; // Arduino API
+   <text>#include &quot;qpn.h&quot;     // QP-nano framework for Arduino
 
 //============================================================================
 // declare all AO classes...
-$declare(AOs::Blinky)
+$declare${AOs::Blinky}
 //...
 
 // AO instances and event queue buffers for them...
@@ -123,7 +122,7 @@ void Q_onAssert(char const Q_ROM * const file, int line) {
 
 //============================================================================
 // define all AO classes (state machine)...
-$define(AOs::Blinky)
+$define${AOs::Blinky}
 //...
 </text>
   </file>

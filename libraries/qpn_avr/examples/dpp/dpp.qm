@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.5.1" links="0">
+<model version="4.6.0" links="0">
  <documentation>This is the Dining Philosopher Problem (DPP) example for the Arduino-UNO board. The example demonstrates:
 
 1. Multiple active objects (5 Philosophers and 1 Table AO)
@@ -246,8 +246,7 @@ me-&gt;fork[n] = FREE;</action>
  </package>
  <directory name=".">
   <file name="dpp.ino">
-   <text>#include &quot;qpn.h&quot;     // QP-nano framework
-#include &quot;Arduino.h&quot; // Arduino API
+   <text>#include &quot;qpn.h&quot; // QP-nano framework for Arduino
 
 Q_DEFINE_THIS_MODULE(&quot;dpp&quot;)
 
@@ -267,8 +266,8 @@ enum {
 
 //============================================================================
 // declare all AO classes...
-$declare(AOs::Philo)
-$declare(AOs::Table)
+$declare${AOs::Philo}
+$declare${AOs::Table}
 //...
 
 // define all AO instances and event queue buffers for them...
@@ -408,7 +407,7 @@ void Q_onAssert(char const Q_ROM * const file, int line) {
 
 //============================================================================
 // define all AO classes...
-$define(AOs::Philo)
+$define${AOs::Philo}
 
 static inline uint8_t RIGHT(uint8_t n) {
     return (n + (N_PHILO - 1)) % N_PHILO;
@@ -421,7 +420,7 @@ enum {
     USED = 1
 };
 
-$define(AOs::Table)
+$define${AOs::Table}
 //...
 </text>
   </file>
