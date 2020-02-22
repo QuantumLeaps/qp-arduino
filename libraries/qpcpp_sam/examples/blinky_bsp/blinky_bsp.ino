@@ -16,9 +16,9 @@
 // for more details.
 //
 //.$endhead${.::blinky_bsp.ino} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#include "qpcpp.h"   // QP-C++ framework
-#include "blinky.h"  // Blinky application interface
-#include "bsp.h"     // Board Support Package (BSP)
+#include "qpcpp.hpp"   // QP-C++ framework
+#include "blinky.hpp"  // Blinky application interface
+#include "bsp.hpp"     // Board Support Package (BSP)
 
 using namespace QP;
 

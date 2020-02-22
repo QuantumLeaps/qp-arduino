@@ -16,8 +16,7 @@
 // for more details.
 //
 //.$endhead${.::blinky.ino} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#include "qpcpp.h"   // QP-C++ framework
-#include "Arduino.h" // Arduino API
+#include "qpcpp.hpp"  // QP-C++ framework
 
 using namespace QP;
 

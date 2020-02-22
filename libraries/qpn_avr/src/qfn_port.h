@@ -1,10 +1,10 @@
 /**
 * @file
-* @brief QF-nano port Arduino-AVR, cooperative QV-nano kernel, GNU-AVR toolset
+* @brief QF-nano port AVR ATmega, QV-nano kernel, GNU-AVR toolset, Arduino
 * @cond
 ******************************************************************************
-* Last Updated for Version: 6.6.0
-* Date of the Last Update:  2019-11-09
+* Last Updated for Version: 6.7.0
+* Date of the Last Update:  2020-02-22
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -28,10 +28,10 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program. If not, see <http://www.gnu.org/licenses/>.
+* along with this program. If not, see <www.gnu.org/licenses>.
 *
 * Contact information:
-* <www.state-machine.com>
+* <www.state-machine.com/licensing>
 * <info@state-machine.com>
 ******************************************************************************
 * @endcond

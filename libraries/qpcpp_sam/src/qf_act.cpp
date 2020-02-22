@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -28,23 +28,32 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"       // QF package-scope interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qf_pkg.hpp"       // QF package-scope interface
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
+
+//****************************************************************************
+/// @description
+/// macro to encapsulate pointer increment, which violates MISRA-C:2004
+/// required rule 17.4 (pointer arithmetic used).
+///
+/// @param[in]  p_  pointer to be incremented.
+///
+#define QF_PTR_INC_(p_) (++(p_))
 
 namespace QP {
 
@@ -67,7 +76,7 @@ QActive *QF::active_[QF_MAX_ACTIVE + 1]; // to be used by QF ports only
 /// @sa QP::QF::remove_()
 ///
 void QF::add_(QActive * const a) {
-    uint_fast8_t p = static_cast<uint_fast8_t>(a->m_prio);
+    uint_fast8_t const p = static_cast<uint_fast8_t>(a->m_prio);
 
     Q_REQUIRE_ID(100, (static_cast<uint_fast8_t>(0) < p)
                       && (p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
@@ -92,7 +101,7 @@ void QF::add_(QActive * const a) {
 /// @sa QP::QF::add_()
 ///
 void QF::remove_(QActive * const a) {
-    uint_fast8_t p = static_cast<uint_fast8_t>(a->m_prio);
+    uint_fast8_t const p = static_cast<uint_fast8_t>(a->m_prio);
 
     Q_REQUIRE_ID(200, (static_cast<uint_fast8_t>(0) < p)
                       && (p <= static_cast<uint_fast8_t>(QF_MAX_ACTIVE))
@@ -107,15 +116,6 @@ void QF::remove_(QActive * const a) {
 
 //****************************************************************************
 /// @description
-/// macro to encapsulate pointer increment, which violates MISRA-C:2004
-/// required rule 17.4 (pointer arithmetic used).
-///
-/// @param[in]  p_  pointer to be incremented.
-///
-#define QF_PTR_INC_(p_) (++(p_))
-
-//****************************************************************************
-/// @description
 /// Clears a memory buffer by writing zeros byte-by-byte.
 ///
 /// @param[in] start  pointer to the beginning of a memory buffer.
@@ -127,12 +127,11 @@ void QF::remove_(QActive * const a) {
 /// Microchip MPLAB), which does not zero the uninitialized variables, as
 /// required by the ANSI C standard.
 ///
-void QF::bzero(void * const start, uint_fast16_t len) {
+void QF::bzero(void * const start, uint_fast16_t const len) {
     uint8_t *ptr = static_cast<uint8_t *>(start);
-    while (len != static_cast<uint_fast16_t>(0)) {
+    for (uint_fast16_t n = len; n > static_cast<uint_fast16_t>(0); --n) {
         *ptr = static_cast<uint8_t>(0);
         QF_PTR_INC_(ptr);
-        --len;
     }
 }
 

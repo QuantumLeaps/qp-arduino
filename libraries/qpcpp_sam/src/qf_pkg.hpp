@@ -3,14 +3,14 @@
 /// @brief Internal (package scope) QF/C++ interface.
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.7
-/// Last updated on  2018-11-07
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-23
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -28,16 +28,16 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#ifndef qf_pkg_h
-#define qf_pkg_h
+#ifndef QF_PKG_HPP
+#define QF_PKG_HPP
 
 //! helper macro to cast const away from an event pointer @p e_
 #define QF_EVT_CONST_CAST_(e_) const_cast<QEvt *>(e_)
@@ -158,6 +158,8 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) {
     --(QF_EVT_CONST_CAST_(e))->refCtr_;
 }
 
+} // namespace QP
+
 //! macro to test that a pointer @p x_ is in range between @p min_ and @p max_
 /// @description
 /// This macro is specifically and exclusively used for checking the range
@@ -166,9 +168,6 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) {
 /// ???. Defining a specific macro for this purpose allows to selectively
 /// disable the warnings for this particular case.
 #define QF_PTR_RANGE_(x_, min_, max_)  (((min_) <= (x_)) && ((x_) <= (max_)))
-
-} // namespace QP
-
 
 //! access element at index @p i_ from the base pointer @p base_
 #define QF_PTR_AT_(base_, i_) (base_[i_])
@@ -181,11 +180,11 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) {
         //! Internal QS macro to output an unformatted event queue
         //! counter data element
         /// @note the counter size depends on the macro #QF_EQUEUE_CTR_SIZE.
-        #define QS_EQC_(ctr_)       QS::u8_(static_cast<uint8_t>(ctr_))
+        #define QS_EQC_PRE_(ctr_)       QS::u8_raw_(static_cast<uint8_t>(ctr_))
     #elif (QF_EQUEUE_CTR_SIZE == 2)
-        #define QS_EQC_(ctr_)       QS::u16_(static_cast<uint16_t>(ctr_))
+        #define QS_EQC_PRE_(ctr_)       QS::u16_raw_(static_cast<uint16_t>(ctr_))
     #elif (QF_EQUEUE_CTR_SIZE == 4)
-        #define QS_EQC_(ctr_)       QS::u32_(static_cast<uint32_t>(ctr_))
+        #define QS_EQC_PRE_(ctr_)       QS::u32_raw_(static_cast<uint32_t>(ctr_))
     #else
         #error "QF_EQUEUE_CTR_SIZE not defined"
     #endif
@@ -196,11 +195,11 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) {
         //! Internal QS macro to output an unformatted event size
         //! data element
         /// @note the event size depends on the macro #QF_EVENT_SIZ_SIZE.
-        #define QS_EVS_(size_)      QS::u8_(static_cast<uint8_t>(size_))
+        #define QS_EVS_PRE_(size_)      QS::u8_raw_(static_cast<uint8_t>(size_))
     #elif (QF_EVENT_SIZ_SIZE == 2)
-        #define QS_EVS_(size_)      QS::u16_(static_cast<uint16_t>(size_))
+        #define QS_EVS_PRE_(size_)      QS::u16_raw_(static_cast<uint16_t>(size_))
     #elif (QF_EVENT_SIZ_SIZE == 4)
-        #define QS_EVS_(size_)      QS::u32_(static_cast<uint32_t>(size_))
+        #define QS_EVS_PRE_(size_)      QS::u32_raw_(static_cast<uint32_t>(size_))
     #endif
 
 
@@ -209,11 +208,11 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) {
         //! Internal QS macro to output an unformatted memory pool
         /// block-size data element
         /// @note the block-size depends on the macro #QF_MPOOL_SIZ_SIZE.
-        #define QS_MPS_(size_)      QS::u8_(static_cast<uint8_t>(size_))
+        #define QS_MPS_PRE_(size_)  QS::u8_raw_(static_cast<uint8_t>(size_))
     #elif (QF_MPOOL_SIZ_SIZE == 2)
-        #define QS_MPS_(size_)      QS::u16_(static_cast<uint16_t>(size_))
+        #define QS_MPS_PRE_(size_)  QS::u16_raw_(static_cast<uint16_t>(size_))
     #elif (QF_MPOOL_SIZ_SIZE == 4)
-        #define QS_MPS_(size_)      QS::u32_(static_cast<uint32_t>(size_))
+        #define QS_MPS_PRE_(size_)  QS::u32_raw_(static_cast<uint32_t>(size_))
     #endif
 
     #if (QF_MPOOL_CTR_SIZE == 1)
@@ -221,11 +220,11 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) {
         //! Internal QS macro to output an unformatted memory pool
         //! block-counter data element
         /// @note the counter size depends on the macro #QF_MPOOL_CTR_SIZE.
-        #define QS_MPC_(ctr_)       QS::u8_(static_cast<uint8_t>(ctr_))
+        #define QS_MPC_PRE_(ctr_)       QS::u8_raw_(static_cast<uint8_t>(ctr_))
     #elif (QF_MPOOL_CTR_SIZE == 2)
-        #define QS_MPC_(ctr_)       QS::u16_(static_cast<uint16_t>(ctr_))
+        #define QS_MPC_PRE_(ctr_)       QS::u16_raw_(static_cast<uint16_t>(ctr_))
     #elif (QF_MPOOL_CTR_SIZE == 4)
-        #define QS_MPC_(ctr_)       QS::u32_(static_cast<uint32_t>(ctr_))
+        #define QS_MPC_PRE_(ctr_)       QS::u32_raw_(static_cast<uint32_t>(ctr_))
     #endif
 
 
@@ -234,13 +233,13 @@ inline void QF_EVT_REF_CTR_DEC_(QEvt const * const e) {
         //! Internal QS macro to output an unformatted time event
         //! tick-counter data element
         /// @note the counter size depends on the macro #QF_TIMEEVT_CTR_SIZE.
-        #define QS_TEC_(ctr_)       QS::u8_(static_cast<uint8_t>(ctr_))
+        #define QS_TEC_PRE_(ctr_)       QS::u8_raw_(static_cast<uint8_t>(ctr_))
     #elif (QF_TIMEEVT_CTR_SIZE == 2)
-        #define QS_TEC_(ctr_)       QS::u16_(static_cast<uint16_t>(ctr_))
+        #define QS_TEC_PRE_(ctr_)       QS::u16_raw_(static_cast<uint16_t>(ctr_))
     #elif (QF_TIMEEVT_CTR_SIZE == 4)
-        #define QS_TEC_(ctr_)       QS::u32_(static_cast<uint32_t>(ctr_))
+        #define QS_TEC_PRE_(ctr_)       QS::u32_raw_(static_cast<uint32_t>(ctr_))
     #endif
 
 #endif  // Q_SPY
 
-#endif  // qf_pkg_h
+#endif  // QF_PKG_HPP

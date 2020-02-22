@@ -4,8 +4,8 @@
 * @ingroup qepn
 * @cond
 ******************************************************************************
-* Last updated for version 6.6.0
-* Last updated on  2019-10-14
+* Last updated for version 6.7.0
+* Last updated on  2019-12-28
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
@@ -32,7 +32,7 @@
 * along with this program. If not, see <www.gnu.org/licenses>.
 *
 * Contact information:
-* <www.state-machine.com>
+* <www.state-machine.com/licensing>
 * <info@state-machine.com>
 ******************************************************************************
 * @endcond
@@ -45,16 +45,16 @@
 * major version number, Y is a 1-digit minor version number, and Z is
 * a 1-digit release number.
 */
-#define QP_VERSION      660U
+#define QP_VERSION      670U
 
 /*! The current QP version number string of the form XX.Y.Z, where XX is
 * a 2-digit major version number, Y is a 1-digit minor version number,
 * and Z is a 1-digit release number.
 */
-#define QP_VERSION_STR  "6.6.0"
+#define QP_VERSION_STR  "6.7.0"
 
-/*! Encrypted current QP release (6.6.0) and date (2019-10-31) */
-#define QP_RELEASE      0x8E22F8FBU
+/*! Encrypted current QP release (6.7.0) and date (2019-12-30) */
+#define QP_RELEASE      0x8E049B81U
 
 
 /****************************************************************************/
@@ -210,7 +210,7 @@ struct QHsmVtable {
 #define QHSM_INIT(me_) do {      \
     Q_ASSERT((me_)->vptr);       \
     (*(me_)->vptr->init)((me_)); \
-} while (0)
+} while (false)
 
 /*! Polymorphically dispatches an event to a HSM. */
 /**

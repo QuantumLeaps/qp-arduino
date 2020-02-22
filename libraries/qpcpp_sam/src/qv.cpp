@@ -4,8 +4,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.4.0
-/// Last updated on  2019-02-10
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-28
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -29,28 +29,28 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"       // QF package-scope internal interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qf_pkg.hpp"       // QF package-scope internal interface
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
 // protection against including this source file in a wrong project
-#ifndef qv_h
+#ifndef QV_HPP
     #error "Source file included in a project NOT based on the QV kernel"
-#endif // qv_h
+#endif // QV_HPP
 
 namespace QP {
 
@@ -135,16 +135,16 @@ int_t QF::run(void) {
 
         // find the maximum priority AO ready to run
         if (QV_readySet_.notEmpty()) {
-            uint_fast8_t p = QV_readySet_.findMax();
-            QActive *a = active_[p];
+            uint_fast8_t const p = QV_readySet_.findMax();
+            QActive * const a = active_[p];
 
 #ifdef Q_SPY
-            QS_BEGIN_NOCRIT_(QS_SCHED_NEXT,
+            QS_BEGIN_NOCRIT_PRE_(QS_SCHED_NEXT,
                              QS::priv_.locFilter[QS::AO_OBJ], a)
-                QS_TIME_(); // timestamp
-                QS_2U8_(static_cast<uint8_t>(p), // prio of the scheduled AO
+                QS_TIME_PRE_(); // timestamp
+                QS_2U8_PRE_(static_cast<uint8_t>(p), // prio of the scheduled AO
                         static_cast<uint8_t>(pprev)); // previous priority
-            QS_END_NOCRIT_()
+            QS_END_NOCRIT_PRE_()
 
             pprev = p; // update previous priority
 #endif // Q_SPY
@@ -157,24 +157,24 @@ int_t QF::run(void) {
             // 2. dispatch the event to the AO's state machine.
             // 3. determine if event is garbage and collect it if so
             //
-            QEvt const *e = a->get_();
+            QEvt const * const e = a->get_();
             a->dispatch(e);
             gc(e);
 
             QF_INT_DISABLE();
 
             if (a->m_eQueue.isEmpty()) { // empty queue?
-                QV_readySet_.remove(p);
+                QV_readySet_.rmove(p);
             }
         }
         else { // no AO ready to run --> idle
 #ifdef Q_SPY
             if (pprev != static_cast<uint_fast8_t>(0)) {
-                QS_BEGIN_NOCRIT_(QS_SCHED_IDLE,
+                QS_BEGIN_NOCRIT_PRE_(QS_SCHED_IDLE,
                     static_cast<void *>(0), static_cast<void *>(0))
-                    QS_TIME_();                          // timestamp
-                    QS_U8_(static_cast<uint8_t>(pprev)); // previous prio
-                QS_END_NOCRIT_()
+                    QS_TIME_PRE_();                          // timestamp
+                    QS_U8_PRE_(static_cast<uint8_t>(pprev)); // previous prio
+                QS_END_NOCRIT_PRE_()
 
                 pprev = static_cast<uint_fast8_t>(0); // update previous prio
             }
@@ -206,7 +206,7 @@ int_t QF::run(void) {
 /// @param[in] qLen    length of the event queue (in events)
 /// @param[in] stkSto  pointer to the stack storage (must be NULL in QV)
 /// @param[in] stkSize stack size [bytes]
-/// @param[in] ie      pointer to the optional initial event (might be NULL).
+// @param[in] par     pointer to an extra parameter (might be NULL)
 ///
 /// @note This function should be called via the macro START().
 ///
@@ -215,10 +215,12 @@ int_t QF::run(void) {
 /// @include qf_start.cpp
 ///
 void QActive::start(uint_fast8_t const prio,
-                     QEvt const *qSto[], uint_fast16_t const qLen,
-                     void * const stkSto, uint_fast16_t const,
-                     QEvt const * const ie)
+                    QEvt const * * const qSto, uint_fast16_t const qLen,
+                    void * const stkSto, uint_fast16_t const stkSize,
+                    void const * const par)
 {
+    (void)stkSize; // unused paramteter in the QV port
+
     /// @pre the priority must be in range and the stack storage must not
     /// be provided, because the QV kernel does not need per-AO stacks.
     ///
@@ -231,8 +233,8 @@ void QActive::start(uint_fast8_t const prio,
 
     QF::add_(this); // make QF aware of this AO
 
-    this->init(ie); // take the top-most initial tran. (virtual call)
-    QS_FLUSH();     // flush the trace buffer to the host
+    this->init(par); // take the top-most initial tran. (virtual call)
+    QS_FLUSH(); // flush the trace buffer to the host
 }
 
 } // namespace QP

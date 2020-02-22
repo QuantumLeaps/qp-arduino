@@ -16,10 +16,9 @@
 // for more details.
 //
 //.$endhead${.::bsp.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#include "qpcpp.h"   // QP-C++ framework
-#include "dpp.h"     // DPP application
-#include "bsp.h"     // Board Support Package
-#include "Arduino.h" // Arduino facilities
+#include "qpcpp.hpp"   // QP-C++ framework
+#include "dpp.hpp"     // DPP application
+#include "bsp.hpp"     // Board Support Package
 
 using namespace QP;
 

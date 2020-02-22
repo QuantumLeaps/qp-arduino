@@ -67,8 +67,7 @@ This structure of the code is approprate only for very small applications. More 
  </package>
  <directory name=".">
   <file name="blinky.ino">
-   <text>#include &quot;qpcpp.h&quot;   // QP-C++ framework
-#include &quot;Arduino.h&quot; // Arduino API
+   <text>#include &quot;qpcpp.hpp&quot;  // QP-C++ framework
 
 using namespace QP;
 

@@ -1,9 +1,10 @@
 /// @file
-/// @brief QP::QActive::QActive() definition
+/// @brief QP/C++ public interface including backwards-compatibility layer
+/// @ingroup qep qf qv qk qxk qs
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.6.0
-/// Last updated on  2019-07-30
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -35,26 +36,38 @@
 ///***************************************************************************
 /// @endcond
 
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.hpp"    // QF port
+#ifndef qpcpp_h
+#define qpcpp_h
 
-namespace QP {
+/// @description
+/// This header file must be included directly or indirectly
+/// in all application modules (*.cpp files) that use QP/C++.
 
-//****************************************************************************
-QActive::QActive(QStateHandler const initial)
-  : QHsm(initial),
-    m_prio(static_cast<uint8_t>(0))
-{
-    m_state.fun = Q_STATE_CAST(&QHsm::top);
+#ifndef QP_API_VERSION
 
-#ifdef QF_OS_OBJECT_TYPE
-    QF::bzero(&m_osObject, static_cast<uint_fast16_t>(sizeof(m_osObject)));
+//! Macro that specifies the backwards compatibility with the
+//! QP/C++ API version.
+/// @description
+/// For example, QP_API_VERSION=540 will cause generating the compatibility
+/// layer with QP/C++ version 5.4.0 and newer, but not older than 5.4.0.
+/// QP_API_VERSION=0 causes generation of the compatibility layer "from the
+/// begining of time", which is the maximum backwards compatibilty. This is
+/// the default.@n
+/// @n
+/// Conversely, QP_API_VERSION=9999 means that no compatibility layer should
+/// be generated. This setting is useful for checking if an application
+/// complies with the latest QP/C++ API.
+#define QP_API_VERSION 0
+
+#endif  // QP_API_VERSION
+
+#include "qf_port.hpp"      // QF/C++ port from the port directory
+#include "qassert.h"        // QP assertions
+#ifdef Q_SPY                // software tracing enabled?
+    #include "qs_port.hpp"  // QS/C++ port from the port directory
+#else
+    #include "qs_dummy.hpp" // QS/C++ dummy (inactive) interface
 #endif
 
-#ifdef QF_THREAD_TYPE
-    QF::bzero(&m_thread, static_cast<uint_fast16_t>(sizeof(m_thread)));
-#endif
-}
-
-} // namespace QP
+#endif // qpcpp_h
 

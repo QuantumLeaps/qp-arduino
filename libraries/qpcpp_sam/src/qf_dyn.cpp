@@ -2,14 +2,14 @@
 /// @brief QF/C++ dynamic event management
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-04
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-27
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -27,22 +27,22 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"       // QF package-scope interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qf_pkg.hpp"       // QF package-scope interface
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
 namespace QP {
@@ -51,7 +51,7 @@ Q_DEFINE_THIS_MODULE("qf_dyn")
 
 // Package-scope objects *****************************************************
 QF_EPOOL_TYPE_ QF_pool_[QF_MAX_EPOOL]; // allocate the event pools
-uint_fast8_t QF_maxPool_;              // number of initialized event pools
+uint_fast8_t QF_maxPool_; // number of initialized event pools
 
 //****************************************************************************
 /// @description
@@ -86,11 +86,15 @@ void QF::poolInit(void * const poolSto,
     /// @pre cannot exceed the number of available memory pools
     Q_REQUIRE_ID(200, QF_maxPool_
                       < static_cast<uint_fast8_t>(Q_DIM(QF_pool_)));
+
+    uint_fast16_t const lastEvtSize = /* last initialized event size */
+        ((QF_maxPool_ == static_cast<uint_fast8_t>(0))
+         ? static_cast<uint_fast16_t>(0)
+         : QF_EPOOL_EVENT_SIZE_(
+            QF_pool_[QF_maxPool_ - static_cast<uint_fast8_t>(1)]));
     /// @pre please initialize event pools in ascending order of evtSize
     Q_REQUIRE_ID(201, (QF_maxPool_ == static_cast<uint_fast8_t>(0))
-        || (QF_EPOOL_EVENT_SIZE_(
-               QF_pool_[QF_maxPool_ - static_cast<uint_fast8_t>(1)])
-            < evtSize));
+        || (lastEvtSize < evtSize));
 
     QF_EPOOL_INIT_(QF_pool_[QF_maxPool_], poolSto, poolSize, evtSize);
     ++QF_maxPool_; // one more pool
@@ -100,8 +104,8 @@ void QF::poolInit(void * const poolSto,
     char_t obj_name[9] = "EvtPool?";
     obj_name[7] = static_cast<char_t>(
         static_cast<int8_t>('0') + static_cast<int8_t>(QF_maxPool_));
-    QS::obj_dict(&QF_pool_[QF_maxPool_ - static_cast<uint_fast8_t>(1)],
-                 &obj_name[0]);
+    QS::obj_dict_pre_(&QF_pool_[QF_maxPool_ - static_cast<uint_fast8_t>(1)],
+                      &obj_name[0]);
 #endif // Q_SPY
 }
 
@@ -146,11 +150,11 @@ QEvt *QF::newX_(uint_fast16_t const evtSize,
     Q_ASSERT_ID(310, idx < QF_maxPool_);
 
     QS_CRIT_STAT_
-    QS_BEGIN_(QS_QF_NEW, static_cast<void *>(0), static_cast<void *>(0))
-        QS_TIME_();                              // timestamp
-        QS_EVS_(static_cast<QEvtSize>(evtSize)); // the size of the event
-        QS_SIG_(static_cast<QSignal>(sig));      // the signal of the event
-    QS_END_()
+    QS_BEGIN_PRE_(QS_QF_NEW, static_cast<void *>(0), static_cast<void *>(0))
+        QS_TIME_PRE_();                              // timestamp
+        QS_EVS_PRE_(static_cast<QEvtSize>(evtSize)); // the size of the event
+        QS_SIG_PRE_(static_cast<QSignal>(sig));      // the signal of the event
+    QS_END_PRE_()
 
     // get e -- platform-dependent
     QEvt *e;
@@ -160,7 +164,7 @@ QEvt *QF::newX_(uint_fast16_t const evtSize,
                       : static_cast<uint_fast16_t>(0)));
 
     // was e allocated correctly?
-    if (e != static_cast<QEvt const *>(0)) {
+    if (e != static_cast<QEvt *>(0)) {
         e->sig     = static_cast<QSignal>(sig); // set the signal
         // store pool ID
         e->poolId_ = static_cast<uint8_t>(
@@ -207,12 +211,12 @@ void QF::gc(QEvt const * const e) {
         // isn't this the last reference?
         if (e->refCtr_ > static_cast<uint8_t>(1)) {
 
-            QS_BEGIN_NOCRIT_(QS_QF_GC_ATTEMPT,
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC_ATTEMPT,
                              static_cast<void *>(0), static_cast<void *>(0))
-                QS_TIME_();        // timestamp
-                QS_SIG_(e->sig);   // the signal of the event
-                QS_2U8_(e->poolId_, e->refCtr_);// pool Id & refCtr of the evt
-            QS_END_NOCRIT_()
+                QS_TIME_PRE_();        // timestamp
+                QS_SIG_PRE_(e->sig);   // the signal of the event
+                QS_2U8_PRE_(e->poolId_, e->refCtr_);// pool Id & refCtr of the evt
+            QS_END_NOCRIT_PRE_()
 
             QF_EVT_REF_CTR_DEC_(e); // decrement the ref counter
 
@@ -220,15 +224,15 @@ void QF::gc(QEvt const * const e) {
         }
         // this is the last reference to this event, recycle it
         else {
-            uint_fast8_t idx = static_cast<uint_fast8_t>(e->poolId_)
+            uint_fast8_t const idx = static_cast<uint_fast8_t>(e->poolId_)
                                - static_cast<uint_fast8_t>(1);
 
-            QS_BEGIN_NOCRIT_(QS_QF_GC,
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_GC,
                              static_cast<void *>(0), static_cast<void *>(0))
-                QS_TIME_();        // timestamp
-                QS_SIG_(e->sig);   // the signal of the event
-                QS_2U8_(e->poolId_, e->refCtr_);// pool Id & refCtr of the evt
-            QS_END_NOCRIT_()
+                QS_TIME_PRE_();        // timestamp
+                QS_SIG_PRE_(e->sig);   // the signal of the event
+                QS_2U8_PRE_(e->poolId_, e->refCtr_);// pool Id & refCtr of the evt
+            QS_END_NOCRIT_PRE_()
 
             QF_CRIT_EXIT_();
 
@@ -266,19 +270,19 @@ QEvt const *QF::newRef_(QEvt const * const e, QEvt const * const evtRef) {
     //! must not be already in use
     Q_REQUIRE_ID(500,
         (e->poolId_ != static_cast<uint8_t>(0))
-        && (evtRef == static_cast<QEvt const *>(0)));
+        && (evtRef == static_cast<QEvt *>(0)));
 
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
     QF_EVT_REF_CTR_INC_(e); // increments the ref counter
 
-    QS_BEGIN_NOCRIT_(QS_QF_NEW_REF,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_NEW_REF,
                      static_cast<void *>(0), static_cast<void *>(0))
-        QS_TIME_();      // timestamp
-        QS_SIG_(e->sig); // the signal of the event
-        QS_2U8_(e->poolId_, e->refCtr_); // pool Id & ref Count
-    QS_END_NOCRIT_()
+        QS_TIME_PRE_();      // timestamp
+        QS_SIG_PRE_(e->sig); // the signal of the event
+        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & ref Count
+    QS_END_NOCRIT_PRE_()
 
     QF_CRIT_EXIT_();
 
@@ -298,12 +302,12 @@ QEvt const *QF::newRef_(QEvt const * const e, QEvt const * const evtRef) {
 void QF::deleteRef_(QEvt const * const evtRef) {
     QS_CRIT_STAT_
 
-    QS_BEGIN_(QS_QF_DELETE_REF,
+    QS_BEGIN_PRE_(QS_QF_DELETE_REF,
               static_cast<void *>(0), static_cast<void *>(0))
-        QS_TIME_();           // timestamp
-        QS_SIG_(evtRef->sig); // the signal of the event
-        QS_2U8_(evtRef->poolId_, evtRef->refCtr_); // pool Id & ref Count
-    QS_END_()
+        QS_TIME_PRE_();           // timestamp
+        QS_SIG_PRE_(evtRef->sig); // the signal of the event
+        QS_2U8_PRE_(evtRef->poolId_, evtRef->refCtr_); // pool Id & ref Count
+    QS_END_PRE_()
 
     gc(evtRef); // recycle the referenced event
 }

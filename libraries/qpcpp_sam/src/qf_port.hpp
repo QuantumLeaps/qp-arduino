@@ -1,15 +1,15 @@
 /// @file
-/// @brief QF/C++ port to ARM Cortex-M, cooperative QV kernel, GNU-ARM toolset
+/// @brief QF/C++ port to ARM Cortex-M, QV kernel, GNU-ARM toolset, Arduino
 /// @cond
 ///***************************************************************************
-/// Last Updated for Version: 6.3.8
-/// Date of the Last Update:  2019-01-11
+/// Last updated for version 6.7.0
+/// Last updated on  2020-02-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -27,16 +27,16 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#ifndef qf_port_h
-#define qf_port_h
+#ifndef QF_PORT_HPP
+#define QF_PORT_HPP
 
 // The maximum number of system clock tick rates
 #define QF_MAX_TICK_RATE        2
@@ -96,15 +96,16 @@
 
 #define QF_CRIT_EXIT_NOP()      __asm volatile ("isb")
 
-#include "qep_port.h" // QEP port
+#include "qep_port.hpp" // QEP port
 
 #if (__ARM_ARCH == 6) // Cortex-M0/M0+/M1(v6-M, v6S-M)?
     // hand-optimized quick LOG2 in assembly
     extern "C" uint_fast8_t QF_qlog2(uint32_t x);
 #endif // Cortex-M0/M0+/M1(v6-M, v6S-M)
 
-#include "qv_port.h"  // QV port
-#include "qf.h"       // QF platform-independent public interface
+#include "qv_port.hpp"  // QV port
+#include "qf.hpp"       // QF platform-independent public interface
+#include "Arduino.h"    // Main include file for the Arduino SDK
 
 //****************************************************************************
 // NOTE1:
@@ -150,5 +151,5 @@
 // macro. This workaround works also for Cortex-M3/M4 cores.
 //
 
-#endif // qf_port_h
+#endif // QF_PORT_HPP
 

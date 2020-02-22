@@ -3,14 +3,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-04
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -28,16 +28,16 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#ifndef qequeue_h
-#define qequeue_h
+#ifndef QEQUEUE_HPP
+#define QEQUEUE_HPP
 
 /// @description
 /// This header file must be included in all QF ports that use native QF
@@ -54,7 +54,7 @@
     //! native QF event queue implementation. Valid values: 1, 2, or 4;
     //! default 1.
     /// @description
-    /// This macro can be defined in the QF port file (qf_port.h) to
+    /// This macro can be defined in the QF port file (qf_port.hpp) to
     /// configure the QP::QEQueueCtr type. Here the macro is not defined
     /// so the default of 1 byte is chosen.
     #define QF_EQUEUE_CTR_SIZE 1
@@ -250,7 +250,7 @@ public:
     ///
     /// @sa QP::QMActive::defer(), QP::QMActive::recall()
     bool isEmpty(void) const {
-        return m_frontEvt == static_cast<QEvt const *>(0);
+        return m_frontEvt == static_cast<QEvt *>(0);
     }
 
 private:
@@ -271,5 +271,5 @@ private:
 
 } // namespace QP
 
-#endif // qequeue_h
+#endif // QEQUEUE_HPP
 

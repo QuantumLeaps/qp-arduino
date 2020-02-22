@@ -2,14 +2,14 @@
 /// @brief QS/C++ port to ARM Cortex-M, generic compiler
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.0.3
-/// Last updated on  2017-12-09
+/// Last updated for version 6.6.0
+/// Last updated on  2019-07-30
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -27,16 +27,16 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#ifndef qs_port_h
-#define qs_port_h
+#ifndef QS_PORT_HPP
+#define QS_PORT_HPP
 
 // QS time-stamp size in bytes
 #define QS_TIME_SIZE        4
@@ -51,9 +51,9 @@
 // NOTE: QS might be used with or without other QP components, in which case
 // the separate definitions of the macros QF_CRIT_STAT_TYPE, QF_CRIT_ENTRY,
 // and QF_CRIT_EXIT are needed. In this port QS is configured to be used with
-// the other QP component, by simply including "qf_port.h" *before* "qs.h".
+// the other QP component, by simply including "qf_port.hpp" *before* "qs.hpp".
 //
-#include "qf_port.h" // use QS with QF
-#include "qs.h"      // QS platform-independent public interface
+#include "qf_port.hpp" // use QS with QF
+#include "qs.hpp"      // QS platform-independent public interface
 
-#endif // qs_port_h
+#endif // QS_PORT_HPP

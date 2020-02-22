@@ -2,14 +2,14 @@
 /// @brief QF/C++ memory management services
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.6
-/// Last updated on  2018-10-04
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-22
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2018 Quantum Leaps, LLC. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -27,22 +27,22 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"       // QF package-scope interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qf_pkg.hpp"       // QF package-scope interface
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
 
@@ -185,12 +185,12 @@ void QMPool::put(void * const b) {
     m_free_head = b; // set as new head of the free list
     ++m_nFree;       // one more free block in this pool
 
-    QS_BEGIN_NOCRIT_(QS_QF_MPOOL_PUT,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_PUT,
                      QS::priv_.locFilter[QS::MP_OBJ], this)
-        QS_TIME_();       // timestamp
-        QS_OBJ_(this);    // this memory pool
-        QS_MPC_(m_nFree); // the number of free blocks in the pool
-    QS_END_NOCRIT_()
+        QS_TIME_PRE_();       // timestamp
+        QS_OBJ_PRE_(this);    // this memory pool
+        QS_MPC_PRE_(m_nFree); // the number of free blocks in the pool
+    QS_END_NOCRIT_PRE_()
 
     QF_CRIT_EXIT_();
 }
@@ -231,7 +231,8 @@ void *QMPool::get(uint_fast16_t const margin) {
         // the pool has some free blocks, so a free block must be available
         Q_ASSERT_CRIT_(310, fb != static_cast<QFreeBlock *>(0));
 
-        void *fb_next = fb->m_next; // put volatile to a temporary to avoid UB
+        // put volatile to a temporary to avoid UB
+        void * const fb_next = fb->m_next;
 
         // is the pool becoming empty?
         --m_nFree;  // one free block less
@@ -257,25 +258,25 @@ void *QMPool::get(uint_fast16_t const margin) {
 
         m_free_head = fb_next; // set the head to the next free block
 
-        QS_BEGIN_NOCRIT_(QS_QF_MPOOL_GET,
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET,
                          QS::priv_.locFilter[QS::MP_OBJ], this)
-            QS_TIME_();        // timestamp
-            QS_OBJ_(this);    // this memory pool
-            QS_MPC_(m_nFree);  // the number of free blocks in the pool
-            QS_MPC_(m_nMin);   // the mninimum # free blocks in the pool
-        QS_END_NOCRIT_()
+            QS_TIME_PRE_();        // timestamp
+            QS_OBJ_PRE_(this);    // this memory pool
+            QS_MPC_PRE_(m_nFree);  // the number of free blocks in the pool
+            QS_MPC_PRE_(m_nMin);   // the mninimum # free blocks in the pool
+        QS_END_NOCRIT_PRE_()
     }
     // don't have enough free blocks at this point
     else {
         fb = static_cast<QFreeBlock *>(0);
 
-        QS_BEGIN_NOCRIT_(QS_QF_MPOOL_GET_ATTEMPT,
+        QS_BEGIN_NOCRIT_PRE_(QS_QF_MPOOL_GET_ATTEMPT,
                          QS::priv_.locFilter[QS::MP_OBJ], m_start)
-            QS_TIME_();        // timestamp
-            QS_OBJ_(m_start);  // the memory managed by this pool
-            QS_MPC_(m_nFree);  // the # free blocks in the pool
-            QS_MPC_(margin);   // the requested margin
-        QS_END_NOCRIT_()
+            QS_TIME_PRE_();        // timestamp
+            QS_OBJ_PRE_(m_start);  // the memory managed by this pool
+            QS_MPC_PRE_(m_nFree);  // the # free blocks in the pool
+            QS_MPC_PRE_(margin);   // the requested margin
+        QS_END_NOCRIT_PRE_()
     }
     QF_CRIT_EXIT_();
 
@@ -298,12 +299,12 @@ void *QMPool::get(uint_fast16_t const margin) {
 uint_fast16_t QF::getPoolMin(uint_fast8_t const poolId) {
 
     /// @pre the poolId must be in range
-    Q_REQUIRE_ID(400, (static_cast<uint_fast8_t>(1) <= poolId)
+    Q_REQUIRE_ID(400, (QF_maxPool_ <= Q_DIM(QF_pool_))
+                       && (static_cast<uint_fast8_t>(1) <= poolId)
                        && (poolId <= QF_maxPool_));
-
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
-    uint_fast16_t min = static_cast<uint_fast16_t>(
+    uint_fast16_t const min = static_cast<uint_fast16_t>(
         QF_pool_[poolId - static_cast<uint_fast8_t>(1)].m_nMin);
     QF_CRIT_EXIT_();
 

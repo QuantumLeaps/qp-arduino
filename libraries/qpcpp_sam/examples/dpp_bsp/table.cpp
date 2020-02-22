@@ -16,9 +16,9 @@
 // for more details.
 //
 //.$endhead${.::table.cpp} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#include "qpcpp.h"
-#include "dpp.h"
-#include "bsp.h"
+#include "qpcpp.hpp"   // QP-C++ framework
+#include "dpp.hpp"     // DPP application
+#include "bsp.hpp"     // Board Support Package
 
 Q_DEFINE_THIS_FILE
 

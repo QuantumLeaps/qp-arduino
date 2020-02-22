@@ -4,14 +4,14 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.3.2
-/// Last updated on  2018-06-16
+/// Last updated for version 6.7.0
+/// Last updated on  2019-12-22
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -29,22 +29,22 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#define QP_IMPL           // this is QP implementation
-#include "qf_port.h"      // QF port
-#include "qf_pkg.h"       // QF package-scope interface
-#include "qassert.h"      // QP embedded systems-friendly assertions
-#ifdef Q_SPY              // QS software tracing enabled?
-    #include "qs_port.h"  // include QS port
+#define QP_IMPL             // this is QP implementation
+#include "qf_port.hpp"      // QF port
+#include "qf_pkg.hpp"       // QF package-scope interface
+#include "qassert.h"        // QP embedded systems-friendly assertions
+#ifdef Q_SPY                // QS software tracing enabled?
+    #include "qs_port.hpp"  // include QS port
 #else
-    #include "qs_dummy.h" // disable the QS software tracing
+    #include "qs_dummy.hpp" // disable the QS software tracing
 #endif // Q_SPY
 
 
@@ -125,13 +125,13 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_PUBLISH,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_PUBLISH,
                      static_cast<void *>(0), static_cast<void *>(0))
-        QS_TIME_();                      // the timestamp
-        QS_OBJ_(sender);                 // the sender object
-        QS_SIG_(e->sig);                 // the signal of the event
-        QS_2U8_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
-    QS_END_NOCRIT_()
+        QS_TIME_PRE_();                      // the timestamp
+        QS_OBJ_PRE_(sender);                 // the sender object
+        QS_SIG_PRE_(e->sig);                 // the signal of the event
+        QS_2U8_PRE_(e->poolId_, e->refCtr_); // pool Id & refCtr of the evt
+    QS_END_NOCRIT_PRE_()
 
     // is it a dynamic event?
     if (e->poolId_ != static_cast<uint8_t>(0)) {
@@ -161,7 +161,7 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
             // POST() asserts internally if the queue overflows
             (void)active_[p]->POST(e, sender);
 
-            subscrList.remove(p); // remove the handled subscriber
+            subscrList.rmove(p); // remove the handled subscriber
             if (subscrList.notEmpty()) {  // still more subscribers?
                 p = subscrList.findMax(); // the highest-prio subscriber
             }
@@ -198,7 +198,7 @@ void QF::publish_(QEvt const * const e, void const * const sender) {
 /// QP::QActive::unsubscribeAll()
 ///
 void QActive::subscribe(enum_t const sig) const {
-    uint_fast8_t p = static_cast<uint_fast8_t>(m_prio);
+    uint_fast8_t const p = static_cast<uint_fast8_t>(m_prio);
     Q_REQUIRE_ID(300, (Q_USER_SIG <= sig)
               && (sig < QF_maxPubSignal_)
               && (static_cast<uint_fast8_t>(0) < p)
@@ -208,12 +208,12 @@ void QActive::subscribe(enum_t const sig) const {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_SUBSCRIBE,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_SUBSCRIBE,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
-        QS_TIME_();    // timestamp
-        QS_SIG_(sig);  // the signal of this event
-        QS_OBJ_(this); // this active object
-    QS_END_NOCRIT_()
+        QS_TIME_PRE_();    // timestamp
+        QS_SIG_PRE_(sig);  // the signal of this event
+        QS_OBJ_PRE_(this); // this active object
+    QS_END_NOCRIT_PRE_()
 
     QF_PTR_AT_(QF_subscrList_, sig).insert(p); // insert into subscriber-list
     QF_CRIT_EXIT_();
@@ -244,7 +244,7 @@ void QActive::subscribe(enum_t const sig) const {
 /// QP::QActive::unsubscribeAll()
 ///
 void QActive::unsubscribe(enum_t const sig) const {
-    uint_fast8_t p = static_cast<uint_fast8_t>(m_prio);
+    uint_fast8_t const p = static_cast<uint_fast8_t>(m_prio);
 
     //! @pre the singal and the prioriy must be in ragne, the AO must also
     // be registered with the framework
@@ -257,14 +257,14 @@ void QActive::unsubscribe(enum_t const sig) const {
     QF_CRIT_STAT_
     QF_CRIT_ENTRY_();
 
-    QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_UNSUBSCRIBE,
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_UNSUBSCRIBE,
                      QS::priv_.locFilter[QS::AO_OBJ], this)
-        QS_TIME_();         // timestamp
-        QS_SIG_(sig);       // the signal of this event
-        QS_OBJ_(this);      // this active object
-    QS_END_NOCRIT_()
+        QS_TIME_PRE_();         // timestamp
+        QS_SIG_PRE_(sig);       // the signal of this event
+        QS_OBJ_PRE_(this);      // this active object
+    QS_END_NOCRIT_PRE_()
 
-    QF_PTR_AT_(QF_subscrList_,sig).remove(p);  // remove from subscriber-list
+    QF_PTR_AT_(QF_subscrList_,sig).rmove(p);  // remove from subscriber-list
 
     QF_CRIT_EXIT_();
 }
@@ -301,14 +301,14 @@ void QActive::unsubscribeAll(void) const {
         QF_CRIT_STAT_
         QF_CRIT_ENTRY_();
         if (QF_PTR_AT_(QF_subscrList_, sig).hasElement(p)) {
-            QF_PTR_AT_(QF_subscrList_, sig).remove(p);
+            QF_PTR_AT_(QF_subscrList_, sig).rmove(p);
 
-            QS_BEGIN_NOCRIT_(QS_QF_ACTIVE_UNSUBSCRIBE,
+            QS_BEGIN_NOCRIT_PRE_(QS_QF_ACTIVE_UNSUBSCRIBE,
                              QS::priv_.locFilter[QS::AO_OBJ], this)
-                QS_TIME_();     // timestamp
-                QS_SIG_(sig);   // the signal of this event
-                QS_OBJ_(this);  // this active object
-            QS_END_NOCRIT_()
+                QS_TIME_PRE_();     // timestamp
+                QS_SIG_PRE_(sig);   // the signal of this event
+                QS_OBJ_PRE_(this);  // this active object
+            QS_END_NOCRIT_PRE_()
 
         }
         QF_CRIT_EXIT_();

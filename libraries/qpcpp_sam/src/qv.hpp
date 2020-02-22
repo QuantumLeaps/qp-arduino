@@ -3,14 +3,14 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.2.0
-/// Last updated on  2018-03-16
+/// Last updated for version 6.6.0
+/// Last updated on  2019-07-30
 ///
-///                    Q u a n t u m     L e a P s
-///                    ---------------------------
-///                    innovating embedded systems
+///                    Q u a n t u m  L e a P s
+///                    ------------------------
+///                    Modern Embedded Software
 ///
-/// Copyright (C) 2002-2018 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2019 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -28,20 +28,20 @@
 /// GNU General Public License for more details.
 ///
 /// You should have received a copy of the GNU General Public License
-/// along with this program. If not, see <http://www.gnu.org/licenses/>.
+/// along with this program. If not, see <www.gnu.org/licenses>.
 ///
 /// Contact information:
-/// https://www.state-machine.com
-/// mailto:info@state-machine.com
+/// <www.state-machine.com/licensing>
+/// <info@state-machine.com>
 ///***************************************************************************
 /// @endcond
 
-#ifndef qv_h
-#define qv_h
+#ifndef QV_HPP
+#define QV_HPP
 
-#include "qequeue.h" // QV kernel uses the native QF event queue
-#include "qmpool.h"  // QV kernel uses the native QF memory pool
-#include "qpset.h"   // QV kernel uses the native QF priority set
+#include "qequeue.hpp" // QV kernel uses the native QF event queue
+#include "qmpool.hpp"  // QV kernel uses the native QF memory pool
+#include "qpset.hpp"   // QV kernel uses the native QF priority set
 
 //****************************************************************************
 // QF configuration for QK
@@ -49,9 +49,9 @@
 //! This macro defines the type of the event queue used for active objects.
 /// @note
 /// This is just an example of the macro definition. Typically, you need
-/// to define it in the specific QF port file (qf_port.h). In case of QK,
+/// to define it in the specific QF port file (qf_port.hpp). In case of QK,
 /// which always depends on the native QF queue, this macro is defined at the
-/// level of the platform-independent interface qv.h.
+/// level of the platform-independent interface qv.hpp.
 #define QF_EQUEUE_TYPE             QEQueue
 
 
@@ -123,5 +123,5 @@ extern "C" {
 
 #endif // QP_IMPL
 
-#endif // qv_h
+#endif // QV_HPP
 

@@ -67,9 +67,9 @@ This structure of the code is recommended for applications with only one active 
   </attribute>
  </package>
  <directory name=".">
-  <file name="bsp.h">
-   <text>#ifndef BSP_H
-#define BSP_H
+  <file name="bsp.hpp">
+   <text>#ifndef BSP_HPP
+#define BSP_HPP
 
 class BSP {
 public:
@@ -79,14 +79,13 @@ public:
     static void ledOn(void);
 };
 
-#endif // BSP_H
+#endif // BSP_HPP
 </text>
   </file>
   <file name="bsp.cpp">
-   <text>#include &quot;qpcpp.h&quot;   // QP-C++ framework
-#include &quot;blinky.h&quot;  // Blinky application interface
-#include &quot;bsp.h&quot;     // Board Support Package (BSP)
-#include &quot;Arduino.h&quot; // Arduino facilities
+   <text>#include &quot;qpcpp.hpp&quot;   // QP-C++ framework
+#include &quot;blinky.hpp&quot;  // Blinky application interface
+#include &quot;bsp.hpp&quot;     // Board Support Package (BSP)
 
 using namespace QP;
 
@@ -178,9 +177,9 @@ extern &quot;C&quot; void Q_onAssert(char const * const module, int loc) {
 
 </text>
   </file>
-  <file name="blinky.h">
-   <text>#ifndef BLINKY_H
-#define BLINKY_H
+  <file name="blinky.hpp">
+   <text>#ifndef BLINKY_HPP
+#define BLINKY_HPP
 
 enum BlinkySignals {
     TIMEOUT_SIG = QP::Q_USER_SIG,
@@ -191,13 +190,13 @@ enum BlinkySignals {
 $declare${AOs::AO_Blinky}
 //...
 
-#endif // BLINKY_H
+#endif // BLINKY_HPP
 </text>
   </file>
   <file name="blinky_bsp.ino">
-   <text>#include &quot;qpcpp.h&quot;   // QP-C++ framework
-#include &quot;blinky.h&quot;  // Blinky application interface
-#include &quot;bsp.h&quot;     // Board Support Package (BSP)
+   <text>#include &quot;qpcpp.hpp&quot;   // QP-C++ framework
+#include &quot;blinky.hpp&quot;  // Blinky application interface
+#include &quot;bsp.hpp&quot;     // Board Support Package (BSP)
 
 using namespace QP;
 
