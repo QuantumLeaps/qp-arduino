@@ -1,13 +1,13 @@
 /*****************************************************************************
 * Product: QP-nano configuration for Arduino-AVR
-* Last updated for version 6.6.0
-* Last updated on  2019-07-30
+* Last updated for version 6.8.0
+* Last updated on  2020-03-08
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -28,15 +28,15 @@
 * along with this program. If not, see <www.gnu.org/licenses>.
 *
 * Contact information:
-* <www.state-machine.com>
+* <www.state-machine.com/licensing>
 * <info@state-machine.com>
 *****************************************************************************/
 #ifndef QPN_CONF_H
 #define QPN_CONF_H
 
-#define Q_PARAM_SIZE            4
-#define QF_MAX_TICK_RATE        1
-#define QF_TIMEEVT_CTR_SIZE     2
+#define Q_PARAM_SIZE            4U
+#define QF_MAX_TICK_RATE        1U
+#define QF_TIMEEVT_CTR_SIZE     2U
 #define QF_TIMEEVT_PERIODIC
 
 #endif  /* QPN_CONF_H */

@@ -3,14 +3,14 @@
 * @brief QF-nano port AVR ATmega, QV-nano kernel, GNU-AVR toolset, Arduino
 * @cond
 ******************************************************************************
-* Last Updated for Version: 6.7.0
-* Date of the Last Update:  2020-02-22
+* Last Updated for Version: 6.8.0
+* Date of the Last Update:  2020-03-22
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
 *                    Modern Embedded Software
 *
-* Copyright (C) 2005-2019 Quantum Leaps, LLC. All rights reserved.
+* Copyright (C) 2005-2020 Quantum Leaps, LLC. All rights reserved.
 *
 * This program is open source software: you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as published
@@ -39,6 +39,9 @@
 #ifndef QFN_PORT_H
 #define QFN_PORT_H
 
+/* GNU-AVR function attribute for "no-return" function */
+#define Q_NORETURN   __attribute__ ((noreturn)) void
+
 /* GNU-AVR PROGMEM utilities for compatiblity with GNU-AVR C++ */
 #define Q_ROM                PROGMEM
 #define Q_ROM_BYTE(rom_var_) pgm_read_byte_near(&(rom_var_))
@@ -51,22 +54,12 @@
 /* QF-nano interrupt disabling policy for interrupt level */
 /*#define QF_ISR_NEST*/  /* nesting of ISRs not allowed */
 
-/* QV sleep mode
-*
-* As described in the "AVR Datasheet" in Section "Reset and Interrupt
-* Handling", when using the SEI instruction to enable interrupts, the
-* instruction following SEI will be executed before any pending interrupts.
-* As the Datasheet shows in the assembly example, the pair of instructions
-*     SEI       ; enable interrupts
-*     SLEEP     ; go to the sleep mode
-* executes ATOMICALLY, and so no interrupt can be serviced between these
-* instructins. You should NEVER separate these two lines.
-*/
+/* QV sleep mode, see NOTE1... */
 #define QV_CPU_SLEEP()          do { \
     __asm__ __volatile__ ("sei" ::); \
     __asm__ __volatile__ ("sleep" ::); \
     SMCR = 0U; \
-} while (0)
+} while (false)
 
 /* QF CPU reset for AVR */
 #define QF_RESET()       __asm__ __volatile__ ("jmp 0x0000" ::)

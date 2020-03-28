@@ -1,9 +1,9 @@
 /// @file
-/// @brief QEP/C++ port to ARM Cortex-M, generic C++ compiler
+/// @brief QEP/C++ port, GCC-ARM compiler
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.7.0
-/// Last updated on  2020-02-22
+/// Last updated for version 6.8.0
+/// Last updated on  2020-01-21
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -38,8 +38,11 @@
 #ifndef QEP_PORT_HPP
 #define QEP_PORT_HPP
 
-#include <cstdint>     // Exact-width types. WG14/N843 C99 Standard
+//! no-return function specifier (GCC-ARM compiler)
+#define Q_NORETURN   __attribute__ ((noreturn)) void
 
-#include "qep.hpp"     // QEP platform-independent public interface
+#include <cstdint>  // Exact-width types. C++11 Standard
+
+#include "qep.hpp"  // QEP platform-independent public interface
 
 #endif // QEP_PORT_HPP

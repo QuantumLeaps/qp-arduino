@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="4.6.0" links="0">
+<model version="5.0.0" links="0">
  <documentation>This is the Dining Philosopher Problem (DPP) example for the Arduino-UNO board. The example demonstrates:
 
 1. Multiple active objects (5 Philosophers and 1 Table AO)
@@ -394,15 +394,17 @@ void QV_onIdle(void) {   // called with interrupts DISABLED
     QV_CPU_SLEEP();  // atomically go to sleep and enable interrupts
 }
 //............................................................................
-void Q_onAssert(char const Q_ROM * const file, int line) {
+Q_NORETURN Q_onAssert(char const Q_ROM * const module, int location) {
     // implement the error-handling policy for your application!!!
     Serial.print(F(&quot;ASSERTION:&quot;));
-    Serial.print(file);
-    Serial.print(line, DEC);
-    for (uint32_t volatile i = 100000; i &gt; 0; --i) {
+    Serial.print(module);
+    Serial.print(location, DEC);
+    for (uint32_t volatile i = 100000U; i &gt; 0U; --i) {
     }
     QF_INT_DISABLE(); // disable all interrupts
     QF_RESET();  // reset the CPU
+    for (;;) {
+    }
 }
 
 //============================================================================
