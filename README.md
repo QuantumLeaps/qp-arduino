@@ -21,10 +21,14 @@ the whole `qp-<ver>_arduino-1.8.x.zip` archive to this folder.
 ----
 # Provided Libraries and Tools
 
-The archive `qp-<ver>_arduino-1.8.x.zip` contains one external library
+The archive `qp-<ver>_arduino-1.8.x.zip` contains two external libraries
 for SAM-based Arduinos:
 
 - `qpcpp_sam` -- QP/C++ framework for SAM-based Arduinos
+- `qpn_avr`   -- QP-nano framework for AVR-based Arduinos
+                 
+NOTE: qpn_avr is now obsolete. It is provided for backgwards compatibility only!
+ 
 
 The archive also contains the QM modeling tool for Windows
 
@@ -45,6 +49,10 @@ as follows:
      | | | +-qpcpp.h          - QP/C++ library header file
      | | | +-...              - QP/C++ library sources
      | | +-library.properties - QP/C++ library properties
+     | |
+     +-libraries/             - libraries folder
+     | +-qpn_avr/             - QP-nano library for AVR-based Arduinos
+     | | +-...                  (now obsolete, for backgwards compatibility only) 
      | |
      | +-qm/                  - QM modeling tool for Windows
      | | +-bin/               - QM binaries (executable and DLLs)
