@@ -3,8 +3,8 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.1
-/// Last updated on  2020-04-05
+/// Last updated for version 6.9.2
+/// Last updated on  2020-12-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XXYZ, where XX is a 2-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      681U
+#define QP_VERSION      692U
 
 //! The current QP version number string of the form XX.Y.Z, where XX is
 // a 2-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "6.8.1"
+#define QP_VERSION_STR  "6.9.2"
 
-//! Encrypted  current QP release (6.8.1) and date (2020-04-04)
-#define QP_RELEASE      0x888CC416U
+//! Encrypted  current QP release (6.9.2) and date (2021-01-18)
+#define QP_RELEASE      0x82C286EBU
 
 
 //****************************************************************************
@@ -272,16 +272,20 @@ class QHsm {
 
 public:
     //! virtual destructor
-    virtual ~QHsm() noexcept;
+    virtual ~QHsm();
 
     //! executes the top-most initial transition in QP::QHsm
-    virtual void init(void const * const e);
+    virtual void init(void const * const e,
+                      std::uint_fast8_t const qs_id);
 
-    //! overloaded init(void)
-    virtual void init(void) { this->init(nullptr); }
+    //! overloaded init(qs_id)
+    virtual void init(std::uint_fast8_t const qs_id) {
+        this->init(nullptr, qs_id);
+    }
 
     //! Dispatches an event to QHsm
-    virtual void dispatch(QEvt const * const e);
+    virtual void dispatch(QEvt const * const e,
+                          std::uint_fast8_t const qs_id);
 
     //! Tests if a given state is part of the current active state
     //! configuration
@@ -307,43 +311,43 @@ protected:
 public:
 // facilities for the QHsm implementation strategy...
     //! event passed to the superstate to handle
-    static constexpr QState Q_RET_SUPER     {0};
+    static constexpr QState Q_RET_SUPER     {static_cast<QState>(0)};
 
     //! event passed to submachine superstate
-    static constexpr QState Q_RET_SUPER_SUB {1};
+    static constexpr QState Q_RET_SUPER_SUB {static_cast<QState>(1)};
 
     //! event unhandled due to a guard evaluating to 'false'
-    static constexpr QState Q_RET_UNHANDLED {2};
+    static constexpr QState Q_RET_UNHANDLED {static_cast<QState>(2)};
 
     //! event handled (internal transition)
-    static constexpr QState Q_RET_HANDLED   {3};
+    static constexpr QState Q_RET_HANDLED   {static_cast<QState>(3)};
 
     //! event silently ignored (bubbled up to top)
-    static constexpr QState Q_RET_IGNORED   {4};
+    static constexpr QState Q_RET_IGNORED   {static_cast<QState>(4)};
 
     //! state entry action executed
-    static constexpr QState Q_RET_ENTRY     {5};
+    static constexpr QState Q_RET_ENTRY     {static_cast<QState>(5)};
 
     //! state exit  action executed
-    static constexpr QState Q_RET_EXIT      {6};
+    static constexpr QState Q_RET_EXIT      {static_cast<QState>(6)};
 
     //! return value without any effect
-    static constexpr QState Q_RET_NULL      {7};
+    static constexpr QState Q_RET_NULL      {static_cast<QState>(7)};
 
     //! regular transition taken
-    static constexpr QState Q_RET_TRAN      {8};
+    static constexpr QState Q_RET_TRAN      {static_cast<QState>(8)};
 
     //! initial transition taken
-    static constexpr QState Q_RET_TRAN_INIT {9};
+    static constexpr QState Q_RET_TRAN_INIT {static_cast<QState>(9)};
 
     //! entry-point transition into a submachine
-    static constexpr QState Q_RET_TRAN_EP   {10};
+    static constexpr QState Q_RET_TRAN_EP   {static_cast<QState>(10)};
 
     //! transition to history of a given state
-    static constexpr QState Q_RET_TRAN_HIST {11};
+    static constexpr QState Q_RET_TRAN_HIST {static_cast<QState>(11)};
 
     //! exit-point transition out of a submachine
-    static constexpr QState Q_RET_TRAN_XP   {12};
+    static constexpr QState Q_RET_TRAN_XP   {static_cast<QState>(12)};
 
 protected:
     //! Helper function to specify a state transition
@@ -424,6 +428,9 @@ protected:
         m_temp.obj = s;
         return Q_RET_EXIT;
     }
+
+    //! Get the current state handler of the HSM
+    virtual QStateHandler getStateHandler() noexcept;
 #else
     //! Helper function to specify a state entry in a QM state-handler
     QState qm_entry(QMState const * const s) noexcept {
@@ -456,7 +463,8 @@ private:
     static constexpr std::int_fast8_t MAX_NEST_DEPTH_{6};
 
     //! internal helper function to take a transition in QP::QHsm
-    std::int_fast8_t hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_]);
+    std::int_fast8_t hsm_tran(QStateHandler (&path)[MAX_NEST_DEPTH_],
+                              std::uint_fast8_t const qs_id);
 
     friend class QMsm;
     friend class QActive;
@@ -494,11 +502,15 @@ class QMsm : public QHsm {
 public:
     //! Performs the second step of SM initialization by triggering
     /// the top-most initial transition.
-    void init(void const * const e) override;
-    void init(void) override { this->init(nullptr); }
+    void init(void const * const e,
+              std::uint_fast8_t const qs_id) override;
+    void init(std::uint_fast8_t const qs_id) override {
+        this->init(nullptr, qs_id);
+    }
 
     //! Dispatches an event to a HSM
-    void dispatch(QEvt const * const e) override;
+    void dispatch(QEvt const * const e,
+                  std::uint_fast8_t const qs_id) override;
 
     //! Tests if a given state is part of the active state configuration
     bool isInState(QMState const * const st) const noexcept;
@@ -515,32 +527,40 @@ protected:
     //! Protected constructor
     explicit QMsm(QStateHandler const initial) noexcept;
 
+#ifdef Q_SPY
+    //! Get the current state handler of the QMsm
+    QStateHandler getStateHandler() noexcept override;
+#endif
+
 private:
-    //! disallow the inhertited isIn() function in QP::QMsm and subclasses
+    //! disallow inhertited isIn() function in QP::QMsm and subclasses
     //! @sa QP::QMsm::isInState()
     bool isIn(QStateHandler const s) noexcept = delete;
 
-    //! disallow the inhertited state() function in QP::QMsm and subclasses
+    //! disallow inhertited state() function in QP::QMsm and subclasses
     //! @sa QP::QMsm::stateObj()
     QStateHandler state(void) const noexcept = delete;
 
-    //! disallow the inhertited childState() function in QP::QMsm and subclasses
+    //! disallow inhertited childState() function in QP::QMsm and subclasses
     //! @sa QP::QMsm::childStateObj()
     QStateHandler childState(QStateHandler const parent) noexcept = delete;
 
-    //! disallow the inhertited top() function in QP::QMsm and subclasses
+    //! disallow inhertited top() function in QP::QMsm and subclasses
     //! @sa QP::QMsm::msm_top_s
     static QState top(void * const me, QEvt const * const e) noexcept = delete;
 
     //! Internal helper function to execute a transition-action table
-    QState execTatbl_(QMTranActTable const * const tatbl);
+    QState execTatbl_(QMTranActTable const * const tatbl,
+                      std::uint_fast8_t const qs_id);
 
     //! Internal helper function to exit current state to transition source
     void exitToTranSource_(QMState const *s,
-                           QMState const * const ts);
+                           QMState const * const ts,
+                           std::uint_fast8_t const qs_id);
 
     //! Internal helper function to enter state history
-    QState enterHistory_(QMState const * const hist);
+    QState enterHistory_(QMState const * const hist,
+                         std::uint_fast8_t const qs_id);
 
     //! maximum depth of implemented entry levels for transitions to history
     static constexpr std::int_fast8_t MAX_ENTRY_DEPTH_ {4};

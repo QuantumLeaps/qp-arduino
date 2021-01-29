@@ -21,11 +21,10 @@ the whole `qp-<ver>_arduino-1.8.x.zip` archive to this folder.
 ----
 # Provided Libraries and Tools
 
-The archive `qp-<ver>_arduino-1.8.x.zip` contains two external libraries
-for Arduino:
+The archive `qp-<ver>_arduino-1.8.x.zip` contains one external library
+for SAM-based Arduinos:
 
 - `qpcpp_sam` -- QP/C++ framework for SAM-based Arduinos
-- `qpn_avr`   -- QP-nano framework for AVR-based Arduinos
 
 The archive also contains the QM modeling tool for Windows
 
@@ -47,22 +46,6 @@ as follows:
      | | | +-...              - QP/C++ library sources
      | | +-library.properties - QP/C++ library properties
      | |
-     | +-qpn_avr/             - QP-nano library for AVR-based Arduinos
-     | | +-examples/          - QP-nano library examples
-     | | | +-blinky/          - Blinky example
-     | | | | +-blinky.ino     - Blinky code (generated)
-     | | | | +-blinky.qm      - Blinky model (for QM tool)
-     | | | +-dpp/             - Dining Philosophers Problem (DPP)
-     | | | | +-dpp.ino        - DPP code (generated)
-     | | | | +-dpp.qm         - DPP model (for QM tool)
-     | | | +-pelican/         - PEdestrian LIghtr CONtrolled crossing
-     | | | | +-pelican.ino    - PELICAN code (generated)
-     | | | | +-pelican.qm     - PELICAN model (for QM tool)
-     | | +-src/               - QP-nano library source code
-     | | | +-qpn.h            - QP-nano library header file
-     | | | +-...              - QP-nano library sources
-     | | +-library.properties - QP-nano library properties
-     | |
      | +-qm/                  - QM modeling tool for Windows
      | | +-bin/               - QM binaries (executable and DLLs)
      | | | +-qm.exe           - QM executable for Windows
@@ -70,7 +53,6 @@ as follows:
      | | | +-...
      |
      +-README.md              - this file
-     +-QP-Arduino-Playground  - web link to QP on Arduino Playground
      +-QP-Arduino_GPL_Exception.txt - GPL exception for QP on Arduino
 
 
@@ -83,15 +65,15 @@ https://www.state-machine.com/qm/gs.html
 ----
 # Working with the Examples
 
-Assumming that you have installed the QP libraries in your `<Sketchbook>`
+Assumming that you have installed the QP library in your `<Sketchbook>`
 folder, the examples provided in each QP library show up in the Arduino
 IDE under the menu:
 
 `File|Examples|Examples from Custom Libraries`
 
 The intended way of working with the examples is to use the
-[QM modeling tool](https://www.state-machine.com/qm/) to modify the
-**models** (`.qm` files) and then to **generate code** from these
+[QM modeling tool](https://www.state-machine.com/products/qm/) to modify
+the **models** (`.qm` files) and then to **generate code** from these
 models. In this scenario, the Arduino IDE is used only to build and
 upload the code to the Arduino board(s).
 
@@ -111,8 +93,8 @@ is active.
 ----
 # Licensing
 
-The QP real-time embedded frameworks for Arduino are licensed under the
-modified GPLv3 license with the
+The QP/C++ real-time embedded framework (RTEF) for Arduino are licensed
+under the modified GPLv3 license with the
 [QP-Arduino Exception](https://www.state-machine.com/licensing/QP-Arduino_GPL_Exception.txt)
 (see also the file QP-Arduino_GPL_Exception.txt in the root of the archive).
 Specifically, the Exception removes the requirement to expose your

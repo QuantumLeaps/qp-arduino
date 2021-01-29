@@ -3,8 +3,8 @@
 /// @brief Internal (package scope) QF/C++ interface.
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-23
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -60,26 +60,26 @@
     /// The purpose of this macro is to enable writing the same code for the
     /// case when critical section status type is defined and when it is not.
     /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
-    /// invokes #QF_CRIT_ENTRY passing the key variable as the parameter.
-    /// Otherwise #QF_CRIT_ENTRY is invoked with a dummy parameter.
-    /// @sa #QF_CRIT_ENTRY
-    #define QF_CRIT_ENTRY_()    QF_CRIT_ENTRY(dummy)
+    /// invokes QF_CRIT_ENTRY() passing the key variable as the parameter.
+    /// Otherwise QF_CRIT_ENTRY() is invoked with a dummy parameter.
+    /// @sa QF_CRIT_ENTRY()
+    #define QF_CRIT_E_()        QF_CRIT_ENTRY(dummy)
 
     //! This is an internal macro for exiting a critical section.
     /// @description
     /// The purpose of this macro is to enable writing the same code for the
     /// case when critical section status type is defined and when it is not.
     /// If the macro #QF_CRIT_STAT_TYPE is defined, this internal macro
-    /// invokes #QF_CRIT_EXIT passing the key variable as the parameter.
-    /// Otherwise #QF_CRIT_EXIT is invoked with a dummy parameter.
-    /// @sa #QF_CRIT_EXIT
+    /// invokes QF_CRIT_EXIT() passing the key variable as the parameter.
+    /// Otherwise QF_CRIT_EXIT() is invoked with a dummy parameter.
+    /// @sa QF_CRIT_EXIT()
     ///
-    #define QF_CRIT_EXIT_()     QF_CRIT_EXIT(dummy)
+    #define QF_CRIT_X_()        QF_CRIT_EXIT(dummy)
 
-#else
+#elif (!defined QF_CRIT_STAT_)
     #define QF_CRIT_STAT_       QF_CRIT_STAT_TYPE critStat_;
-    #define QF_CRIT_ENTRY_()    QF_CRIT_ENTRY(critStat_)
-    #define QF_CRIT_EXIT_()     QF_CRIT_EXIT(critStat_)
+    #define QF_CRIT_E_()        QF_CRIT_ENTRY(critStat_)
+    #define QF_CRIT_X_()        QF_CRIT_EXIT(critStat_)
 #endif  // QF_CRIT_STAT_TYPE
 
 // Assertions inside the crticial section ------------------------------------
@@ -93,7 +93,7 @@
 
     #define Q_ASSERT_CRIT_(id_, test_) do {\
         if ((test_)) {} else { \
-            QF_CRIT_EXIT_(); \
+            QF_CRIT_X_(); \
             Q_onAssert(&Q_this_module_[0], static_cast<int_t>(id_)); \
         } \
     } while (false)
@@ -101,7 +101,7 @@
     #define Q_REQUIRE_CRIT_(id_, test_) Q_ASSERT_CRIT_((id_), (test_))
 
     #define Q_ERROR_CRIT_(id_) do { \
-        QF_CRIT_EXIT_(); \
+        QF_CRIT_X_(); \
         Q_onAssert(&Q_this_module_[0], static_cast<int_t>(id_)); \
     } while (false)
 
@@ -129,8 +129,8 @@ struct QFreeBlock {
 // is NOT used for reference counting in time events, because the @c poolId_
 // attribute is zero ("static events").
 //
-constexpr std::uint8_t TE_IS_LINKED    = 1U << 7;  // flag
-constexpr std::uint8_t TE_WAS_DISARMED = 1U << 6;  // flag
+constexpr std::uint8_t TE_IS_LINKED    = 1U << 7U;  // flag
+constexpr std::uint8_t TE_WAS_DISARMED = 1U << 6U;  // flag
 constexpr std::uint8_t TE_TICK_RATE    = 0x0FU;     // bitmask
 
 //****************************************************************************

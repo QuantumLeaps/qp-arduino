@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-01-20
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -82,9 +82,9 @@ void QF::add_(QActive * const a) noexcept {
     Q_REQUIRE_ID(100, (0U < p) && (p <= QF_MAX_ACTIVE)
                       && (active_[p] == nullptr));
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     active_[p] = a;  // registger the active object at this priority
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 }
 
 //****************************************************************************
@@ -107,10 +107,10 @@ void QF::remove_(QActive * const a) noexcept {
                       && (active_[p] == a));
 
     QF_CRIT_STAT_
-    QF_CRIT_ENTRY_();
+    QF_CRIT_E_();
     active_[p] = nullptr; // free-up the priority level
     a->m_state.fun = nullptr; // invalidate the state
-    QF_CRIT_EXIT_();
+    QF_CRIT_X_();
 }
 
 //****************************************************************************
@@ -157,20 +157,20 @@ extern "C" {
         QP::QPSetBits t;
 
 #if (QF_MAX_ACTIVE > 16U)
-        t = static_cast<QP::QPSetBits>(x >> 16);
+        t = static_cast<QP::QPSetBits>(x >> 16U);
         if (t != 0U) {
             n += 16U;
             x = t;
         }
 #endif
 #if (QF_MAX_ACTIVE > 8U)
-        t = (x >> 8);
+        t = (x >> 8U);
         if (t != 0U) {
             n += 8U;
             x = t;
         }
 #endif
-        t = (x >> 4);
+        t = (x >> 4U);
         if (t != 0U) {
             n += 4U;
             x = t;

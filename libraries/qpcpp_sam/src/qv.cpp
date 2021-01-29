@@ -4,8 +4,8 @@
 /// @ingroup qv
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-23
+/// Last updated for version 6.9.1
+/// Last updated on  2020-09-18
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -136,6 +136,11 @@ int_t QF::run(void) {
 
     // the combined event-loop and background-loop of the QV kernel...
     QF_INT_DISABLE();
+
+    // produce the QS_QF_RUN trace record
+    QS_BEGIN_NOCRIT_PRE_(QS_QF_RUN, 0U)
+    QS_END_NOCRIT_PRE_()
+
     for (;;) {
 
         // find the maximum priority AO ready to run
@@ -144,8 +149,7 @@ int_t QF::run(void) {
             QActive * const a = active_[p];
 
 #ifdef Q_SPY
-            QS_BEGIN_NOCRIT_PRE_(QS_SCHED_NEXT,
-                             QS::priv_.locFilter[QS::AO_OBJ], a)
+            QS_BEGIN_NOCRIT_PRE_(QS_SCHED_NEXT, a->m_prio)
                 QS_TIME_PRE_(); // timestamp
                 QS_2U8_PRE_(p, pprev);// scheduled prio & previous prio
             QS_END_NOCRIT_PRE_()
@@ -162,7 +166,7 @@ int_t QF::run(void) {
             // 3. determine if event is garbage and collect it if so
             //
             QEvt const * const e = a->get_();
-            a->dispatch(e);
+            a->dispatch(e, a->m_prio);
             gc(e);
 
             QF_INT_DISABLE();
@@ -174,7 +178,7 @@ int_t QF::run(void) {
         else { // no AO ready to run --> idle
 #ifdef Q_SPY
             if (pprev != 0U) {
-                QS_BEGIN_NOCRIT_PRE_(QS_SCHED_IDLE, nullptr, nullptr)
+                QS_BEGIN_NOCRIT_PRE_(QS_SCHED_IDLE, 0U)
                     QS_TIME_PRE_();    // timestamp
                     QS_U8_PRE_(pprev); // previous prio
                 QS_END_NOCRIT_PRE_()
@@ -207,11 +211,9 @@ int_t QF::run(void) {
 /// @param[in] qSto    pointer to the storage for the ring buffer of the
 ///                    event queue (used only with the built-in QP::QEQueue)
 /// @param[in] qLen    length of the event queue (in events)
-/// @param[in] stkSto  pointer to the stack storage (must be NULL in QV)
+/// @param[in] stkSto  pointer to the stack storage (must be nullptr in QV)
 /// @param[in] stkSize stack size [bytes]
-// @param[in] par     pointer to an extra parameter (might be NULL)
-///
-/// @note This function should be called via the macro START().
+/// @param[in] par     pointer to an extra parameter (might be nullptr)
 ///
 /// @usage
 /// The following example shows starting an AO when a per-task stack is needed
@@ -222,7 +224,7 @@ void QActive::start(std::uint_fast8_t const prio,
                     void * const stkSto, std::uint_fast16_t const stkSize,
                     void const * const par)
 {
-    (void)stkSize; // unused paramteter in the QV port
+    static_cast<void>(stkSize); // unused paramteter in the QV port
 
     /// @pre the priority must be in range and the stack storage must not
     /// be provided, because the QV kernel does not need per-AO stacks.
@@ -236,7 +238,7 @@ void QActive::start(std::uint_fast8_t const prio,
 
     QF::add_(this); // make QF aware of this AO
 
-    this->init(par); // take the top-most initial tran. (virtual call)
+    this->init(par, m_prio); // take the top-most initial tran. (virtual)
     QS_FLUSH(); // flush the trace buffer to the host
 }
 

@@ -1,15 +1,15 @@
 /// @file
-/// @brief QF/C++ port to ARM Cortex-M, QV kernel, GNU-ARM toolset, Arduino
+/// @brief QF/C++ port to ARM Cortex-M, cooperative QV kernel, GNU-ARM toolset
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-03-22
+/// Last updated for version 6.9.2
+/// Last updated on  2021-01-28
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2020 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -145,7 +145,7 @@
 //
 // NOTE5:
 // The selective disabling of "QF-aware" interrupts with the BASEPRI register
-// has a problem on ARM Cortex-M7 core r0p1 (see ARM-EPM-064408, errata
+// has a problem on ARM Cortex-M7 core r0p1 (see SDEN-1068427, errata
 // 837070). The workaround recommended by ARM is to surround MSR BASEPRI with
 // the CPSID i/CPSIE i pair, which is implemented in the QF_INT_DISABLE()
 // macro. This workaround works also for Cortex-M3/M4 cores.

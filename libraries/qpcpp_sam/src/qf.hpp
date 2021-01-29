@@ -3,8 +3,8 @@
 /// @ingroup qf
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.8.0
-/// Last updated on  2020-04-03
+/// Last updated for version 6.9.2
+/// Last updated on  2020-12-17
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
@@ -176,13 +176,13 @@ public: // for access from extern "C" functions
     QF_THREAD_TYPE m_thread;
 #endif
 
+#ifdef QXK_HPP // QXK kernel used?
+    //! QXK dynamic priority (1..#QF_MAX_ACTIVE) of AO/thread.
+    std::uint8_t m_dynPrio;
+#endif
+
     //! QF priority (1..#QF_MAX_ACTIVE) of this active object.
     std::uint8_t m_prio;
-
-#ifdef QXK_HPP // QXK kernel used?
-    //! QF start priority (1..#QF_MAX_ACTIVE) of this active object.
-    std::uint8_t m_startPrio;
-#endif
 
 protected:
     //! protected constructor (abstract class)
@@ -207,6 +207,11 @@ public:
 #ifdef QF_ACTIVE_STOP
     //! Stops execution of an active object and removes it from the
     //! framework's supervision.
+    /// @attention
+    /// QActive::stop() must be called only from the AO that is about
+    /// to stop its execution. By that time, any pointers or references
+    /// to the AO are considered invalid (dangling) and it becomes
+    /// illegal for the rest of the application to post events to the AO.
     void stop(void);
 #endif
 
@@ -325,9 +330,16 @@ private:
 class QMActive : public QActive {
 public:
     // all the following operations delegate to the QHsm class...
-    void init(void const * const e) override;
-    void init(void) override;
-    void dispatch(QEvt const * const e) override;
+    void init(void const * const e,
+              std::uint_fast8_t const qs_id) override;
+    void init(std::uint_fast8_t const qs_id) override;
+    void dispatch(QEvt const * const e,
+                  std::uint_fast8_t const qs_id) override;
+
+#ifdef Q_SPY
+    //! Get the current state handler of the QMsm
+    QStateHandler getStateHandler() noexcept override;
+#endif
 
     //! Tests if a given state is part of the active state configuration
     bool isInState(QMState const * const st) const noexcept;
@@ -628,9 +640,13 @@ class QTicker : public QActive {
 public:
     explicit QTicker(std::uint_fast8_t const tickRate) noexcept; // ctor
 
-    void init(void const * const e) noexcept override;
-    void init(void) noexcept override { this->init(nullptr); }
-    void dispatch(QEvt const * const e) noexcept override;
+    void init(void const * const e,
+              std::uint_fast8_t const qs_id) noexcept override;
+    void init(std::uint_fast8_t const qs_id) noexcept override {
+        this->init(qs_id);
+    }
+    void dispatch(QEvt const * const e,
+                  std::uint_fast8_t const qs_id) noexcept override;
 #ifndef Q_SPY
     bool post_(QEvt const * const e,
                std::uint_fast16_t const margin) noexcept override;
@@ -654,7 +670,7 @@ public:
     /// The #QF_CRIT_EXIT_NOP() macro contains minimal code required to
     /// prevent such merging of critical sections in such merging of
     /// critical sections in QF ports, in which it can occur.
-    #define QF_CRIT_EXIT_NOP()   ((void)0)
+    #define QF_CRIT_EXIT_NOP()   (static_cast<void>(0))
 #endif
 
 //****************************************************************************
@@ -703,6 +719,7 @@ public:
     /// This macro allocates a new event and sets the pointer @p e_, while
     /// leaving at least @p margin_ of events still available in the pool
     ///
+    /// @param[out] e_     pointer to the newly allocated event
     /// @param[in] evtT_   event type (class name) of the event to allocate
     /// @param[in] margin_ number of events that must remain available
     ///                    in the given pool after this allocation. The
@@ -779,8 +796,8 @@ public:
     /// because it provides the vital information for software tracing and
     /// avoids any overhead when the tracing is disabled.
     ///
-    /// @param[in] tickRate clock tick rate to be serviced through this call
-    /// @param[in] sender   pointer to the sender object. This parameter
+    /// @param[in] tickRate_ clock tick rate to be serviced through this call
+    /// @param[in] sender_   pointer to the sender object. This parameter
     ///            is actually only used when QS software tracing is enabled
     ///            (macro #Q_SPY is defined)
     /// @note
@@ -790,7 +807,7 @@ public:
     ///
     /// @note
     /// The pointer to the sender object is not necessarily a pointer
-    /// to an active object. In fact, when #QF_TICK_X() is called from
+    /// to an active object. In fact, when TICK_X() is called from
     /// an interrupt, you would create a unique object just to unambiguously
     /// identify the ISR as the sender of the time events.
     ///
@@ -840,8 +857,7 @@ public:
     /// unambiguously identify the sender of the event.
     ///
     /// @sa QP::QActive::post_()
-    #define POST(e_, sender_) \
-        post_((e_), QP::QF_NO_MARGIN, (sender_))
+    #define POST(e_, sender_) post_((e_), QP::QF_NO_MARGIN, (sender_))
 
     //! Invoke the direct event posting facility QP::QActive::post_()
     //! without delivery guarantee.
