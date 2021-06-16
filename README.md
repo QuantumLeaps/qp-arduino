@@ -1,3 +1,5 @@
+![QP-Arduino](https://www.state-machine.com/img/logo_qp-arduino.png)
+
 This README provides a quick overview of QP for Arduino.
 Please refer to the companion webiste to this project at:
 
@@ -19,7 +21,7 @@ dialog box. Once you identify the `<Sketchbook>` folder, you simply unzip
 the whole `qp-<ver>_arduino-1.8.x.zip` archive to this folder.
 
 ----
-# Provided Libraries and Tools
+# Provided Libraries and Examples
 
 The archive `qp-<ver>_arduino-1.8.x.zip` contains two external libraries
 for SAM-based Arduinos:
@@ -29,10 +31,15 @@ for SAM-based Arduinos:
                  
 NOTE: qpn_avr is now obsolete. It is provided for backgwards compatibility only!
  
+----
+# Provided Tools
 
 The archive also contains the QM modeling tool for Windows
 
 - `qm`        -- QM modeling tool for Windows 32/64-bit
+
+----
+# Directories and Files
 
 After the installation, your Arduino `<Sketchbook>` folder should look
 as follows:
@@ -45,6 +52,12 @@ as follows:
      | | | +-blinky/          - Blinky example
      | | | | +-blinky.ino     - Blinky code (generated)
      | | | | +-blinky.qm      - Blinky model (for QM tool)
+     | | | +-blinky_bsp/      - Blinky example with Board Support Package
+     | | | | +-blinky_bsp.ino - Blinky code (generated)
+     | | | | +-blinky_bsp.qm  - Blinky model (for QM tool)
+     | | | +-dpp_bsp/         - Dining Philosopher example with BSP
+     | | | | +-dpp_bsp.ino    - DPP code (generated)
+     | | | | +-dpp_bsp.qm     - DPP model (for QM tool)
      | | +-src/               - QP/C++ library source code
      | | | +-qpcpp.h          - QP/C++ library header file
      | | | +-...              - QP/C++ library sources

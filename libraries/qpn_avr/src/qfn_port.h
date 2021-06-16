@@ -3,8 +3,8 @@
 * @brief QF-nano port AVR ATmega, QV-nano kernel, GNU-AVR toolset, Arduino
 * @cond
 ******************************************************************************
-* Last Updated for Version: 6.8.1a
-* Date of the Last Update:  2021-01-29
+* Last Updated for Version: 6.8.2
+* Date of the Last Update:  2021-07-07
 *
 *                    Q u a n t u m  L e a P s
 *                    ------------------------
