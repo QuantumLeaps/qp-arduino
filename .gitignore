@@ -34,7 +34,6 @@ lint*.txt
 *.bak
 *.qlc
 JLink*.*
-version-*
 
 qm/
 eclipse/

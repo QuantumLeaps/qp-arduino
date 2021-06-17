@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model version="5.1.2" links="0">
+<model version="5.1.3" links="0">
  <documentation>This is a redesign of the original Blinky example for the Arduino-UNO board, which blinks the on-board LED (L) once per second.
 
 This example demonstrates:
