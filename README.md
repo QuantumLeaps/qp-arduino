@@ -52,6 +52,9 @@ as follows:
      | | | +-blinky/          - Blinky example
      | | | | +-blinky.ino     - Blinky code (generated)
      | | | | +-blinky.qm      - Blinky model (for QM tool)
+     | | | +-blinky2/         - Blinky2 example for blinking two LEDs
+     | | | | +-blinky2.ino    - Blinky2 code (generated)
+     | | | | +-blinky2.qm     - Blinky2 model (for QM tool)
      | | | +-blinky_bsp/      - Blinky example with Board Support Package
      | | | | +-blinky_bsp.ino - Blinky code (generated)
      | | | | +-blinky_bsp.qm  - Blinky model (for QM tool)
@@ -67,9 +70,9 @@ as follows:
      | +-qpn_avr/             - QP-nano library for AVR-based Arduinos
      | | +-...                  (now obsolete, for backgwards compatibility only) 
      | |
-     | +-qm/                  - QM modeling tool for Windows
+     | +-qm/                  - QM modeling tool (for Windows, Linux, or macOS)
      | | +-bin/               - QM binaries (executable and DLLs)
-     | | | +-qm.exe           - QM executable for Windows
+     | | | +-qm.exe           - QM executable (for Windows)
      | | +-Resources/         - QM resources
      | | | +-...
      |
@@ -77,10 +80,9 @@ as follows:
      +-QP-Arduino_GPL_Exception.txt - GPL exception for QP on Arduino
 
 
-NOTE: The QP-Arduino archive contains QM for Windows only. But QM is also
-available for Linux and MacOS hosts. If you wish to work on those operating
-systems, you will need to install QM separately, as described at:
-https://www.state-machine.com/qm/gs.html 
+NOTE: The QP-Arduino archive contains QM for the platform of your choice
+(Windows, Linux or macOS), but this requires downloading the corresponding
+version of the QP-Arduino integration.
 
 
 ----
