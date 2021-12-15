@@ -401,8 +401,8 @@ m_fork[n] = FREE;</action>
  </package>
  <!--${.}-->
  <directory name=".">
-  <!--${.::dpp_bsp.ino}-->
-  <file name="dpp_bsp.ino">
+  <!--${.::dpp_bsp-sam.ino}-->
+  <file name="dpp_bsp-sam.ino">
    <text>#include &quot;qpcpp.hpp&quot;  // QP-C++ framework
 #include &quot;dpp.hpp&quot;    // DPP application
 #include &quot;bsp.hpp&quot;    // Board Support Package

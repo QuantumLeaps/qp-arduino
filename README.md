@@ -47,20 +47,20 @@ as follows:
     <Sketchbook>/             - your Arduino Sketchbook folder
      |
      +-libraries/             - libraries folder
-     | +-qpcpp_sam/           - QP/C++ library for SAM-based Arduinos
-     | | +-examples/          - QP/C++ library examples
-     | | | +-blinky/          - Blinky example
-     | | | | +-blinky.ino     - Blinky code (generated)
-     | | | | +-blinky.qm      - Blinky model (for QM tool)
-     | | | +-blinky2/         - Blinky2 example for blinking two LEDs
-     | | | | +-blinky2.ino    - Blinky2 code (generated)
-     | | | | +-blinky2.qm     - Blinky2 model (for QM tool)
-     | | | +-blinky_bsp/      - Blinky example with Board Support Package
-     | | | | +-blinky_bsp.ino - Blinky code (generated)
-     | | | | +-blinky_bsp.qm  - Blinky model (for QM tool)
-     | | | +-dpp_bsp/         - Dining Philosopher example with BSP
-     | | | | +-dpp_bsp.ino    - DPP code (generated)
-     | | | | +-dpp_bsp.qm     - DPP model (for QM tool)
+     | +-qpcpp_arm-cm/            - QP/C++ library for ARM Cortex-M based boards
+     | | +-examples/              - QP/C++ library examples
+     | | | +-blinky-sam/          - Blinky example for SAM-based Arduinos
+     | | | | +-blinky-sam.ino     - Blinky code (generated)
+     | | | | +-blinky-sam.qm      - Blinky model (for QM tool)
+     | | | +-blinky_bsp-sam/      - Blinky example with Board Support Package for SAM
+     | | | | +-blinky_bsp-sam.ino - Blinky code (generated)
+     | | | | +-blinky_bsp-sam.qm  - Blinky model (for QM tool)
+     | | | +-blinky_bsp-teensy4/      - Blinky example with Board Support Package for Teensy4
+     | | | | +-blinky_bsp-teensy4.ino - Blinky code (generated)
+     | | | | +-blinky_bsp-teensy4.qm  - Blinky model (for QM tool)
+     | | | +-dpp_bsp-sam/         - Dining Philosopher example with BSP for SAM
+     | | | | +-dpp_bsp-sam.ino    - DPP code (generated)
+     | | | | +-dpp_bsp-sam.qm     - DPP model (for QM tool)
      | | +-src/               - QP/C++ library source code
      | | | +-qpcpp.h          - QP/C++ library header file
      | | | +-...              - QP/C++ library sources
@@ -70,9 +70,9 @@ as follows:
      | +-qpn_avr/             - QP-nano library for AVR-based Arduinos
      | | +-...                  (now obsolete, for backgwards compatibility only) 
      | |
-     | +-qm/                  - QM modeling tool (for Windows, Linux, or macOS)
+     | +-qm/                  - QM modeling tool for Windows
      | | +-bin/               - QM binaries (executable and DLLs)
-     | | | +-qm.exe           - QM executable (for Windows)
+     | | | +-qm.exe           - QM executable for Windows
      | | +-Resources/         - QM resources
      | | | +-...
      |
@@ -80,9 +80,10 @@ as follows:
      +-QP-Arduino_GPL_Exception.txt - GPL exception for QP on Arduino
 
 
-NOTE: The QP-Arduino archive contains QM for the platform of your choice
-(Windows, Linux or macOS), but this requires downloading the corresponding
-version of the QP-Arduino integration.
+NOTE: The QP-Arduino archive contains QM for Windows only. But QM is also
+available for Linux and MacOS hosts. If you wish to work on those operating
+systems, you will need to install QM separately, as described at:
+https://www.state-machine.com/qm/gs.html 
 
 
 ----
