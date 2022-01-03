@@ -26,10 +26,10 @@ the whole `qp-<ver>_arduino-1.8.x.zip` archive to this folder.
 The archive `qp-<ver>_arduino-1.8.x.zip` contains two external libraries
 for SAM-based Arduinos:
 
-- `qpcpp_sam` -- QP/C++ framework for SAM-based Arduinos
-- `qpn_avr`   -- QP-nano framework for AVR-based Arduinos
+- `qpcpp_arm-cm` -- QP/C++ framework for Arduinos based on ARM Cortex-M
+- `qpn_avr`   -- QP-nano framework for Arduinos based on AVR
                  
-NOTE: qpn_avr is now obsolete. It is provided for backgwards compatibility only!
+> **NOTE:** `qpn_avr` is now obsolete. It is provided for backgwards compatibility only!
  
 ----
 # Provided Tools
@@ -80,7 +80,7 @@ as follows:
      +-QP-Arduino_GPL_Exception.txt - GPL exception for QP on Arduino
 
 
-NOTE: The QP-Arduino archive contains QM for Windows only. But QM is also
+> **NOTE:** The QP-Arduino archive contains QM for Windows only. But QM is also
 available for Linux and MacOS hosts. If you wish to work on those operating
 systems, you will need to install QM separately, as described at:
 https://www.state-machine.com/qm/gs.html 
@@ -119,9 +119,11 @@ is active.
 
 The QP/C++ real-time embedded framework (RTEF) for Arduino are licensed
 under the modified GPLv3 license with the
-[QP-Arduino Exception](https://www.state-machine.com/licensing/QP-Arduino_GPL_Exception.txt)
-(see also the file QP-Arduino_GPL_Exception.txt in the root of the archive).
-Specifically, the Exception removes the requirement to expose your
+[QP-Arduino Exception](https://www.state-machine.com/licenses/QP-Arduino_GPL_Exception.txt)
+(see also the file [QP-Arduino_GPL_Exception.txt](./QP-Arduino_GPL_Exception.txt)
+in the root of the archive).
+
+Specifically, the Arduino GPLv3 Exception removes the requirement to expose your
 propriatory source code as long as you deploy it on an Arduino-Certified
 board.
 
