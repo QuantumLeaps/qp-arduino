@@ -3,14 +3,14 @@
 /// @ingroup qep
 /// @cond
 ///***************************************************************************
-/// Last updated for version 6.9.3
-/// Last updated on  2021-02-26
+/// Last updated for version 6.9.4
+/// Last updated on  2022-01-14
 ///
 ///                    Q u a n t u m  L e a P s
 ///                    ------------------------
 ///                    Modern Embedded Software
 ///
-/// Copyright (C) 2005-2021 Quantum Leaps. All rights reserved.
+/// Copyright (C) 2005-2022 Quantum Leaps. All rights reserved.
 ///
 /// This program is open source software: you can redistribute it and/or
 /// modify it under the terms of the GNU General Public License as published
@@ -43,15 +43,15 @@
 //! The current QP version as a decimal constant XXYZ, where XX is a 2-digit
 // major version number, Y is a 1-digit minor version number, and Z is
 // a 1-digit release number.
-#define QP_VERSION      693U
+#define QP_VERSION      694U
 
 //! The current QP version number string of the form XX.Y.Z, where XX is
 // a 2-digit major version number, Y is a 1-digit minor version number,
 // and Z is a 1-digit release number.
-#define QP_VERSION_STR  "6.9.3"
+#define QP_VERSION_STR  "6.9.4"
 
-//! Encrypted  current QP release (6.9.3) and date (2021-04-12)
-#define QP_RELEASE      0x8295AA8AU
+//! Encrypted  current QP release (6.9.4) and date (2022-01-14)
+#define QP_RELEASE      0x7CCD4229U
 
 
 //****************************************************************************

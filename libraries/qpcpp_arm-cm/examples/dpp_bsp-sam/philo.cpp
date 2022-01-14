@@ -30,7 +30,7 @@ private:
     QP::QTimeEvt m_timeEvt;
 
 public:
-    static Philo instance[N_PHILO];
+    static Philo inst[N_PHILO];
 
 public:
     Philo();
@@ -53,11 +53,11 @@ protected:
 //.$define${AOs::AO_Philo[N_PHILO]} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 //.${AOs::AO_Philo[N_PHILO]} .................................................
 QP::QActive * const AO_Philo[N_PHILO] = { // "opaque" pointers to Philo AO
-    &Philo::instance[0],
-    &Philo::instance[1],
-    &Philo::instance[2],
-    &Philo::instance[3],
-    &Philo::instance[4]
+    &Philo::inst[0],
+    &Philo::inst[1],
+    &Philo::inst[2],
+    &Philo::inst[3],
+    &Philo::inst[4]
 };
 //.$enddef${AOs::AO_Philo[N_PHILO]} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -75,13 +75,13 @@ inline QP::QTimeEvtCtr eat_time() {
 
 // helper function to provide the ID of Philo
 inline uint8_t PHILO_ID(Philo const * const philo) {
-    return static_cast<uint8_t>(philo - &Philo::instance[0]);
+    return static_cast<uint8_t>(philo - &Philo::inst[0]);
 }
 
 // generate definition  of the AO --------------------------------------------
 //.$define${AOs::Philo} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 //.${AOs::Philo} .............................................................
-Philo Philo::instance[N_PHILO];
+Philo Philo::inst[N_PHILO];
 //.${AOs::Philo::Philo} ......................................................
 Philo::Philo()
   : QActive(Q_STATE_CAST(&Philo::initial)),
@@ -91,29 +91,34 @@ Philo::Philo()
 //.${AOs::Philo::SM} .........................................................
 Q_STATE_DEF(Philo, initial) {
     //.${AOs::Philo::SM::initial}
-    static bool registered = false; // starts off with 0, per C-standard
-    (void)e; // suppress the compiler warning about unused parameter
+    (void)e; // unused parameter
 
     subscribe(EAT_SIG);
     subscribe(TEST_SIG);
 
-    if (!registered) {
+    // QS dictionaries only once for all Philos...
+    static bool registered = false;
+    if (!registered) { // first time through?
         registered = true;
 
-        QS_OBJ_DICTIONARY(&l_philo[0].m_timeEvt);
-        QS_OBJ_DICTIONARY(&l_philo[1].m_timeEvt);
-        QS_OBJ_DICTIONARY(&l_philo[2].m_timeEvt);
-        QS_OBJ_DICTIONARY(&l_philo[3].m_timeEvt);
-        QS_OBJ_DICTIONARY(&l_philo[4].m_timeEvt);
+        QS_OBJ_DICTIONARY(&Philo::inst[0]);
+        QS_OBJ_DICTIONARY(&Philo::inst[0].m_timeEvt);
+        QS_OBJ_DICTIONARY(&Philo::inst[1]);
+        QS_OBJ_DICTIONARY(&Philo::inst[1].m_timeEvt);
+        QS_OBJ_DICTIONARY(&Philo::inst[2]);
+        QS_OBJ_DICTIONARY(&Philo::inst[2].m_timeEvt);
+        QS_OBJ_DICTIONARY(&Philo::inst[3]);
+        QS_OBJ_DICTIONARY(&Philo::inst[3].m_timeEvt);
+        QS_OBJ_DICTIONARY(&Philo::inst[4]);
+        QS_OBJ_DICTIONARY(&Philo::inst[4].m_timeEvt);
 
-        QS_FUN_DICTIONARY(&initial);
-        QS_FUN_DICTIONARY(&thinking);
-        QS_FUN_DICTIONARY(&hungry);
-        QS_FUN_DICTIONARY(&eating);
+        QS_FUN_DICTIONARY(&Philo::initial);
+        QS_FUN_DICTIONARY(&Philo::thinking);
+        QS_FUN_DICTIONARY(&Philo::hungry);
+        QS_FUN_DICTIONARY(&Philo::eating);
+
+        QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr);
     }
-
-    QS_SIG_DICTIONARY(HUNGRY_SIG,  this); // signal for each Philos
-    QS_SIG_DICTIONARY(TIMEOUT_SIG, this); // signal for each Philos
     return tran(&thinking);
 }
 //.${AOs::Philo::SM::thinking} ...............................................

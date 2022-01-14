@@ -39,9 +39,9 @@ This structure of the code is recommended for applications with multiple active 
   <class name="Philo" superclass="qpcpp::QActive">
    <!--${AOs::Philo::m_timeEvt}-->
    <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
-   <!--${AOs::Philo::instance[N_PHILO]}-->
-   <attribute name="instance[N_PHILO]" type="Philo" visibility="0x00" properties="0x01">
-    <documentation>the (static) instances of the Philo class</documentation>
+   <!--${AOs::Philo::inst[N_PHILO]}-->
+   <attribute name="inst[N_PHILO]" type="Philo" visibility="0x00" properties="0x01">
+    <documentation>the (static) insts of the Philo class</documentation>
    </attribute>
    <!--${AOs::Philo::Philo}-->
    <operation name="Philo" type="" visibility="0x00" properties="0x00">
@@ -52,29 +52,34 @@ This structure of the code is recommended for applications with multiple active 
    <statechart properties="0x00">
     <!--${AOs::Philo::SM::initial}-->
     <initial target="../1">
-     <action>static bool registered = false; // starts off with 0, per C-standard
-(void)e; // suppress the compiler warning about unused parameter
+     <action>(void)e; // unused parameter
 
 subscribe(EAT_SIG);
 subscribe(TEST_SIG);
 
-if (!registered) {
+// QS dictionaries only once for all Philos...
+static bool registered = false;
+if (!registered) { // first time through?
     registered = true;
 
-    QS_OBJ_DICTIONARY(&amp;l_philo[0].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[1].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[2].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[3].m_timeEvt);
-    QS_OBJ_DICTIONARY(&amp;l_philo[4].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[0]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[0].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[1]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[1].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[2]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[2].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[3]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[3].m_timeEvt);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[4]);
+    QS_OBJ_DICTIONARY(&amp;Philo::inst[4].m_timeEvt);
 
-    QS_FUN_DICTIONARY(&amp;initial);
-    QS_FUN_DICTIONARY(&amp;thinking);
-    QS_FUN_DICTIONARY(&amp;hungry);
-    QS_FUN_DICTIONARY(&amp;eating);
-}
+    QS_FUN_DICTIONARY(&amp;Philo::initial);
+    QS_FUN_DICTIONARY(&amp;Philo::thinking);
+    QS_FUN_DICTIONARY(&amp;Philo::hungry);
+    QS_FUN_DICTIONARY(&amp;Philo::eating);
 
-QS_SIG_DICTIONARY(HUNGRY_SIG,  this); // signal for each Philos
-QS_SIG_DICTIONARY(TIMEOUT_SIG, this); // signal for each Philos</action>
+    QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr);
+}</action>
      <initial_glyph conn="2,3,5,1,20,5,-3">
       <action box="0,-2,6,2"/>
      </initial_glyph>
@@ -173,9 +178,9 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
    <attribute name="m_fork[N_PHILO]" type="uint8_t" visibility="0x02" properties="0x00"/>
    <!--${AOs::Table::m_isHungry[N_PHILO]}-->
    <attribute name="m_isHungry[N_PHILO]" type="bool" visibility="0x02" properties="0x00"/>
-   <!--${AOs::Table::instance}-->
-   <attribute name="instance" type="Table" visibility="0x00" properties="0x01">
-    <documentation>the (static) instance of the class</documentation>
+   <!--${AOs::Table::inst}-->
+   <attribute name="inst" type="Table" visibility="0x00" properties="0x01">
+    <documentation>the (static) inst of the class</documentation>
    </attribute>
    <!--${AOs::Table::Table}-->
    <operation name="Table" type="" visibility="0x00" properties="0x00">
@@ -190,7 +195,7 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
    <statechart properties="0x00">
     <!--${AOs::Table::SM::initial}-->
     <initial target="../1/2">
-     <action>(void)e; // suppress the compiler warning about unused parameter
+     <action>(void)e; // unused parameter
 
 subscribe(DONE_SIG);
 subscribe(PAUSE_SIG);
@@ -203,15 +208,15 @@ for (uint8_t n = 0U; n &lt; N_PHILO; ++n) {
     BSP::displayPhilStat(n, THINKING);
 }
 
-// global signals...
-QS_SIG_DICTIONARY(DONE_SIG,      (void *)0);
-QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
-QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
-QS_SIG_DICTIONARY(SERVE_SIG,     (void *)0);
-QS_SIG_DICTIONARY(TEST_SIG,      (void *)0);
+// QS dictionaries...
+QS_OBJ_DICTIONARY(&amp;Table::inst);
 
-// signals just for this AO...
-QS_SIG_DICTIONARY(HUNGRY_SIG, this);</action>
+QS_SIG_DICTIONARY(DONE_SIG,   nullptr);
+QS_SIG_DICTIONARY(EAT_SIG,    nullptr);
+QS_SIG_DICTIONARY(PAUSE_SIG,  nullptr);
+QS_SIG_DICTIONARY(SERVE_SIG,  nullptr);
+QS_SIG_DICTIONARY(TEST_SIG,   nullptr);
+QS_SIG_DICTIONARY(HUNGRY_SIG, nullptr);</action>
      <initial_glyph conn="3,3,5,1,45,18,-10">
       <action box="0,-2,6,2"/>
      </initial_glyph>
@@ -387,16 +392,16 @@ m_fork[n] = FREE;</action>
   <!--${AOs::AO_Philo[N_PHILO]}-->
   <attribute name="AO_Philo[N_PHILO]" type="QP::QActive * const" visibility="0x00" properties="0x00">
    <code>= { // &quot;opaque&quot; pointers to Philo AO
-    &amp;Philo::instance[0],
-    &amp;Philo::instance[1],
-    &amp;Philo::instance[2],
-    &amp;Philo::instance[3],
-    &amp;Philo::instance[4]
+    &amp;Philo::inst[0],
+    &amp;Philo::inst[1],
+    &amp;Philo::inst[2],
+    &amp;Philo::inst[3],
+    &amp;Philo::inst[4]
 };</code>
   </attribute>
   <!--${AOs::AO_Table}-->
   <attribute name="AO_Table" type="QP::QActive * const" visibility="0x00" properties="0x00">
-   <code>= &amp;Table::instance; // &quot;opaque&quot; AO pointer</code>
+   <code>= &amp;Table::inst; // &quot;opaque&quot; AO pointer</code>
   </attribute>
  </package>
  <!--${.}-->
@@ -480,44 +485,71 @@ public:
 
 using namespace QP;
 
+//............................................................................
+// QS facilities
+
+// un-comment if QS instrumentation needed
+//#define QS_ON
+
+enum AppRecords { // application-specific QS trace records
+    PHILO_STAT = QP::QS_USER,
+};
+
+static QP::QSpyId const l_TIMER_ID = { 0U }; // QSpy source ID
+
 //----------------------------------------------------------------------------
 // BSP functions
 
-//............................................................................
 void BSP::init(void) {
     // initialize the hardware used in this sketch...
     // NOTE: interrupts are configured and started later in QF::onStartup()
     pinMode(LED_BUILTIN, OUTPUT);
+
+    randomSeed(1234); // seed the Random Number Generator
+
+#ifdef QS_ON
+    QS_INIT(0);
+
+    // output QS dictionaries
+    QS_OBJ_DICTIONARY(&amp;l_TIMER_ID);
+    QS_USR_DICTIONARY(PHILO_STAT);
+
+    // setup the QS filters...
+    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
+    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
+    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
+
+#else
 
     Serial.begin(115200); // set the highest stanard baud rate of 115200 bps
     Serial.print(&quot;QP-C++: &quot;);
     Serial.print(QP_VERSION_STR);
     Serial.println(&quot;&quot;);
 
-    randomSeed(1234); // seed the Random Number Generator
+#endif
 }
 //............................................................................
 void BSP::displayPhilStat(uint8_t n, char_t const *stat) {
-    if (stat[0] == 'e') {
-        digitalWrite(LED_BUILTIN, HIGH);
-    }
-    else {
-        digitalWrite(LED_BUILTIN, LOW);
-    }
+    digitalWrite(LED_BUILTIN, (stat[0] == 'e') ? HIGH : LOW);
 
+#ifdef QS_ON
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]-&gt;m_prio) // app-specific record begin
+        QS_U8(1, n);  // Philo number
+        QS_STR(stat); // Philo status
+    QS_END()
+#else
     Serial.print(&quot;Philosopher &quot;);
     Serial.print(n, DEC);
     Serial.print(&quot; &quot;);
     Serial.println(stat);
+#endif
 }
 //............................................................................
 void BSP::displayPaused(uint8_t paused) {
-    if (paused) {
-        Serial.println(&quot;Paused ON&quot;);
-    }
-    else {
-        Serial.println(&quot;Paused OFF&quot;);
-    }
+    char const *msg = paused ? &quot;Paused ON&quot; : &quot;Paused OFF&quot;;
+#ifndef QS_ON
+    Serial.println(msg);
+#endif
 }
 //............................................................................
 void BSP::ledOff(void) {
@@ -564,22 +596,24 @@ uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
 // interrupts.................................................................
 void TIMER_HANDLER(void) {
     TC_GetStatus(TIMER, TIMER_CHANNEL);  // clear the interrupt source
-    QF::TICK_X(0, (void *)0); // process time events for tick rate 0
+    QF::TICK_X(0, &amp;l_TIMER_ID); // process time events for tick rate 0
 
+#ifndef QS_ON
     if (Serial.available() &gt; 0) {
         switch (Serial.read()) { // read the incoming byte
             case 'p':
             case 'P':
                 static QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
-                QF::PUBLISH(&amp;pauseEvt, (void*)0);
+                QF::PUBLISH(&amp;pauseEvt, &amp;l_TIMER_ID);
                 break;
             case 's':
             case 'S':
                 static QEvt const serveEvt = { SERVE_SIG, 0U, 0U};
-                QF::PUBLISH(&amp;serveEvt, (void*)0);
+                QF::PUBLISH(&amp;serveEvt, &amp;l_TIMER_ID);
                 break;
         }
     }
+#endif
 }
 //............................................................................
 void QF::onStartup(void) {
@@ -616,6 +650,29 @@ void QV::onIdle(void) { // called with interrupts DISABLED
     QV_CPU_SLEEP();  // atomically go to sleep and enable interrupts
 #else
     QF_INT_ENABLE(); // simply re-enable interrupts
+
+#ifdef QS_ON
+
+    // transmit QS outgoing data (QS-TX)
+    uint16_t len = Serial.availableForWrite();
+    if (len &gt; 0U) { // any space available in the output buffer?
+        uint8_t const *buf = QS::getBlock(&amp;len);
+        if (buf) {
+            Serial.write(buf, len); // asynchronous and non-blocking
+        }
+    }
+
+    // receive QS incoming data (QS-RX)
+    len = Serial.available();
+    if (len &gt; 0U) {
+        do {
+            QP::QS::rxPut(Serial.read());
+        } while (--len &gt; 0U);
+        QS::rxParse();
+    }
+
+#endif // QS_ON
+
 #endif
 }
 //............................................................................
@@ -628,10 +685,55 @@ extern &quot;C&quot; Q_NORETURN Q_onAssert(char const * const module, int locati
 
     QF_INT_DISABLE(); // disable all interrupts
     BSP::ledOn();  // trun the LED on
-    for (;;) { // sit in an endless loop for now
+    for (;;) { // freeze in an endless loop for now...
     }
 }
 
+//----------------------------------------------------------------------------
+// QS callbacks...
+#ifdef QS_ON
+
+//............................................................................
+bool QP::QS::onStartup(void const * arg) {
+    static uint8_t qsTxBuf[1024]; // buffer for QS transmit channel (QS-TX)
+    static uint8_t qsRxBuf[128];  // buffer for QS receive channel (QS-RX)
+    initBuf  (qsTxBuf, sizeof(qsTxBuf));
+    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+    Serial.begin(115200); // run serial port at 115200 baud rate
+    return true; // return success
+}
+//............................................................................
+void QP::QS::onCommand(uint8_t cmdId, uint32_t param1,
+                       uint32_t param2, uint32_t param3)
+{
+}
+
+#endif // QS_ON
+
+//............................................................................
+void QP::QS::onCleanup(void) {
+}
+//............................................................................
+QP::QSTimeCtr QP::QS::onGetTime(void) {
+    return millis();
+}
+//............................................................................
+void QP::QS::onFlush(void) {
+#ifdef QS_ON
+    uint16_t len = 0xFFFFU; // big number to get as many bytes as available
+    uint8_t const *buf = QS::getBlock(&amp;len); // get continguous block of data
+    while (buf != nullptr) { // data available?
+        Serial.write(buf, len); // might poll until all bytes fit
+        len = 0xFFFFU; // big number to get as many bytes as available
+        buf = QS::getBlock(&amp;len); // try to get more data
+    }
+    Serial.flush(); // wait for the transmission of outgoing data to complete
+#endif // QS_ON
+}
+//............................................................................
+void QP::QS::onReset(void) {
+    NVIC_SystemReset();
+}
 </text>
   </file>
   <!--${.::dpp.hpp}-->
@@ -693,7 +795,7 @@ inline QP::QTimeEvtCtr eat_time() {
 
 // helper function to provide the ID of Philo
 inline uint8_t PHILO_ID(Philo const * const philo) {
-    return static_cast&lt;uint8_t&gt;(philo - &amp;Philo::instance[0]);
+    return static_cast&lt;uint8_t&gt;(philo - &amp;Philo::inst[0]);
 }
 
 // generate definition  of the AO --------------------------------------------

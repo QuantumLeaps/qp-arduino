@@ -31,7 +31,7 @@ private:
     bool m_isHungry[N_PHILO];
 
 public:
-    static Table instance;
+    static Table inst;
 
 public:
     Table();
@@ -53,7 +53,7 @@ protected:
 //.$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //.$define${AOs::AO_Table} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 //.${AOs::AO_Table} ..........................................................
-QP::QActive * const AO_Table = &Table::instance; // "opaque" AO pointer
+QP::QActive * const AO_Table = &Table::inst; // "opaque" AO pointer
 //.$enddef${AOs::AO_Table} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 // helper function to provide the RIGHT neighbour of a Philo[n]
@@ -77,7 +77,7 @@ static char const * const EATING   = "eating  ";
 // generate definition of the AO ---------------------------------------------
 //.$define${AOs::Table} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 //.${AOs::Table} .............................................................
-Table Table::instance;
+Table Table::inst;
 //.${AOs::Table::Table} ......................................................
 Table::Table()
   : QActive(Q_STATE_CAST(&Table::initial))
@@ -91,7 +91,7 @@ Table::Table()
 //.${AOs::Table::SM} .........................................................
 Q_STATE_DEF(Table, initial) {
     //.${AOs::Table::SM::initial}
-    (void)e; // suppress the compiler warning about unused parameter
+    (void)e; // unused parameter
 
     subscribe(DONE_SIG);
     subscribe(PAUSE_SIG);
@@ -104,15 +104,15 @@ Q_STATE_DEF(Table, initial) {
         BSP::displayPhilStat(n, THINKING);
     }
 
-    // global signals...
-    QS_SIG_DICTIONARY(DONE_SIG,      (void *)0);
-    QS_SIG_DICTIONARY(EAT_SIG,       (void *)0);
-    QS_SIG_DICTIONARY(PAUSE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(SERVE_SIG,     (void *)0);
-    QS_SIG_DICTIONARY(TEST_SIG,      (void *)0);
+    // QS dictionaries...
+    QS_OBJ_DICTIONARY(&Table::inst);
 
-    // signals just for this AO...
-    QS_SIG_DICTIONARY(HUNGRY_SIG, this);
+    QS_SIG_DICTIONARY(DONE_SIG,   nullptr);
+    QS_SIG_DICTIONARY(EAT_SIG,    nullptr);
+    QS_SIG_DICTIONARY(PAUSE_SIG,  nullptr);
+    QS_SIG_DICTIONARY(SERVE_SIG,  nullptr);
+    QS_SIG_DICTIONARY(TEST_SIG,   nullptr);
+    QS_SIG_DICTIONARY(HUNGRY_SIG, nullptr);
     return tran(&serving);
 }
 //.${AOs::Table::SM::active} .................................................

@@ -80,7 +80,7 @@ void loop() {
 // interrupts.................................................................
 void TIMER_HANDLER(void) {
     TC_GetStatus(TIMER, TIMER_CHANNEL);  // clear the interrupt source
-    QF::TICK_X(0, (void *)0); // process time events for tick rate 0
+    QF::TICK_X(0, nullptr); // process time events for tick rate 0
 }
 //............................................................................
 void QF::onStartup(void) {
@@ -107,6 +107,7 @@ void QF::onStartup(void) {
     NVIC_EnableIRQ(TIMER_IRQn);
     // ...
 }
+
 //............................................................................
 void QV::onIdle(void) { // called with interrupts DISABLED
 #ifdef NDEBUG
@@ -130,6 +131,23 @@ extern "C"  Q_NORETURN Q_onAssert(char const * const module, int location) {
     digitalWrite(LED_BUILTIN, HIGH); // turn the LED on
     for (;;) { // sit in an endless loop for now
     }
+}
+
+//============================================================================
+// dummy QS callbacks...
+
+//............................................................................
+void QP::QS::onCleanup(void) {
+}
+//............................................................................
+QP::QSTimeCtr QP::QS::onGetTime(void) {
+    return 0U;
+}
+//............................................................................
+void QP::QS::onFlush(void) {
+}
+//............................................................................
+void QP::QS::onReset(void) {
 }
 
 //============================================================================

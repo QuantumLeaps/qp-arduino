@@ -78,8 +78,15 @@ Blinky::Blinky()
 //.${AOs::Blinky::SM} ........................................................
 Q_STATE_DEF(Blinky, initial) {
     //.${AOs::Blinky::SM::initial}
-    m_timeEvt.armX(BSP::TICKS_PER_SEC/2, BSP::TICKS_PER_SEC/2);
     (void)e; // unused parameter
+    m_timeEvt.armX(BSP::TICKS_PER_SEC/2, BSP::TICKS_PER_SEC/2);
+
+    QS_OBJ_DICTIONARY(&Blinky::instance);
+    QS_SIG_DICTIONARY(TIMEOUT_SIG, nullptr);
+
+    QS_FUN_DICTIONARY(&Blinky::off);
+    QS_FUN_DICTIONARY(&Blinky::on);
+
     return tran(&off);
 }
 //.${AOs::Blinky::SM::off} ...................................................
