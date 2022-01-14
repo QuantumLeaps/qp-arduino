@@ -19,13 +19,13 @@
 #include "qpcpp.hpp"  // QP-C++ framework
 #ifdef Q_SPY
 
-constexpr int QsRXBuffer_KB = 2; //Units are in Kilobytes
-constexpr int QsTXBuffer_B  = 100;//Units are in bytes
+constexpr int QsTXBuffer_KB = 2; //Units are in Kilobytes
+constexpr int QsRXBuffer_B  = 100;//Units are in bytes
 bool QP::QS::onStartup(void const * arg)
 {
   Serial.begin(115200); //RUN QSpy at 115200 bps
-  static uint8_t qsTxBuf[QsRXBuffer_KB * 1024]; // buffer for QS transmit channel
-  static uint8_t qsRxBuf[QsTXBuffer_B];    // buffer for QS receive channel
+  static uint8_t qsTxBuf[QsTXBuffer_KB * 1024]; // buffer for QS transmit channel
+  static uint8_t qsRxBuf[QsRXBuffer_B];    // buffer for QS receive channel
   initBuf  (qsTxBuf, sizeof(qsTxBuf));
   rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
   return true; // return success
