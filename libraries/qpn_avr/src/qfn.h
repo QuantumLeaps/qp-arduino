@@ -4,7 +4,7 @@
 * @ingroup qfn
 * @cond
 ******************************************************************************
-* Last updated for version 6.8.0
+* Last updated for version 6.8.2
 * Last updated on  2020-03-08
 *
 *                    Q u a n t u m  L e a P s
@@ -97,7 +97,9 @@
 #endif
 
 /****************************************************************************/
-/*! QActive active object (based on QHsm-implementation) */
+/*! QActive active object (based on QHsm-implementation)
+* @extends QHsm
+*/
 /**
 * @description
 * QActive is the base structure for derivation of active objects. Active
@@ -141,7 +143,9 @@ typedef struct QActive {
 
 } QActive;
 
-/*! Virtual table for the QActive class */
+/*! Virtual table for the QActive class
+* @extends QHsmVtable
+*/
 typedef struct {
     QHsmVtable super; /*!< inherits QHsmVtable */
 
@@ -278,11 +282,15 @@ void QActive_ctor(QActive * const me, QStateHandler initial);
                 QF_ACTIVE_CAST((me_)), (margin_),          \
                 (enum_t)(sig_), (QParam)(par_)))
 
-    /*! Implementation of the task-level event posting */
+    /*! Implementation of the task-level event posting
+    * @private @memberof QActive
+    */
     bool QActive_postX_(QActive * const me, uint_fast8_t margin,
                         enum_t const sig, QParam const par);
 
-    /*! Implementation of the ISR-level event posting */
+    /*! Implementation of the ISR-level event posting
+    * @private @memberof QActive
+    */
     bool QActive_postXISR_(QActive * const me, uint_fast8_t margin,
                            enum_t const sig, QParam const par);
 
@@ -322,16 +330,22 @@ void QActive_ctor(QActive * const me, QStateHandler initial);
     void QF_tickXISR(uint_fast8_t const tickRate);
 
 #ifdef QF_TIMEEVT_PERIODIC
-    /*! Arm the QP-nano one-shot time event. */
+    /*! Arm the QP-nano one-shot time event.
+    * @public @memberof QActive
+    */
     void QActive_armX(QActive * const me, uint_fast8_t const tickRate,
                       QTimeEvtCtr const nTicks, QTimeEvtCtr const interval);
 #else
-    /*! Arm the QP-nano one-shot time event. */
+    /*! Arm the QP-nano one-shot time event.
+    * @public @memberof QActive
+    */
     void QActive_armX(QActive * const me, uint_fast8_t const tickRate,
                       QTimeEvtCtr const nTicks);
 #endif
 
-    /*! Disarm a time event. Since the tick counter */
+    /*! Disarm a time event. Since the tick counter
+    * @public @memberof QActive
+    */
     void QActive_disarmX(QActive * const me, uint_fast8_t const tickRate);
 
 #endif /* (QF_TIMEEVT_CTR_SIZE != 0U) */

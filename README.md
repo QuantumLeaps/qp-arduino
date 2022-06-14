@@ -1,3 +1,10 @@
+[![Object-Oriented Programming in C](img/thumbnail.jpg)](https://www.state-machine.com/oop)
+
+
+## Brought to you by:
+[![Quantum Leaps](https://www.state-machine.com/attachments/logo_ql_400.png)](https://www.state-machine.co)
+
+---------------------------------------------------------------------
 ![QP-Arduino](https://www.state-machine.com/img/logo_qp-arduino.png)
 
 This README provides a quick overview of QP for Arduino.

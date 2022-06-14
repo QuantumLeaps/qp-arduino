@@ -4,7 +4,7 @@
 * @ingroup qfn
 * @cond
 ******************************************************************************
-* Last updated for version 6.8.0
+* Last updated for version 6.8.2
 * Last updated on  2020-03-08
 *
 *                    Q u a n t u m  L e a P s
@@ -93,6 +93,9 @@ uint8_t const Q_ROM QF_log2Lkup[16] = {
 #endif /* QF_LOG2 */
 
 /****************************************************************************/
+/**
+* @protected @memberof QActive
+*/
 void QActive_ctor(QActive * const me, QStateHandler initial) {
     static QActiveVtable const vtable = { /* QActive virtual table */
         { &QHsm_init_,
@@ -116,6 +119,7 @@ void QActive_ctor(QActive * const me, QStateHandler initial) {
 
 /****************************************************************************/
 /**
+* @private @memberof QActive
 * @description
 * Direct event posting is the simplest asynchronous communication method
 * available in QF-nano.
@@ -201,6 +205,7 @@ bool QActive_postX_(QActive * const me, uint_fast8_t margin,
 
 /****************************************************************************/
 /**
+* @private @memberof QActive
 * @description
 * Direct event posting is the simplest asynchronous communication method
 * available in QF-nano.
@@ -424,6 +429,7 @@ void QF_tickXISR(uint_fast8_t const tickRate) {
 
 /****************************************************************************/
 /**
+* @public @memberof QActive
 * @description
 * Arms a time event to fire in a specified number of clock ticks at the
 * specified tick rate. The timeout signal gets directly posted (using the
@@ -475,6 +481,7 @@ void QActive_armX(QActive * const me, uint_fast8_t const tickRate,
 
 /****************************************************************************/
 /**
+* @public @memberof QActive
 * @description
 * The time event of the active object gets disarmed (stopped).
 *

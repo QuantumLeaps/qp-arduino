@@ -224,7 +224,9 @@ struct QHsmVtable {
 #define QHSM_DISPATCH(me_) ((*(me_)->vptr->dispatch)((me_)))
 
 /* public methods */
-/*! protected "constructor" of a HSM. */
+/*! "constructor" of a HSM.
+* @protected @memberof QHsm
+*/
 void QHsm_ctor(QHsm * const me, QStateHandler initial);
 
 /*! Obtain the current active state from a HSM (read only). */
@@ -235,7 +237,9 @@ void QHsm_ctor(QHsm * const me, QStateHandler initial);
 */
 #define QHsm_state(me_) (Q_STATE_CAST(Q_HSM_UPCAST(me_)->state))
 
-/*! Obtain the current active child state of a given parent in QHsm */
+/*! Obtain the current active child state of a given parent in QHsm
+* @public @memberof QHsm
+*/
 /**
 * @param[in] me_     pointer (see @ref oop)
 * @param[in] parent_ pointer to the parent state-handler
@@ -249,13 +253,19 @@ void QHsm_ctor(QHsm * const me, QStateHandler initial);
 QStateHandler QHsm_childState_(QHsm * const me,
                                QStateHandler const parent);
 
-/*! Implementation of the top-most initial transition in QHsm. */
+/*! Implementation of the top-most initial transition in QHsm.
+* @private @memberof QHsm
+*/
 void QHsm_init_(QHsm * const me);
 
-/*! Implementation of dispatching events to QHsm. */
+/*! Implementation of dispatching events to QHsm.
+* @private @memberof QHsm
+*/
 void QHsm_dispatch_(QHsm * const me);
 
-/*! the top-state. */
+/*! the top-state.
+* @protected @memberof QHsm
+*/
 QState QHsm_top(void const * const me);
 
 
