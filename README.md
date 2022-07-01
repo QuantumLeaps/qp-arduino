@@ -1,8 +1,5 @@
-[![Object-Oriented Programming in C](img/thumbnail.jpg)](https://www.state-machine.com/oop)
-
-
 ## Brought to you by:
-[![Quantum Leaps](https://www.state-machine.com/attachments/logo_ql_400.png)](https://www.state-machine.co)
+[![Quantum Leaps](https://www.state-machine.com/attachments/logo_ql_400.png)](https://www.state-machine.com)
 
 ---------------------------------------------------------------------
 ![QP-Arduino](https://www.state-machine.com/img/logo_qp-arduino.png)
