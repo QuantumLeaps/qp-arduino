@@ -33,7 +33,7 @@ for SAM-based Arduinos:
 - `qpcpp_arm-cm` -- QP/C++ framework for Arduinos based on ARM Cortex-M
 - `qpn_avr`   -- QP-nano framework for Arduinos based on AVR
                  
-> **NOTE:** `qpn_avr` is now obsolete. It is provided for backgwards compatibility only!
+> **NOTE:** `qpn_avr` is now obsolete. It is provided for backwards compatibility only!
  
 ----
 # Provided Tools
@@ -147,7 +147,7 @@ can be used to for
 [QView visualization and monitoring](https://www.state-machine.com/qtools/qview.html)
 
 The `dpp_bsp-sam` example demonstrates the [QView monitoring]. To see this
-feture, you need to upload the dpp_bsp-sam code to the Arduino UNO board and
+feature, you need to upload the dpp_bsp-sam code to the Arduino UNO board and
 then you need to launch QView, from the sub-directory `qview` in the
 `dpp_bsp-sam` example.
 
@@ -162,7 +162,7 @@ under the modified GPLv3 license with the
 in the root of the archive).
 
 Specifically, the Arduino GPLv3 Exception removes the requirement to expose your
-propriatory source code as long as you deploy it on an Arduino-Certified
+proprietary source code as long as you deploy it on an Arduino-Certified
 board.
 
 The [QM model-based design tool](https://www.state-machine.com/qm/) is freeware.
