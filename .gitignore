@@ -35,7 +35,6 @@ lint*.txt
 *.qlc
 JLink*.*
 
-qm/
 eclipse/
 test/
 test_ports/
@@ -59,3 +58,6 @@ lint/*.txt
 lint/MISRA_Exemplar_Suite_test/*.txt
 
 .DS_Store
+.venv
+venv
+.pio
