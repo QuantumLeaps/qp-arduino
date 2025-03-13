@@ -1,0 +1,10 @@
+var searchData=
+[
+  ['segmentdisplay_5finit_737',['SegmentDisplay_init',['../qwin__gui_8h.html#ab9f3af6b18cde882d413a27995e42449',1,'SegmentDisplay_init(SegmentDisplay *const me, UINT segNum, UINT bitmapNum):&#160;qwin_gui.c'],['../qwin__gui_8c.html#a321067a25fd3cde83597370c0d0de5e9',1,'SegmentDisplay_init(SegmentDisplay *const me, UINT segmentNum, UINT bitmapNum):&#160;qwin_gui.c']]],
+  ['segmentdisplay_5finitbitmap_738',['SegmentDisplay_initBitmap',['../qwin__gui_8h.html#ab7b1bb27cf7fa10426a989f3cfad3bf5',1,'SegmentDisplay_initBitmap(SegmentDisplay *const me, UINT bitmapNum, HBITMAP hBitmap):&#160;qwin_gui.c'],['../qwin__gui_8c.html#ab7b1bb27cf7fa10426a989f3cfad3bf5',1,'SegmentDisplay_initBitmap(SegmentDisplay *const me, UINT bitmapNum, HBITMAP hBitmap):&#160;qwin_gui.c']]],
+  ['segmentdisplay_5finitsegment_739',['SegmentDisplay_initSegment',['../qwin__gui_8h.html#abef066bbc7b296ffccc6889b6577450c',1,'SegmentDisplay_initSegment(SegmentDisplay *const me, UINT segmentNum, UINT segmentID):&#160;qwin_gui.c'],['../qwin__gui_8c.html#abef066bbc7b296ffccc6889b6577450c',1,'SegmentDisplay_initSegment(SegmentDisplay *const me, UINT segmentNum, UINT segmentID):&#160;qwin_gui.c']]],
+  ['segmentdisplay_5fsetsegment_740',['SegmentDisplay_setSegment',['../qwin__gui_8h.html#ae6a665c05f1cc08ceccac655cbe39007',1,'SegmentDisplay_setSegment(SegmentDisplay *const me, UINT segmentNum, UINT bitmapNum):&#160;qwin_gui.c'],['../qwin__gui_8c.html#ae6a665c05f1cc08ceccac655cbe39007',1,'SegmentDisplay_setSegment(SegmentDisplay *const me, UINT segmentNum, UINT bitmapNum):&#160;qwin_gui.c']]],
+  ['segmentdisplay_5fxtor_741',['SegmentDisplay_xtor',['../qwin__gui_8h.html#ab257446f2d7880f2096f894193090a43',1,'SegmentDisplay_xtor(SegmentDisplay *const me):&#160;qwin_gui.c'],['../qwin__gui_8c.html#ab257446f2d7880f2096f894193090a43',1,'SegmentDisplay_xtor(SegmentDisplay *const me):&#160;qwin_gui.c']]],
+  ['show_5fcanvas_742',['show_canvas',['../classqview_1_1_q_view.html#a5ee0250f0338f5582bdcdc139ce01bfd',1,'qview::QView']]],
+  ['skip_743',['skip',['../namespacequtest__dsl.html#a7561fe7dd3150c85363087e8e7feb2aa',1,'qutest_dsl']]]
+];

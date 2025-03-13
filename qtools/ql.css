@@ -1,0 +1,660 @@
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-image: none;
+  font-family: -apple-system, system-UI, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+}
+
+table, div, p, dl {
+  font-family: -apple-system, system-UI, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+table.directory {
+  font-family: -apple-system, system-UI, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.title {
+  font-family: -apple-system, system-UI, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+}
+
+#nav-tree .label {
+  font-family: -apple-system, system-UI, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+}
+
+#projectname #projectnumber {
+  font-family: -apple-system, system-UI, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+}
+
+code {
+  font-family: "Lucida Console", Monaco, monospace;
+}
+
+pre.fragment {
+  font-family: "Lucida Console", Monaco, monospace;
+  font-size: 90%;
+}
+
+div.line {
+  font-family: "Lucida Console", Monaco, monospace;
+}
+
+td.memItemLeft, td.memItemRight {
+  font-family: "Lucida Console", Monaco, monospace;
+}
+
+.memproto table td {
+  font-family: "Lucida Console", Monaco, monospace !important;
+}
+
+.memItem {
+  font-family: "Lucida Console", Monaco, monospace;
+}
+
+img {
+  max-width:100%;
+}
+
+img.inline {
+  display: block;
+  margin: auto;
+}
+
+/********   Header    ********/
+#titlearea {
+  background: #ECF0F5;
+}
+
+#logo {
+  margin: 10px 20px 0px 10px;
+}
+
+#projectname {
+  font-family: -apple-system, system-UI, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin-right: 10px;
+}
+
+#projectnumber {
+  font-family: -apple-system, system-UI, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 200%;
+  margin-right: 10px;
+}
+
+#projectbrief {
+  font-family: -apple-system, system-UI, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 200%;
+  margin: 0;
+}
+
+#MSearchBox {
+  margin-top: 20px;
+}
+
+/********   Side bar  ********/
+.ui-resizable-e {
+  background: #C4CFE5;
+}
+
+/********  Main menu  ********/
+#nav-tree {
+  background: #F5F6FA;
+}
+
+#nav-tree .selected a:hover {
+  background: transparent;
+}
+
+
+/********   Main content  ********/
+.contents {
+  margin: 10px auto !important;
+  padding: 0 10px;
+  max-width: 1012px;
+}
+
+/********   Anchors     ********/
+a:hover {
+  background-color: #FFFFAA;
+  text-decoration: none;
+}
+
+a.extern {
+  background:url(img/extern.png) no-repeat right;
+  padding-right: 14px;
+  text-decoration:none;
+}
+.extern:hover {
+  background-color: #E7E7FF;
+}
+
+/******** Inline code    ********/
+p code,
+li code,
+td code,
+dd code {
+  background-color: #EEEEEE;
+  border: 1px solid #AABBDD;
+}
+
+/**     Table of Contents (ToC)     **/
+div.toc {
+  margin: 0 !important;
+  border-radius: 4px !important;
+}
+
+div.toc h3 {
+  font-size: 150%;
+  color: inherit;
+}
+
+/********  Content table  ********/
+table.doxtable tr:nth-child(even) td {
+  background: #32363D;
+}
+
+div.headertitle {
+  text-align: center;
+  font-size: 150%;
+  color: #007;
+}
+
+div.ingroups {
+  font-size: 50%;
+}
+
+div.summary {
+  font-size: 100%;
+}
+
+.contents table.doxtable {
+  margin: 0 auto;
+}
+
+/********   Field table   ********/
+.fieldtable {
+  box-shadow: none !important;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+}
+
+
+/******** Memitem and memtitle********/
+
+.memitem,
+.memproto,
+.memdoc {
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  background-image: none;
+}
+
+.memdoc {
+  border: 1px solid #A8B8D9;
+}
+
+/******** TOP navigation  ********/
+.tablist a:hover,
+.tablist li.current a {
+  text-shadow: none;
+  -moz-text-shadow: none;
+  -webkit-text-shadow: none;
+}
+
+/******** Side-Navigation ********/
+/* initial width of the side-navigation */
+#side-nav {
+  width: 272px;
+}
+
+#nav-tree-contents {
+  margin: 6px;
+}
+
+#nav-tree .label {
+  font-size: 100%;
+}
+
+span.arrow {
+  font-family: "Lucida Console", Monaco, monospace;
+  font-size: 100%;
+}
+
+
+/********  H in textblocks ********/
+h1, h2, h3, h4, h5, h6 {
+  color: #354C7B;
+}
+
+.textblock h1 {
+  border-bottom: 1px solid #4466AA;
+  margin: 20px 0px 10px 0px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.textblock h1:first-child {
+  margin-top: 10px;
+}
+
+.textblock h2 {
+  border-bottom: 1px solid #AADDEE;
+  margin: 15px 0px 10px 0px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.textblock h2:first-child {
+  margin-top: 10px;
+}
+
+/******** Tag (explanation section) ********/
+dl.tag dt {
+  float: left;
+  background-color: black;
+  color: white;
+  line-height: 1.3em;
+  padding: 0 5px;
+}
+
+dl.tag blockquote {
+  border-left: 4px solid #9CAFD4;
+}
+
+span.tag {
+  background-color:#000;
+  color:#fff;
+  font-weight:bold;
+  padding:0 4px 0 4px;
+  margin: 0 6px 0 -25px;
+}
+
+span.bullet {
+  background-color:#f00;
+  border-radius: 7px 7px 7px 7px;
+  color:#fff;
+  font-weight:bold;
+  padding:0 4px 0 4px;
+  margin: 0 6px 0 -25px;
+}
+
+span.black {
+  background-color:#000;
+  color:#fff;
+  font-weight:bold;
+  padding:0 4px 0 4px;
+}
+
+span.ref {
+  background-color:#000;
+  color:#fff;
+  font-weight:bold;
+  padding:0 4px 0 4px;
+}
+
+span.ref_color {
+  background-color:#000;
+  color:#fff;
+  font-weight:bold;
+  padding:0 4px 0 4px;
+}
+
+/********   Note, warning, etc... ********/
+dl.note,
+dl.attention,
+dl.warning,
+dl.remark,
+dl.todo,
+dl.deprecated,
+dl.reflist {
+  border: 0;
+  padding: 0px;
+  margin: 4px 0px 4px 0px;
+  border-radius: 4px;
+}
+
+dl.note dt,
+dl.attention dt,
+dl.warning dt,
+dl.remark dt,
+dl.todo dt,
+dl.deprecated dt,
+dl.reflist dt {
+  margin: 0;
+  padding: 2px 4px;
+
+  border: none;
+  border-top-left-radius: 0px;
+  border-top-right-radius:0px;
+
+  font-weight: bold;
+  /*text-transform: uppercase;*/
+  color: #FFFFFF !important;
+
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  text-shadow: none;
+}
+
+dl.note dd,
+dl.attention dd,
+dl.warning dd,
+dl.remark dd,
+dl.todo dd,
+dl.deprecated dd,
+dl.reflist dd {
+  margin: 0;
+  padding: 4px;
+  background: none;
+
+  color: #222222;
+
+  border: 1px solid;
+  border-bottom-left-radius: 0px;
+  border-bottom-right-radius: 0px;
+  border-top: none;
+
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  text-shadow: none;
+}
+
+dl.reflist dd {
+  margin-bottom: 15px;
+}
+
+/* Background colors */
+dl.note {}
+dl.attention {}
+dl.warning {}
+dl.remark {}
+dl.todo {}
+dl.deprecated {}
+dl.reflist {}
+
+/* Headers... */
+dl.note dt {
+  background-color: #cbc693;
+}
+
+dl.attention dt {
+  background-color: #bf5f82;
+}
+
+dl.warning dt {
+  background-color: #bf5f82;
+}
+
+dl.remark dt {
+  background-color: #aaaadd;
+}
+
+dl.todo dt {
+  background-color: #82b3c9;
+}
+
+dl.deprecated dt {
+  background-color: #af8eb5;
+}
+
+dl.reflist dt {
+  background-color: #cbae82;
+}
+
+/* Content... */
+dl.note dd {
+  background-color: #fff9c4;
+  border-color: #cbc693;
+}
+
+dl.attention dd {
+  background-color: #cbc693;
+  border-color: #f48fb1;
+}
+
+dl.warning dd {
+  background-color: #f48fb1;
+  border-color: #bf5f82;
+}
+
+dl.remark dd {
+  background-color: #eeeeee;
+  border-color: #aaaaaa;
+}
+
+dl.todo dd {
+  background-color: #b3e5fc;
+  border-color: #82b3c9;
+}
+
+dl.deprecated dd {
+  background-color: #e1bee7;
+  border-color: #af8eb5;
+}
+
+dl.reflist dd {
+  background-color: #ffe0b2;
+  border-color: #cbae82;
+}
+
+/********   Reference list********/
+/**Similar to warning/note/todo/... messages**/
+dl.reflist {
+}
+
+/********   Note, warning ********/
+#docs_list {
+  padding: 0 10px;
+}
+
+#docs_list ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#docs_list ul li {
+  display: inline-block;
+  border-right: 1px solid #BFBFBF;
+}
+
+#docs_list ul li:last-child {
+  border-right: none;
+}
+
+#docs_list ul li a {
+  display: block;
+  padding: 8px 13px;
+  font-weight: bold;
+}
+
+#docs_list ul li a:hover,
+#docs_list ul li a.docs_current {
+  text-decoration: underline;
+}
+
+/********   Download url  ********/
+.download_url {
+  font-weight: bold;
+  font-size: 150%;
+  line-height: 150%;
+}
+
+/********  Dark code + syntax  ********/
+div.fragment {
+  margin: 0;
+  border: 1px solid #000000;
+  background: #32363d;
+  color: #D8D8D8;
+}
+
+pre.fragment {
+  margin: 0;
+  border: 1px solid #000000;
+  background: #323677;
+  color: #D8D8D8;
+}
+
+div.line a {
+  color: #aaf;
+}
+
+div.line a:hover {
+  text-decoration: underline;
+}
+
+span.keyword {
+  color: #f92472;
+  font-style: italic;
+}
+
+span.keywordtype {
+  color: #67cfc1;
+  font-style: italic;
+}
+
+span.keywordflow {
+  color: #f92472;
+  font-style: italic;
+}
+
+span.comment {
+  color: #997;
+}
+
+span.preprocessor {
+  color: #a6e22b;
+}
+
+span.stringliteral {
+  color: #e7db74;
+}
+
+span.charliteral {
+  color: #e7db74;
+}
+
+span.vhdldigit {
+  color: #ff00ff;
+}
+
+span.vhdlchar {
+  color: #000000;
+}
+
+span.vhdlkeyword {
+  color: #700070;
+}
+
+span.vhdllogic {
+  color: #ff0000;
+}
+
+span.lineno {
+  color: #777;
+  /*background: transparent;*/
+}
+
+span.lineno a {
+  color: #77f;
+  /*background: transparent;*/
+}
+
+/******** Modules/Directory table    **/
+.directory .arrow {
+  height: initial;
+}
+
+.directory td.entry {
+  padding: 3px 6px;
+}
+
+/********   Mem items   ********/
+.paramname, .paramname em {
+  font-style: italic;
+}
+
+.memdoc {
+  text-shadow: none;
+}
+
+.memItem table {
+  font-family: inherit;
+}
+
+/********   Footer    ********/
+#nav-path {
+  background-color: #EEEEEE;
+}
+
+#nav-path ul {
+  background: transparent;
+  color: inherit;
+  border: none;
+  border-top: 1px solid #aaa;
+}
+
+.navpath li.footer {
+  color: inherit;
+}
+
+.navpath li.navelem a {
+  text-shadow: none;
+}
+
+/******** Custom spans  ********/
+.img {
+  padding-left: 20px;
+  white-space: nowrap;
+  color: #00A;
+}
+
+.logo {
+  line-height: 50px;
+  padding: 10px 0px 20px 55px;
+  white-space: nowrap;
+  color: #007;
+  font-weight: bold;
+}
+
+/********      Icons  ********/
+.qp_link   {background:url(img/qp_link.png)   no-repeat;}
+.file      {background:url(img/file.png)      no-repeat;}
+.file_c    {background:url(img/file_c.png)    no-repeat;}
+.file_cpp  {background:url(img/file_cpp.png)  no-repeat;}
+.file_doc  {background:url(img/file_doc.png)  no-repeat;}
+.file_h    {background:url(img/file_h.png)    no-repeat;}
+.file_mak  {background:url(img/file_mak.png)  no-repeat;}
+.file_pdf  {background:url(img/file_pdf.png)  no-repeat;}
+.file_py   {background:url(img/file_py.png)   no-repeat;}
+.file_qm   {background:url(img/file_qm.png)   no-repeat;}
+.file_qmp  {background:url(img/file_qmp.png)  no-repeat;}
+.file_tcl  {background:url(img/file_tcl.png)  no-repeat;}
+.file_wish {background:url(img/file_wish.png) no-repeat;}
+.folder    {background:url(img/folder.png)    no-repeat;}
+.key_down  {background:url(img/key_down.png)  no-repeat;}
+.key_ret   {background:url(img/key_ret.png)   no-repeat;}
+.key_up    {background:url(img/key_up.png)    no-repeat;}
+.bug       {background:url(img/bug.png)       no-repeat;}
+.logo_win   {background:url(img/logo_win48.png)   no-repeat;}
+.logo_linux {background:url(img/logo_linux48.png) no-repeat;}
+.logo_macos {background:url(img/logo_macos48.png) no-repeat;}
+
+/********     Responsive  ********/
+/*
+@media only screen and (max-width: 801px) {
+  #titlearea { display: none; }
+  #nav-path  { display: none; }
+}
+*/
+
