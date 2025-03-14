@@ -5,7 +5,12 @@
 ![QP-Arduino](https://www.state-machine.com/img/logo_qp-arduino.png)
 
 This README provides a quick overview of QP for Arduino.
-Please refer to the companion webiste to this project at:
+
+More detailed documentation for qpcpp, qm, and qtools can be found at:
+
+https://quantumleaps.github.io/qp-arduino/
+
+Please refer to the companion website to this project at:
 
 https://www.state-machine.com/arduino
 
