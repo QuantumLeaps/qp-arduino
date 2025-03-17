@@ -23,7 +23,7 @@ https://www.state-machine.com/arduino
 * Repository Information
 - Name: qp-arduino
 - Description: QP real-time embedded framework for Arduino (ARM Cortex-M)
-- Version: 6.9.5
+- Version: 6.9.6
 - qpcpp version: 6.9.3
 - qm version: 5.1.3
 - qtools version: 6.9.3

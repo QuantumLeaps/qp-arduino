@@ -1,4 +1,4 @@
-QP/C++ and QP-nano FRAMEWORK EXCEPTION FOR ARDUINO
+QP/C++ FRAMEWORK EXCEPTION FOR ARDUINO
 
 Version 3.0, December 22, 2021
 
@@ -7,9 +7,9 @@ Copyright (c) 2005-2021 Quantum Leaps, LLC. <https://www.state-machine.com/>
 Everyone is permitted to copy and distribute verbatim copies of this
 license document, but changing it is not allowed.
 
-This QP/C++ and QP-nano Framework Exception for Arduino ("Exception")
+This QP/C++ Framework Exception for Arduino ("Exception")
 is an additional permission under section 7 of the GNU General Public
-License, version 3 ("GPLv3"). It applies to the QP/C++ and QP-nano
+License, version 3 ("GPLv3"). It applies to the QP/C++
 source code (the "QP Frameworks") that is distributed as part of the
 QP-Arduino Support Package.
 
