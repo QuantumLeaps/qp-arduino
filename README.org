@@ -218,6 +218,7 @@ cd ~/qp
 curl -OL https://github.com/QuantumLeaps/qtools/releases/download/v6.9.3/qtools-posix_6.9.3.zip
 unzip qtools-posix_6.9.3.zip && rm qtools-posix_6.9.3.zip && mv qtools qtools-6.9.3
 cd qtools-6.9.3/qspy/posix
+sudo apt install build-essential
 make
 alias qspy='~/qp/qtools-6.9.3/bin/qspy'
 #+END_SRC
