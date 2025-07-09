@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['new_20model_20dialog_20box_101',['New Model Dialog Box',['../ui_new-dlg.html',1,'ui']]]
+  ['property_20editor_0',['Property Editor',['../ui_prop.html',1,'ui']]]
 ];

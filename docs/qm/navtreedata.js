@@ -25,13 +25,34 @@
 var NAVTREE =
 [
   [ "QM", "index.html", [
-    [ "About QM™", "index.html", "index" ],
+    [ "About QM™", "index.html", [
+      [ "What is it?", "index.html#ab_what", null ],
+      [ "What does it do?", "index.html#ab_goals", null ],
+      [ "How does it look?", "index.html#ab_look", null ],
+      [ "What's special about it?", "index.html#ab_special", [
+        [ "Low Ceremony", "index.html#ab_ceremony", null ],
+        [ "Built-in QP™ Frameworks", "index.html#ab_qp", null ],
+        [ "Forward Engineering", "index.html#ab_forward", null ],
+        [ "Capturing the Physical Design", "index.html#ab_code", null ],
+        [ "No more \"Fighting the Tool\"", "index.html#ab_friendly", null ]
+      ] ],
+      [ "How is it licensed?", "index.html#ab_license", [
+        [ "The QM™ Tool", "index.html#ab_eula", null ],
+        [ "The Generated Code", "index.html#ab_gen_code", null ]
+      ] ],
+      [ "How to get help?", "index.html#ab_help", null ]
+    ] ],
     [ "Getting Started", "gs.html", "gs" ],
     [ "User Interface", "ui.html", "ui" ],
     [ "Basic Modeling", "bm.html", "bm" ],
     [ "State Machines", "sm.html", "sm" ],
     [ "Code Engineering", "ce.html", "ce" ],
     [ "Revision History", "history.html", [
+      [ "Version 5.2.3, 2022-11-18", "history.html#qm_5_2_3", null ],
+      [ "Version 5.2.2, 2022-09-30", "history.html#qm_5_2_2", null ],
+      [ "Version 5.2.1, 2022-07-31", "history.html#qm_5_2_1", null ],
+      [ "Version 5.2.0, 2022-06-30", "history.html#qm_5_2_0", null ],
+      [ "Version 5.1.4, 2022-04-30", "history.html#qm_5_1_4", null ],
       [ "Version 5.1.3, 2021-06-17", "history.html#qm_5_1_3", null ],
       [ "Version 5.1.1, 2021-04-12", "history.html#qm_5_1_1", null ],
       [ "Version 5.1.0, 2020-11-01", "history.html#qm_5_1_0", null ],
@@ -93,44 +114,22 @@ var NAVTREE =
       [ "Version 1.0.03, 2010-10-29", "history.html#qm_1_0_03", null ],
       [ "Version 1.0.00, 2010-10-20", "history.html#qm_1_0_00", null ]
     ] ],
-    [ "Quick Links", "links.html", null ],
-    [ "Index", "idx.html", [
-      [ "$", "idx.html#idx_dollar", null ],
-      [ "A", "idx.html#idx_a", null ],
-      [ "B", "idx.html#idx_b", null ],
-      [ "C", "idx.html#idx_c", null ],
-      [ "D", "idx.html#idx_d", null ],
-      [ "E", "idx.html#idx_e", null ],
-      [ "F", "idx.html#idx_f", null ],
-      [ "G", "idx.html#idx_g", null ],
-      [ "H", "idx.html#idx_h", null ],
-      [ "I", "idx.html#idx_i", null ],
-      [ "J", "idx.html#idx_j", null ],
-      [ "K", "idx.html#idx_k", null ],
-      [ "L", "idx.html#idx_l", null ],
-      [ "M", "idx.html#idx_m", null ],
-      [ "N", "idx.html#idx_n", null ],
-      [ "O", "idx.html#idx_o", null ],
-      [ "P", "idx.html#idx_p", null ],
-      [ "Q", "idx.html#idx_q", null ],
-      [ "R", "idx.html#idx_r", null ],
-      [ "S", "idx.html#idx_s", null ],
-      [ "T", "idx.html#idx_t", null ],
-      [ "U", "idx.html#idx_u", null ],
-      [ "V", "idx.html#idx_v", null ],
-      [ "W", "idx.html#idx_w", null ],
-      [ "X", "idx.html#idx_x", null ],
-      [ "Y", "idx.html#idx_y", null ],
-      [ "Z", "idx.html#idx_z", null ]
-    ] ]
+    [ "QM™ License", "license.html", "license" ],
+    [ "Using Online Help", "help.html", [
+      [ "Dark Mode Toggle", "help.html#help_dark_mode", null ],
+      [ "Using the Tree View", "help.html#help_tree_view", null ],
+      [ "Reading Online Help Sequentially", "help.html#help_seq", null ],
+      [ "Quickly Locating a Topic of Interest", "help.html#help_random", null ],
+      [ "QL-Doxygen on GitHub", "help.html#help_github", null ]
+    ] ],
+    [ "Quick Links", "links.html", null ]
   ] ]
 ];
 
 var NAVTREEINDEX =
 [
 "bm.html",
-"history.html#qm_4_5_0",
-"ui_tools-dlg.html#ui_tools-dlg_open"
+"history.html#qm_4_2_1"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

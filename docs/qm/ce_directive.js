@@ -14,6 +14,7 @@ var ce_directive =
       [ "Free Operation Declaration", "ce_declare.html#ce_declare_oper", null ],
       [ "Package Declaration", "ce_declare.html#ce_declare_package", null ]
     ] ],
+    [ "$declare1${}", "ce_declare1.html", null ],
     [ "$define${}", "ce_define.html", null ],
     [ "$define1${}", "ce_define1.html", null ]
 ];

@@ -9,7 +9,6 @@ var sm =
       [ "Adding a Statechart", "sm_statechart.html#sm_add", null ],
       [ "Resizing a State Machine Diagram", "sm_statechart.html#sm_resize", null ],
       [ "Statechart Property Sheet", "sm_statechart.html#sm_statechart_prop", [
-        [ "Use \"me->\"", "sm_statechart.html#sm_statechart-use-me", null ],
         [ "QS_FUN_DICT", "sm_statechart.html#sm_statechart-QS", null ],
         [ "Documentation", "sm_statechart.html#sm_statechart-doc", null ]
       ] ]
@@ -29,14 +28,14 @@ var sm =
       ] ]
     ] ],
     [ "Working with Transitions", "sm_tran.html", [
+      [ "Regular Transitions", "sm_tran.html#sm_tran_reg", null ],
+      [ "Internal Transitions", "sm_tran.html#sm_tran_intern", null ],
       [ "Adding a Transition", "sm_tran.html#sm_tran_add", [
         [ "Adding Internal Transition", "sm_tran.html#sm_tran_add-internal", null ],
         [ "Adding State-to-State Transition", "sm_tran.html#sm_tran_add-state", null ]
       ] ],
       [ "Transition Property Sheet", "sm_tran.html#sm_tran_prop", [
         [ "Transition Trigger", "sm_tran.html#sm_tran-trig", [
-          [ "Class Destructors in C", "bm_oper-class.html#bm_class-xtor_C", null ],
-          [ "Class Destructors in C++", "bm_oper-class.html#bm_class-xtor_Cpp", null ],
           [ "Trigger List", "sm_tran.html#sm_tran_trig-list", null ],
           [ "CATCH_ALL Trigger", "sm_tran.html#sm_tran_CATCH_ALL", null ]
         ] ],
@@ -44,12 +43,13 @@ var sm =
         [ "Transition Action", "sm_tran.html#sm_tran-act", null ]
       ] ],
       [ "Transition Text Box", "sm_tran.html#sm_tran_text", null ],
+      [ "Moving Transitions", "sm_tran.html#sm_tran_move", null ],
       [ "Changing Transition Type", "sm_tran.html#sm_tran_type", null ],
       [ "Routing Transitions", "sm_tran.html#sm_tran_routing", null ],
       [ "What About Guards?", "sm_tran.html#sm_tran_guards", null ]
     ] ],
     [ "Working with Choice Segments", "sm_choice.html", [
-      [ "Adding Choice Segment", "sm_choice.html#sm_choice_add", null ],
+      [ "Adding A Choice Segment", "sm_choice.html#sm_choice_add", null ],
       [ "Choice Segment Property Sheet", "sm_choice.html#sm_choice_prop", [
         [ "Choice Guard", "sm_choice.html#sm_choice-guard", null ],
         [ "Choice Target", "sm_choice.html#sm_choice-target", null ],
@@ -64,7 +64,7 @@ var sm =
       [ "Routing Choice Segments", "sm_choice.html#sm_choice_routing", null ]
     ] ],
     [ "Working with Initial Transitions", "sm_init.html", [
-      [ "Adding Initial Transition", "sm_init.html#sm_initial_add", null ],
+      [ "Adding the Initial Transition", "sm_init.html#sm_initial_add", null ],
       [ "Invalid Initial Transitions", "sm_init.html#sm_initial_invalid", null ],
       [ "Initial Transition Property Sheet", "sm_init.html#sm_init_prop", [
         [ "Initial Transition Action", "sm_init.html#bm_init-act", null ]
@@ -108,7 +108,7 @@ var sm =
     ] ],
     [ "Working with Submachine States", "sm_smstate.html", [
       [ "Adding a Submachine State", "sm_smstate.html#sm_smstate_add", null ],
-      [ "Moving a Sumachine State", "sm_smstate.html#sm_smstate_move", null ],
+      [ "Moving a Submachine State", "sm_smstate.html#sm_smstate_move", null ],
       [ "Resizing a Submachine State", "sm_smstate.html#sm_smstate_resize", null ],
       [ "Deleting a Submachine State", "sm_smstate.html#sm_smstate_delete", null ],
       [ "Submachine State Property Sheet", "sm_smstate.html#sm_smstate_prop", [

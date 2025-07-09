@@ -39,15 +39,16 @@ var bm =
     ] ],
     [ "Working with Class Operations", "bm_oper-class.html", [
       [ "Class Constructors", "bm_oper-class.html#bm_class-ctor", [
-        [ "Class Constructors in C", "bm_oper-class.html#bm_class-ctor_C", [
-          [ "Invoking Constructors of Static Objects in C", "bm_oper-class.html#bm_class-ctor_call", null ]
-        ] ],
-        [ "Class Constructors in C++", "bm_oper-class.html#bm_class-ctor_Cpp", [
-          [ "C++ Constructor Initializer List", "bm_oper-class.html#bm_class-ctor_initializer", null ],
-          [ "Explicit Constructor in C++", "bm_oper-class.html#bm_class-ctor_explicit", null ]
+        [ "Class Constructors in C", "bm_oper-class.html#bm_class-ctor_C", null ],
+        [ "Invoking Constructors of Static Objects in C", "bm_oper-class.html#bm_class-ctor_call", null ],
+        [ "Class Constructors in C++", "bm_oper-class.html#bm_class-ctor_Cpp", null ],
+        [ "C++ Constructor Initializer List", "bm_oper-class.html#bm_class-ctor_initializer", null ],
+        [ "Explicit Constructor in C++", "bm_oper-class.html#bm_class-ctor_explicit", null ],
+        [ "Class Destructors", "bm_oper-class.html#bm_class-xtor", null ],
+        [ "Class Destructors in C", "bm_oper-class.html#bm_class-xtor_C", [
+          [ "Class Destructors in C++", "bm_oper-class.html#bm_class-xtor_cpp", null ]
         ] ]
       ] ],
-      [ "Class Destructors", "bm_oper-class.html#bm_class-xtor", null ],
       [ "Static (Class-Wide) Operations", "bm_oper-class.html#bm_class-oper-static", null ],
       [ "Class Operation Property Sheet", "bm_oper-class.html#bm_class-oper-prop", null ]
     ] ],
@@ -66,8 +67,9 @@ var bm =
       [ "The Drawing Canvas", "bm_diagram.html#bm_diagram_canvas", null ],
       [ "The Grid", "bm_diagram.html#bm_diagram_grid", null ],
       [ "Selecting Diagram Shapes", "bm_diagram.html#bm_diagram_shape_select", [
+        [ "Selecting Shapes with the Mouse-Toggle", "bm_diagram.html#bm_diagram_shape_select-mouse", null ],
         [ "Selecting Shapes with the Lasso", "bm_diagram.html#bm_diagram_shape_select-lasso", null ],
-        [ "Selecting Shapes with the Mouse-Toggle", "bm_diagram.html#bm_diagram_shape_select-mouse", null ]
+        [ "Moving the Selected Shapes", "bm_diagram.html#bm_diagram_shape_move", null ]
       ] ],
       [ "Panning Diagrams", "bm_diagram.html#bm_diagram_pan", null ],
       [ "Scrolling Diagrams", "bm_diagram.html#bm_diagram_scroll", [
