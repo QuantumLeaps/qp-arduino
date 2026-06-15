@@ -66,11 +66,11 @@ void BSP::init(void) {
 #endif
 }
 //............................................................................
-void BSP::displayPhilStat(uint8_t n, char_t const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     digitalWrite(LED_BUILTIN, (stat[0] == 'e') ? HIGH : LOW);
 
 #ifdef QS_ON
-    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->m_prio) // app-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]->getPrio()) // app-specific record begin
         QS_U8(1, n);  // Philo number
         QS_STR(stat); // Philo status
     QS_END()
@@ -83,9 +83,11 @@ void BSP::displayPhilStat(uint8_t n, char_t const *stat) {
 }
 //............................................................................
 void BSP::displayPaused(uint8_t paused) {
-    char const *msg = paused ? "Paused ON" : "Paused OFF";
 #ifndef QS_ON
+    char const *msg = paused ? "Paused ON" : "Paused OFF";
     Serial.println(msg);
+#else
+    static_cast<void>(paused);
 #endif
 }
 //............................................................................
@@ -133,20 +135,20 @@ uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
 // interrupts.................................................................
 void TIMER_HANDLER(void) {
     TC_GetStatus(TIMER, TIMER_CHANNEL);  // clear the interrupt source
-    QF::TICK_X(0, &l_TIMER_ID); // process time events for tick rate 0
+    QTimeEvt::tick(0U, &l_TIMER_ID); // process time events for tick rate 0
 
 #ifndef QS_ON
     if (Serial.available() > 0) {
         switch (Serial.read()) { // read the incoming byte
             case 'p':
             case 'P':
-                static QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
-                QF::PUBLISH(&pauseEvt, &l_TIMER_ID);
+                static QEvt const pauseEvt(PAUSE_SIG);
+                QActive::publish_(&pauseEvt, &l_TIMER_ID, 0U);
                 break;
             case 's':
             case 'S':
-                static QEvt const serveEvt = { SERVE_SIG, 0U, 0U};
-                QF::PUBLISH(&serveEvt, &l_TIMER_ID);
+                static QEvt const serveEvt(SERVE_SIG);
+                QActive::publish_(&serveEvt, &l_TIMER_ID, 0U);
                 break;
         }
     }
@@ -213,14 +215,14 @@ void QV::onIdle(void) { // called with interrupts DISABLED
 #endif
 }
 //............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const module, int location) {
+extern "C" Q_NORETURN Q_onError(char const * const module, int location) {
     //
     // NOTE: add here your application-specific error handling
     //
     (void)module;
     (void)location;
 
-    QF_INT_DISABLE(); // disable all interrupts
+    noInterrupts(); // disable all interrupts
     BSP::ledOn();  // trun the LED on
     for (;;) { // freeze in an endless loop for now...
     }

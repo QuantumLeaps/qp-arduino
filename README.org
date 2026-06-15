@@ -23,11 +23,11 @@ https://www.state-machine.com/arduino
 * Repository Information
 - Name: qp-arduino
 - Description: QP real-time embedded framework for Arduino (ARM Cortex-M)
-- Version: 6.9.6
-- qpcpp version: 6.9.3
-- qm version: 5.2.3
-- qtools version: 6.9.3
-- Release Date: 2025-03-14
+- Version: 7.3.4
+- qpcpp source tag: v7.3.4
+- qm version: 6.1.1
+- qtools version: 7.3.4
+- Release Date: 2026-06-15
 - Creation Date: 2017-01-30
 - License: GPLv3
 - URL: https://github.com/QuantumLeaps/qp-arduino
@@ -52,6 +52,17 @@ hierarchical state machines.
 This repository contains one external library for ARM Cortex-M based Arduinos:
 
 - =qp-arduino= -- QP/C++ framework for Arduinos based on ARM Cortex-M
+
+NOTE: The qpcpp =v7.3.4= source tag used for this package contains generated
+framework headers that still report =QP_VERSION_STR "7.3.3"= and
+=QP_VERSION 733U=. This package preserves those upstream generated files
+unchanged where possible and identifies the imported source by the =v7.3.4=
+tag.
+
+The v7 port provenance, file mapping, and intentional Arduino-local deltas are
+documented in =UPGRADE_QPCPP_V7.md=. The script
+=scripts/check_upstream_provenance.sh= verifies that imported files still match
+qpcpp =v7.3.4= except for the documented Arduino deltas.
 
 * Installation
 
@@ -120,7 +131,8 @@ follows:
         │   ├── blinky_bsp-sam
         │   ├── blinky_bsp-teensy4
         │   ├── dpp_bsp-sam
-        │   └── dpp_bsp-teensy4
+        │   ├── dpp_bsp-teensy4
+        │   └── port_validation-teensy4
         └── src
             └── qp-arduino
 #+END_SRC
@@ -192,10 +204,10 @@ Or it may be downloaded and installed on the command line:
 
 #+BEGIN_SRC sh
 cd ~ && rm -rf qp && mkdir qp && cd qp
-curl -OL https://github.com/QuantumLeaps/qm/releases/download/v5.2.3/qm_5.2.3-linux64.zip
-unzip qm_5.2.3-linux64.zip && rm qm_5.2.3-linux64.zip && mv qm qm-5.2.3
-chmod u+x qm-5.2.3/bin/qm && chmod u+x qm-5.2.3/bin/qm.sh
-alias qm='~/qp/qm-5.2.3/bin/qm.sh'
+curl -OL https://github.com/QuantumLeaps/qm/releases/download/v6.1.1/qm_6.1.1-linux64.zip
+unzip qm_6.1.1-linux64.zip && rm qm_6.1.1-linux64.zip && mv qm qm-6.1.1
+chmod u+x qm-6.1.1/bin/qm && chmod u+x qm-6.1.1/bin/qm.sh
+alias qm='~/qp/qm-6.1.1/bin/qm.sh'
 #+END_SRC
 
 ** QTools
@@ -215,12 +227,12 @@ Or they may be downloaded and installed on the command line:
 
 #+BEGIN_SRC sh
 cd ~/qp
-curl -OL https://github.com/QuantumLeaps/qtools/releases/download/v6.9.3/qtools-posix_6.9.3.zip
-unzip qtools-posix_6.9.3.zip && rm qtools-posix_6.9.3.zip && mv qtools qtools-6.9.3
-cd qtools-6.9.3/qspy/posix
+curl -OL https://github.com/QuantumLeaps/qtools/releases/download/v7.3.4/qtools-posix_7.3.4.zip
+unzip qtools-posix_7.3.4.zip && rm qtools-posix_7.3.4.zip && mv qtools qtools-7.3.4
+cd qtools-7.3.4/qspy/posix
 sudo apt install build-essential
 make
-alias qspy='~/qp/qtools-6.9.3/bin/qspy'
+alias qspy='~/qp/qtools-7.3.4/bin/qspy'
 #+END_SRC
 
 * QP/Spy Software Tracing Support
@@ -229,8 +241,9 @@ The qpcpp_arm-cm library now supports the
 [[https://www.state-machine.com/software-tracing][QP/Spy software tracing]].
 This feature is also demonstrated in the qpcpp examples (with the BSP).
 
-To activate the software tracing, you would need to un-comment the =QS_ON= macro
-at the top of bsp.cpp source file.
+The Arduino port is built with QP/Spy instrumentation enabled. To activate the
+serial QS transport in an example, define the =QS_ON= macro at the top of its
+=bsp.cpp= source file.
 
 NOTE: Because the QP/Spy output is binary, you cannot watch it with a standard
 serial terminal. Instead, you need to use the

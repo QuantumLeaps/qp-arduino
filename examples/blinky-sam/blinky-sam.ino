@@ -70,7 +70,7 @@ void loop() {
 // interrupts.................................................................
 void TIMER_HANDLER(void) {
     TC_GetStatus(TIMER, TIMER_CHANNEL);  // clear the interrupt source
-    QF::TICK_X(0, nullptr); // process time events for tick rate 0
+    QTimeEvt::tick(0U, nullptr); // process time events for tick rate 0
 }
 //............................................................................
 void QF::onStartup(void) {
@@ -109,14 +109,14 @@ void QV::onIdle(void) { // called with interrupts DISABLED
 #endif
 }
 //............................................................................
-extern "C"  Q_NORETURN Q_onAssert(char const * const module, int location) {
+extern "C"  Q_NORETURN Q_onError(char const * const module, int location) {
     //
     // NOTE: add here your application-specific error handling
     //
     (void)module;
     (void)location;
 
-    QF_INT_DISABLE(); // disable all interrupts
+    noInterrupts(); // disable all interrupts
     digitalWrite(LED_BUILTIN, HIGH); // turn the LED on
     for (;;) { // sit in an endless loop for now
     }
@@ -161,8 +161,8 @@ protected:
 //.$enddecl${AOs::Blinky} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //.$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 //. Check for the minimum required QP version
-#if (QP_VERSION < 690U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
-#error qpcpp version 6.9.0 or higher required
+#if (QP_VERSION < 730U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
+#error qpcpp version 7.3.0 or higher required
 #endif
 //.$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //.$define${AOs::Blinky} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

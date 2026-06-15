@@ -77,7 +77,7 @@ void BSP::ledOn(void) {
 
 // interrupts.................................................................
 void TIMER_HANDLER(void) {
-    QF::TICK_X(0, &l_TIMER_ID); // process time events for tick rate 0
+    QTimeEvt::tick(0U, &l_TIMER_ID); // process time events for tick rate 0
 }
 //............................................................................
 void QF::onStartup(void) {
@@ -121,14 +121,14 @@ void QV::onIdle(void) { // called with interrupts DISABLED
 #endif
 }
 //............................................................................
-extern "C" Q_NORETURN Q_onAssert(char const * const module, int location) {
+extern "C" Q_NORETURN Q_onError(char const * const module, int location) {
     //
     // NOTE: add here your application-specific error handling
     //
     (void)module;
     (void)location;
 
-    QF_INT_DISABLE(); // disable all interrupts
+    noInterrupts(); // disable all interrupts
     BSP::ledOn();  // trun the LED on
     for (;;) { // freeze in an endless loop for now...
     }

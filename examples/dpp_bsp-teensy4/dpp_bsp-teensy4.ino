@@ -30,7 +30,7 @@ void setup() {
 
     // init publish-subscribe
     static QSubscrList subscrSto[MAX_PUB_SIG];
-    QF::psInit(subscrSto, Q_DIM(subscrSto));
+    QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // initialize event pools...
     static QF_MPOOL_EL(TableEvt) smlPoolSto[2*N_PHILO];

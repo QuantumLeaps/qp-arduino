@@ -61,3 +61,4 @@ lint/MISRA_Exemplar_Suite_test/*.txt
 .venv
 venv
 .pio
+.pio-core

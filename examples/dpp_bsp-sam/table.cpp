@@ -47,8 +47,8 @@ protected:
 // generate definition of the opaque pointer to the AO -----------------------
 //.$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 //. Check for the minimum required QP version
-#if (QP_VERSION < 690U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
-#error qpcpp version 6.9.0 or higher required
+#if (QP_VERSION < 730U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
+#error qpcpp version 7.3.0 or higher required
 #endif
 //.$endskip${QP_VERSION} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 //.$define${AOs::AO_Table} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -152,7 +152,7 @@ Q_STATE_DEF(Table, serving) {
                     m_fork[n] = USED;
                     TableEvt *te = Q_NEW(TableEvt, EAT_SIG);
                     te->philoNum = n;
-                    QP::QF::PUBLISH(te, this);
+                    QP::QActive::publish_(te, this, getPrio());
                     m_isHungry[n] = false;
                     BSP::displayPhilStat(n, EATING);
                 }
@@ -174,7 +174,7 @@ Q_STATE_DEF(Table, serving) {
                 m_fork[n] = USED;
                 TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = n;
-                QP::QF::PUBLISH(pe, this);
+                QP::QActive::publish_(pe, this, getPrio());
                 BSP::displayPhilStat(n, EATING);
                 status_ = Q_RET_HANDLED;
             }
@@ -206,7 +206,7 @@ Q_STATE_DEF(Table, serving) {
                 m_isHungry[m] = false;
                 TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = m;
-                QP::QF::PUBLISH(pe, this);
+                QP::QActive::publish_(pe, this, getPrio());
                 BSP::displayPhilStat(m, EATING);
             }
             m = LEFT(n); // check the left neighbor
@@ -217,7 +217,7 @@ Q_STATE_DEF(Table, serving) {
                 m_isHungry[m] = false;
                 TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
                 pe->philoNum = m;
-                QP::QF::PUBLISH(pe, this);
+                QP::QActive::publish_(pe, this, getPrio());
                 BSP::displayPhilStat(m, EATING);
             }
             status_ = Q_RET_HANDLED;

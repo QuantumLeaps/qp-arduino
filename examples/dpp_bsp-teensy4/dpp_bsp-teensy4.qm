@@ -150,7 +150,7 @@ Q_ASSERT(Q_EVT_CAST(TableEvt)-&gt;philoNum != PHILO_ID(this));</action>
      <entry>m_timeEvt.armX(eat_time(), 0U);</entry>
      <exit>TableEvt *pe = Q_NEW(TableEvt, DONE_SIG);
 pe-&gt;philoNum = PHILO_ID(this);
-QP::QF::PUBLISH(pe, this);
+QP::QActive::publish_(pe, this, getPrio());
 (void)m_timeEvt.disarm();</exit>
      <!--${AOs::Philo::SM::eating::TIMEOUT}-->
      <tran trig="TIMEOUT" target="../../1">
@@ -251,7 +251,7 @@ QS_SIG_DICTIONARY(HUNGRY_SIG, nullptr);
         m_fork[n] = USED;
         TableEvt *te = Q_NEW(TableEvt, EAT_SIG);
         te-&gt;philoNum = n;
-        QP::QF::PUBLISH(te, this);
+        QP::QActive::publish_(te, this, getPrio());
         m_isHungry[n] = false;
         BSP::displayPhilStat(n, EATING);
     }
@@ -271,7 +271,7 @@ uint8_t m = LEFT(n);</action>
 m_fork[n] = USED;
 TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
 pe-&gt;philoNum = n;
-QP::QF::PUBLISH(pe, this);
+QP::QActive::publish_(pe, this, getPrio());
 BSP::displayPhilStat(n, EATING);</action>
         <choice_glyph conn="19,26,5,-1,10">
          <action box="1,0,10,2"/>
@@ -310,7 +310,7 @@ if (m_isHungry[m] &amp;&amp; (m_fork[m] == FREE)) {
     m_isHungry[m] = false;
     TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
     pe-&gt;philoNum = m;
-    QP::QF::PUBLISH(pe, this);
+    QP::QActive::publish_(pe, this, getPrio());
     BSP::displayPhilStat(m, EATING);
 }
 m = LEFT(n); // check the left neighbor
@@ -321,7 +321,7 @@ if (m_isHungry[m] &amp;&amp; (m_fork[n] == FREE)) {
     m_isHungry[m] = false;
     TableEvt *pe = Q_NEW(TableEvt, EAT_SIG);
     pe-&gt;philoNum = m;
-    QP::QF::PUBLISH(pe, this);
+    QP::QActive::publish_(pe, this, getPrio());
     BSP::displayPhilStat(m, EATING);
 }</action>
        <tran_glyph conn="4,34,3,-1,15">
@@ -426,7 +426,7 @@ void setup() {
 
     // init publish-subscribe
     static QSubscrList subscrSto[MAX_PUB_SIG];
-    QF::psInit(subscrSto, Q_DIM(subscrSto));
+    QActive::psInit(subscrSto, Q_DIM(subscrSto));
 
     // initialize event pools...
     static QF_MPOOL_EL(TableEvt) smlPoolSto[2*N_PHILO];
@@ -465,7 +465,7 @@ public:
     enum { TICKS_PER_SEC = 100} ;
     static void init(void);
     static void displayPaused(uint8_t const paused);
-    static void displayPhilStat(uint8_t const n, char_t const *stat);
+    static void displayPhilStat(uint8_t const n, char const *stat);
     static void terminate(int16_t const result);
 
     static void randomSeed(uint32_t const seed); // random seed
@@ -532,11 +532,11 @@ void BSP::init(void) {
 #endif
 }
 //............................................................................
-void BSP::displayPhilStat(uint8_t n, char_t const *stat) {
+void BSP::displayPhilStat(uint8_t n, char const *stat) {
     digitalWrite(LED_BUILTIN, (stat[0] == 'e') ? HIGH : LOW);
 
 #ifdef QS_ON
-    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]-&gt;m_prio) // app-specific record begin
+    QS_BEGIN_ID(PHILO_STAT, AO_Philo[n]-&gt;getPrio()) // app-specific record begin
         QS_U8(1, n);  // Philo number
         QS_STR(stat); // Philo status
     QS_END()
@@ -549,9 +549,11 @@ void BSP::displayPhilStat(uint8_t n, char_t const *stat) {
 }
 //............................................................................
 void BSP::displayPaused(uint8_t paused) {
-    char const *msg = paused ? &quot;Paused ON&quot; : &quot;Paused OFF&quot;;
 #ifndef QS_ON
+    char const *msg = paused ? &quot;Paused ON&quot; : &quot;Paused OFF&quot;;
     Serial.println(msg);
+#else
+    static_cast&lt;void&gt;(paused);
 #endif
 }
 //............................................................................
@@ -596,20 +598,20 @@ uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
 
 // interrupts.................................................................
 void TIMER_HANDLER(void) {
-    QF::TICK_X(0, &amp;l_TIMER_ID); // process time events for tick rate 0
+    QTimeEvt::tick(0U, &amp;l_TIMER_ID); // process time events for tick rate 0
 
 #ifndef QS_ON
     if (Serial.available() &gt; 0) {
         switch (Serial.read()) { // read the incoming byte
             case 'p':
             case 'P':
-                static QEvt const pauseEvt = { PAUSE_SIG, 0U, 0U};
-                QF::PUBLISH(&amp;pauseEvt, &amp;l_TIMER_ID);
+                static QEvt const pauseEvt(PAUSE_SIG);
+                QActive::publish_(&amp;pauseEvt, &amp;l_TIMER_ID, 0U);
                 break;
             case 's':
             case 'S':
-                static QEvt const serveEvt = { SERVE_SIG, 0U, 0U};
-                QF::PUBLISH(&amp;serveEvt, &amp;l_TIMER_ID);
+                static QEvt const serveEvt(SERVE_SIG);
+                QActive::publish_(&amp;serveEvt, &amp;l_TIMER_ID, 0U);
                 break;
         }
     }
@@ -657,14 +659,14 @@ void QV::onIdle(void) { // called with interrupts DISABLED
 #endif
 }
 //............................................................................
-extern &quot;C&quot; Q_NORETURN Q_onAssert(char const * const module, int location) {
+extern &quot;C&quot; Q_NORETURN Q_onError(char const * const module, int location) {
     //
     // NOTE: add here your application-specific error handling
     //
     (void)module;
     (void)location;
 
-    QF_INT_DISABLE(); // disable all interrupts
+    noInterrupts(); // disable all interrupts
     BSP::ledOn();  // trun the LED on
     for (;;) { // freeze in an endless loop for now...
     }
