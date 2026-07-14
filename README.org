@@ -64,6 +64,13 @@ documented in =UPGRADE_QPCPP_V7.md=. The script
 =scripts/check_upstream_provenance.sh= verifies that imported files still match
 qpcpp =v7.3.4= except for the documented Arduino deltas.
 
+The required build target for this migration is Teensy 4.1. The retained SAM
+examples and other Teensy or AVR boards are not support claims. Teensyduino is
+installed in Arduino's =avr= architecture namespace, so =library.properties=
+uses =architectures=avr= as the narrowest Library Manager selector that includes
+Teensy 4.1. That package field cannot identify an individual board and does not
+mean that classic AVR or every Teensy board has been validated.
+
 * Installation
 
 The QP adaptation for Arduino may be used either with the
@@ -270,6 +277,13 @@ the archive).
 
 Specifically, the Arduino GPLv3 Exception removes the requirement to expose your
 proprietary source code as long as you deploy it on an Arduino-Certified board.
+
+The packaged =LICENSE= is byte-identical to
+=qpcpp v7.3.4:LICENSES/GPL-3.0-or-later.txt=, and the packaged Arduino exception
+is byte-identical to
+=qpcpp v7.3.4:LICENSES/QP-Arduino_GPL_Exception.txt=. The imported framework
+source retains upstream's dual-license SPDX notices; a commercial license is a
+separate alternative obtained from Quantum Leaps.
 
 The [[https://www.state-machine.com/qm/][QM model-based design tool]] is freeware.
 The QM tool is provided under the terms of a simple
