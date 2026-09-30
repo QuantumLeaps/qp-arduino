@@ -14,10 +14,13 @@ This README provides a quick overview of QP for Arduino.
 
 The [[./UPGRADE_QPCPP_V7.md][v7 migration plan]] owns port provenance and
 validation status. The [[./docs/observability-plan.md][observability development
-plan]] tracks =OBS-QP=: Teensy 4.1 QV validation and a trace pilot within the
+plan]] tracks =OBS-QP=: RP2040 QV qualification and a trace pilot within the
 shared [[../orb-weaver-context/context/experimental-system-observability-plan.md][experimental-system roadmap]].
-Hardware gates remain open; this work does not establish a release or broader
-board support.
+As decided 2026-09-30, the Earle Philhower Arduino core family is the primary
+RP2040 path; exact fixture/core versions and software/hardware gates are open.
+Teensy 4.1 build regressions remain, but its hardware gates are deferred and do
+not block RP2040 qualification. STM32G0B1CEU6 is the later second target. None
+of these plans establishes new target support or a release.
 
 More detailed documentation for qpcpp, qm, and qtools can be found at:
 
@@ -34,7 +37,7 @@ https://www.state-machine.com/arduino
 - qpcpp source tag: v7.3.4
 - qm version: 6.1.1
 - qtools version: 7.3.4
-- Release Date: 2026-06-15
+- Migration status: unreleased; RP2040 qualification open
 - Creation Date: 2017-01-30
 - License: GPLv3
 - URL: https://github.com/QuantumLeaps/qp-arduino
@@ -71,12 +74,23 @@ documented in =UPGRADE_QPCPP_V7.md=. The script
 =scripts/check_upstream_provenance.sh= verifies that imported files still match
 qpcpp =v7.3.4= except for the documented Arduino deltas.
 
-The required build target for this migration is Teensy 4.1. The retained SAM
-examples and other Teensy or AVR boards are not support claims. Teensyduino is
-installed in Arduino's =avr= architecture namespace, so =library.properties=
-uses =architectures=avr= as the narrowest Library Manager selector that includes
-Teensy 4.1. That package field cannot identify an individual board and does not
-mean that classic AVR or every Teensy board has been validated.
+The recorded software migration baseline built the Teensy 4.1 examples. New
+RP2040 examples, BSP/core integration and target tests remain development work;
+the initial fixture will be non-actuating and separate from the working
+joystick. The imported ARMv6-M QV path is a starting point, not RP2040 target
+evidence. Start with QP/QS and application drivers on core 0 only.
+
+=library.properties= still uses =architectures=avr= for the earlier Teensy
+packaging decision: Teensyduino installs in Arduino's =avr= namespace. This
+unchanged selector neither advertises RP2040 nor proves support for classic
+AVR, every Teensy, or any other board. Architecture metadata review is an open
+RP2040 gate. Retained SAM examples remain best-effort sources.
+
+RP2040 and the later STM32G0B1CEU6 target have no SWO/ITM. QS uses an explicitly
+qualified UART or other transport; SWD serves programming/debug. The hardware
+direction retains passive Digital-50 plus a separate optional debug/trace
+connector and a reusable external RP2040 probe. Connector/probe qualification
+is independent of the standalone QP fixture and does not allocate DUT pins here.
 
 * Installation
 

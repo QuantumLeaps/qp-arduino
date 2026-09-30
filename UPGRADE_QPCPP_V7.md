@@ -5,18 +5,20 @@
 - Upgrade `qp-arduino` from qpcpp v6-derived files to qpcpp tag `v7.3.4` (`10441f7a03fa956b9e4772a073a05a96487983e2`).
 - Use strict v7 API by default: `QP_API_VERSION` defaults to `9999`; do not add v6 public-header compatibility shims.
 - Preserve upstream generated framework metadata exactly, including the known `QP_VERSION_STR "7.3.3"` value in qpcpp `v7.3.4`; document this mismatch instead of locally patching generated files.
-- Teensy 4.1 is the required target. SAM examples are updated best-effort but are not hardware acceptance gates.
+- As decided 2026-09-30, RP2040 with the Earle Philhower Arduino core family is the primary qualification target. Exact fixture/core versions and all RP2040 software/hardware gates remain open.
+- Preserve the completed Teensy software baseline and future build regressions. Teensy hardware gates are deferred and nonblocking for RP2040; STM32G0B1CEU6 is the later second target. SAM examples are best-effort, not a support claim.
 
 ## Observability Workstream
 
 The [observability development plan](docs/observability-plan.md) tracks
-`OBS-QP` in the cross-repository experimental-system roadmap: finish this
-plan's Teensy 4.1 hardware gates, then measure a representative QV trace pilot.
-This document remains the sole port acceptance and provenance ledger. The
-observability work does not broaden the `v7.3.4`/QV scope, require application
-migration, or imply RP2040 validation. BSP, tick and trace transport remain in
-examples/applications. No new validation result is recorded by this planning
-addition.
+`OBS-QP`: qualify QP `v7.3.4`/QV on a simple non-actuating RP2040 fixture, then
+measure a representative trace pilot. The fixture is separate from the working
+joystick and can use qualified bench connections without waiting for a new
+Digital-50 board, debug connector or external probe product. This document
+remains the sole port acceptance and provenance ledger. BSP, tick and trace
+transport remain in examples/applications; QP adoption in the delivered
+application remains optional. No build or hardware result is added by this
+2026-09-30 planning revision.
 
 ## Port Provenance and Local Deltas
 
@@ -60,7 +62,7 @@ Intentional Arduino-local deltas are:
 - Examples and `.qm` snippets are migrated from v6 APIs to v7 APIs without
   claiming QM regeneration unless the model is actually regenerated later.
 
-## Key Changes
+## Original v7 Migration Changes
 
 - Replace the production framework payload under `src/qp-arduino` with the v7 QV/Cortex-M set: public/internal headers, QF/QEP/QS/QV sources, `qstamp.cpp`, `qs_64bit.cpp`, and ARM-CM QV GNU port files.
 - Exclude QK, QXK, and QUTest runtime files from the normal Arduino library build so normal sketches do not compile unused kernels or test-only code.
@@ -82,7 +84,7 @@ Intentional Arduino-local deltas are:
   - README names qpcpp source tag `v7.3.4`, qtools `v7.3.4`, and QM `6.1.1`.
   - README documents that the upstream v7.3.4 framework headers still report `QP_VERSION_STR "7.3.3"`.
 
-## Verification Work
+## Original Verification Work — Teensy Software Baseline
 
 - Add a provenance check script that compares imported upstream files against qpcpp `v7.3.4`, allowing only intentional local deltas in `qpcpp.hpp`, `qp_port.hpp`, and Arduino-specific docs/metadata.
 - Add a Teensy build helper that builds at least:
@@ -155,43 +157,136 @@ scripts/build_teensy_examples.sh
 git diff --check
 ```
 
-## Remaining Gates
+## Current Qualification Decision — 2026-09-30
 
-No known software-only migration gate remains open. Release validation still
-requires attached hardware and external measurement equipment:
+RP2040 is the primary qualification target, using the Earle Philhower Arduino
+core family already used by `mouse-joystick-firm`. This is a development target,
+not a support claim. Select and record the exact simple RP2040 fixture, core,
+PlatformIO platform/toolchain versions, clock settings and pin map before
+building the qualification baseline. Do not use the working joystick as the
+initial port fixture or require a new Digital-50 board before port work starts.
 
-- upload the port-validation firmware to a Teensy 4.1 and establish the target
-  QSPY/QUTest handshake with qtools `v7.3.4`;
-- pass the target QUTest coverage for queues, publish/subscribe, dynamic events,
-  time events, active-object dispatch, idle behavior, assertions, QS TX, and
-  QS RX;
-- use an LA5032 on validation probe pins 2-6 to measure the 100 Hz tick and
-  ISR-to-active-object dispatch latency, recording captures plus p99 and maximum
-  latency;
-- demonstrate no missed or doubled ticks for 10 minutes and no port assertions
-  during the two-hour soak.
+The original v7 framework import and Teensy software baseline above are
+completed historical work. RP2040 introduces new **open software and hardware
+gates** below. Teensy examples and software regression coverage remain; its
+unperformed hardware gates are explicitly deferred and **do not block RP2040
+qualification**. Neither target inherits validation from the other.
 
-## Acceptance Criteria
+STM32G0B1CEU6 is the later second qualification target, with its own Arduino
+core/BSP/build/target plan still to be selected. RP2040 and STM32G0B1CEU6 are
+Cortex-M0+ devices without SWO/ITM trace. Plan QS output over a qualified UART
+or other explicitly measured transport; SWD is programming/debug access, not
+a replacement for QS output.
 
-- No stale v6 framework files remain in `src/qp-arduino`.
-- Strict v7 default builds pass without relying on `QP_API_VERSION < 730` compatibility macros.
-- Provenance check passes with only documented local Arduino deltas.
-- Teensy 4.1 Blinky, DPP, and port-validation builds pass.
-- QSPY/QUTest handshake works with qtools `v7.3.4`.
-- Target QUTest suite passes on Teensy 4.1.
-- LA5032 validation shows:
-  - 100 Hz tick average within +/-1%.
-  - No missed or doubled ticks during a 10-minute run.
-  - ISR-to-active-object dispatch latency remains below one tick under validation load.
-  - No port assertions during a 2-hour soak.
-- Timing captures and measured p99/max latency are documented after the first hardware run; thresholds may be tightened only after the baseline is recorded.
-- Package metadata makes no broader support claim than the recorded evidence.
-- License and exception provenance is explicitly reconciled with the imported
-  upstream tag.
+## Active RP2040 Software Gates — All Open
 
-## Assumptions
+- [ ] Select a simple non-actuating fixture with accessible programming,
+      trace and measurement pins. Record its identity, revision, actual wiring
+      and clock setup. Adapt validation probe roles to that pin map; Teensy
+      pins 2-6 are not an RP2040 allocation.
+- [ ] Pin and record the Earle Philhower core version/commit, PlatformIO
+      platform, compiler, SDK dependencies and build configuration. The core
+      family is decided; exact versions and fixture are still open.
+- [ ] Audit the imported ARMv6-M QV path as the starting point. Cortex-M0+
+      critical sections use PRIMASK/global interrupt masking, not BASEPRI.
+      Verify architecture selection, assembly/linkage, ISR entry/exit and
+      critical-section assumptions against this Arduino core. Existing
+      ARMv6-M source is not evidence of an operating RP2040 port.
+- [ ] Keep QP, QS and application drivers on core 0 initially. Do not launch
+      application work on core 1, call QP APIs there, or share application
+      drivers across cores. PRIMASK masks only the executing core; it is not
+      a multicore lock. Document any core/runtime background activity and
+      its implications rather than assuming the second core cannot interfere.
+- [ ] Implement the fixture BSP/tick/trace callbacks with explicit timer and
+      interrupt ownership. Verify Arduino timekeeping and USB/UART servicing
+      while QV owns the run loop; bound trace drain/flush paths and idle work.
+      Keep these details outside generated or handwritten application logic.
+- [ ] Build RP2040 Blinky, DPP and port-validation examples using strict v7
+      defaults. Supply concrete host-driven procedures for queues, pub/sub,
+      dynamic events, time events, active-object dispatch, idle, assertions,
+      QS TX and bench QS RX; do not count a planned test as implemented.
+- [ ] Run provenance checks after framework/port changes and retain the
+      existing Teensy example build regressions. Re-run the recorded upstream
+      host baseline when framework/test-tool changes warrant it; distinguish
+      those host results from RP2040 target evidence.
+- [ ] Review Arduino package architecture metadata against the selected core
+      and actual build evidence before publishing RP2040 support. The current
+      `library.properties` still says `architectures=avr` for the historical
+      Teensy packaging decision. It is unchanged by this documentation update
+      and does not advertise or establish RP2040 support. Record any later
+      metadata change as an intentional delta; do not broaden it speculatively.
 
-- The upgrade uses the local `../qpcpp` tag `v7.3.4` and local `../qtools` branch/tag `v7.3.4`.
-- QM 6.1.1 is the target editor/generator version, but if QM is unavailable during implementation, example sources and `.qm` text snippets are patched together without falsely claiming regeneration.
-- Teensy pins 2-6 are available for validation probes.
-- SAM examples are kept source-compatible where straightforward, but Teensy 4.1 is the only required electrical target.
+## Active RP2040 Hardware Acceptance — All Open
+
+- [ ] Upload the fixture firmware and establish the target QSPY/QUTest
+      handshake with qtools `v7.3.4`; retain exact tool/configuration logs.
+- [ ] Pass the RP2040 target coverage for queues, publish/subscribe, dynamic
+      events, time events, active-object dispatch, idle behavior, assertions,
+      QS TX and bench QS RX. Record expected assertion tests separately from
+      the assertion-free soak.
+- [ ] Use a qualified analyzer path on the fixture's actual probe map to
+      measure a 100 Hz tick average within +/-1%, with no missed or doubled
+      ticks during a 10-minute run.
+- [ ] Record ISR-to-active-object dispatch p99 and maximum latency under
+      documented validation load; maximum must remain below one 100 Hz tick.
+- [ ] Complete a two-hour soak without unexpected port assertions, recording
+      load, resets and trace/capture coverage rather than assuming silence
+      establishes success.
+- [ ] Demonstrate bounded application response and continued local control
+      with the trace reader absent, slow or disconnected and under declared
+      trace/queue pressure. Record RAM/flash, queue/pool margins, trace loss,
+      handler duration and transport overhead against budgets declared before
+      the run.
+- [ ] Qualify a transmit-only observation profile separately from the bench
+      QS RX/QUTest profile. Experiment observation must not accept QS reset,
+      memory-write, event-injection or command input. Preserve dictionaries,
+      clock/reset interpretation and explicit loss reporting in saved traces.
+
+These gates use a standalone fixture and available qualified bench connections.
+Their completion does not depend on a new debug connector, reusable probe
+product, Digital-50 PCB revision, or migration of the joystick application.
+Measurements on new board/probe/cable combinations require their own `OBS-HW`
+qualification before experiment use.
+
+## Deferred Teensy 4.1 Hardware Gates — Nonblocking For RP2040
+
+No Teensy hardware result is implied by the software results above. The original
+hardware checks remain unperformed, deferred by the 2026-09-30 target decision:
+
+- [ ] Target QSPY/QUTest handshake with qtools `v7.3.4` and the Teensy
+      port-validation firmware.
+- [ ] Target tests for queues, pub/sub, dynamic events, time events,
+      active-object dispatch, idle, assertions, QS TX and QS RX.
+- [ ] LA5032 captures on the fixture's verified Teensy probe pins 2-6:
+      100 Hz tick average within +/-1%; no missed or doubled ticks for
+      10 minutes; ISR-to-dispatch latency below one tick under validation
+      load, with p99 and maximum recorded.
+- [ ] Two-hour soak without unexpected port assertions.
+
+Retain these criteria if Teensy hardware qualification resumes. Their deferred
+status neither erases the previous build evidence nor constitutes a Teensy
+support claim. Retained SAM examples remain best-effort sources, not a
+qualification target.
+
+## Release And Support Claims
+
+The branch remains unreleased/unvalidated for its active RP2040 target until
+the active software and hardware gates pass. A later release must identify the
+exact qualified target/core/BSP configurations and metadata scope; deferred
+Teensy hardware checks do not block an RP2040-scoped release and cannot be
+reported as passed. STM32G0B1CEU6 requires its later independent gates.
+
+For every supported configuration, maintain strict v7 APIs, no stale v6
+framework files, documented minimal deltas, passing provenance/build checks,
+and the imported tag's license/exception provenance. Preserve raw evidence and
+measured units; tighten timing thresholds only after recording a baseline.
+
+## Continuing Assumptions
+
+- The upstream sources remain local `../qpcpp` tag `v7.3.4` and `../qtools`
+  tag `v7.3.4`; exact commits are recorded above.
+- QM 6.1.1 remains the editor/generator reference. If unavailable, update source
+  and model snippets consistently without claiming regeneration.
+- No electrical support is inferred from package architecture selectors or
+  source-level ARMv6-M compatibility. The RP2040 fixture/core versions and
+  STM32G0B1CEU6 follow-on BSP remain explicit open selections.

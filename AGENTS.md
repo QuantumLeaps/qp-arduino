@@ -20,17 +20,31 @@ made and implemented here.
   documented in `UPGRADE_QPCPP_V7.md`.
 - Run `scripts/check_upstream_provenance.sh` after framework or port changes.
 - Keep board-specific timer, BSP, and trace hookup in examples or applications.
+- RP2040 is the primary qualification target as of 2026-09-30, using the
+  Earle Philhower Arduino core family already used by `mouse-joystick-firm`.
+  Exact fixture/core/platform/toolchain versions must be selected and recorded.
+  Start on a simple non-actuating fixture, separate from the working joystick.
+- Preserve Teensy 4.1 build/reference regressions. Its hardware gates are
+  explicitly deferred and do not block RP2040 qualification. STM32G0B1CEU6 is
+  the later second target; retained SAM examples are not a support claim.
 - Do not broaden board or architecture claims without build and target
-  evidence. Teensy 4.1 is the required validation target; the retained SAM
-  examples are not a support claim.
+  evidence. Imported ARMv6-M QV code is a starting point, not an RP2040 port
+  validation. Review PRIMASK/global interrupt masking on Cortex-M0+, not
+  BASEPRI; initially keep QP/QS and application drivers on core 0, with no
+  application core-1 work, QP calls or shared drivers.
+- Neither RP2040 nor STM32G0B1CEU6 provides SWO/ITM. Keep UART/QS transport
+  decisions in the BSP/application and the separate optional debug/trace
+  contract; do not add control paths to passive InstrumentPort-Digital-50.
 - The migration branch intentionally defaults `QP_API_VERSION` to `9999`.
   Reintroducing v6 compatibility requires an explicit decision and dedicated
   tests.
 
 ## Completion Discipline
 
-- Do not describe the branch as released or validated while the acceptance
-  criteria in `UPGRADE_QPCPP_V7.md` remain unmet.
+- Do not describe the active RP2040 target as released or validated while its
+  software and hardware criteria in `UPGRADE_QPCPP_V7.md` remain unmet. Report
+  deferred Teensy hardware work separately; it is not an RP2040 release gate
+  and must not be reported as passed.
 - Record exact upstream tags and commits, intentional deltas, build logs, and
   hardware evidence.
 - Reconcile package metadata and license-file provenance with the imported
