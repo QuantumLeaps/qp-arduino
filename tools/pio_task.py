@@ -33,8 +33,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-DEFAULT_EXAMPLE = "examples/blinky_bsp-rp2040"
-DEFAULT_ENV = "rp2040_mouse_joystick"
+DEFAULT_EXAMPLE = "examples/dpp_bsp-teensy4"
+DEFAULT_ENV = "teensy41"
 
 
 def _project_root() -> Path:

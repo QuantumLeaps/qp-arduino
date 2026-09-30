@@ -25,7 +25,7 @@ using namespace QP;
 //............................................................................
 // QS facilities
 
-// un-comment if QS instrumentation needed
+// QS instrumentation enabled by default
 #define QS_ON
 
 enum AppRecords { // application-specific QS trace records
@@ -120,7 +120,7 @@ uint32_t BSP::random(void) { // a very cheap pseudo-random-number generator
 
 //
 // NOTE: The usual source of system clock tick in ARM Cortex-M (SysTick timer)
-// is aready used by the Arduino library. Therefore, this code uses a different
+// is already used by the Arduino library. Therefore, this code uses a different
 // hardware Timer1 of the Teensy 4 board for providing the system clock tick.
 //
 // NOTE: You can re-define the macros to use a different ATSAM timer/channel.

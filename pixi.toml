@@ -1,92 +1,197 @@
 # Reproducible development environment for qp-arduino on Linux, macOS and
 # Windows: https://pixi.sh. `pixi install` creates it; `pixi run <task>` uses it.
-# People without Pixi can keep using a plain Python virtual environment with
-# PlatformIO installed (see README.org); every task below is a thin wrapper
-# around `pio` or a Python script, so nothing here is required.
+# Every task is a thin wrapper around `pio` or a Python script in tools/, so
+# people without Pixi can use any PlatformIO installation (see README.org).
 [workspace]
 name = "qp-arduino"
 version = "7.3.4"
-description = "QP/C++ v7.3.4 (QV kernel) for Arduino: build, check and flash the examples reproducibly."
+description = "QP/C++ v7.3.4 (QV kernel) real-time embedded framework for Arduino (ARM Cortex-M)."
+authors = ["Peter Polidoro <peter@polidoro.io>"]
 channels = ["conda-forge"]
+# Solving for every platform keeps pixi.lock usable on each OS/arch.
 platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
 
 [dependencies]
-# PlatformIO Core CLI (noarch on conda-forge). Same range the joystick firmware uses.
+# PlatformIO Core CLI (conda-forge, noarch). Provides the `pio` command.
 platformio = ">=6.1.19,<7"
-# The helper scripts in tools/ are plain Python 3.
+# The helper scripts in tools/ are plain Python 3 (stdlib only).
 python = ">=3.12,<3.14"
-# The provenance check reads the upstream tag with `git show`, and PlatformIO
-# clones the pinned RP2040 platform with git.
+# The provenance check reads the upstream tag with `git show`, PlatformIO
+# clones the pinned RP2040 platform, and QTools 7.3.4 is cloned from its tag.
 git = "*"
 
 [activation.env]
 PLATFORMIO_SETTING_ENABLE_TELEMETRY = "no"
 
+# --------------------------------------------------------------------------------------
+# PlatformIO
+#
+# Examples are selected by setting PLATFORMIO_SRC_DIR rather than by editing
+# platformio.ini. tools/pio_task.py does that portably, gives each example its
+# own build directory under .pio/build-examples, and keeps PlatformIO's own
+# state in .pio-core inside the repository.
+# --------------------------------------------------------------------------------------
 [tasks]
 pio-version = "pio --version"
+# List connected devices/ports (/dev/ttyACM0, /dev/cu.usbmodem*, COM3, ...).
 ports = "pio device list"
 
 [tasks.provenance]
 description = "Check the imported framework files against qpcpp tag v7.3.4 in ../qpcpp (override with QPCPP_DIR / QPCPP_TAG)."
 cmd = "python tools/check_upstream_provenance.py"
 
+# Generic tasks: name any example and environment (teensy41, rp2040_mouse_joystick, due).
 [tasks.build]
 description = "Compile one example for one PlatformIO environment."
 args = [
-  { arg = "example", default = "examples/blinky_bsp-rp2040" },
-  { arg = "env", default = "rp2040_mouse_joystick" },
+  { arg = "example", default = "examples/dpp_bsp-teensy4" },
+  { arg = "env", default = "teensy41" },
 ]
 cmd = "python tools/pio_task.py build --example {{ example }} --env {{ env }}"
 
 [tasks.rebuild]
 description = "Clean, then compile one example."
 args = [
-  { arg = "example", default = "examples/blinky_bsp-rp2040" },
-  { arg = "env", default = "rp2040_mouse_joystick" },
+  { arg = "example", default = "examples/dpp_bsp-teensy4" },
+  { arg = "env", default = "teensy41" },
 ]
 cmd = "python tools/pio_task.py rebuild --example {{ example }} --env {{ env }}"
 
 [tasks.clean]
 args = [
-  { arg = "example", default = "examples/blinky_bsp-rp2040" },
-  { arg = "env", default = "rp2040_mouse_joystick" },
+  { arg = "example", default = "examples/dpp_bsp-teensy4" },
+  { arg = "env", default = "teensy41" },
 ]
 cmd = "python tools/pio_task.py clean --example {{ example }} --env {{ env }}"
 
 [tasks.upload]
 description = "Compile and upload one example. RP2040: board in BOOTSEL, or running firmware that honours the 1200 baud touch."
 args = [
-  { arg = "example", default = "examples/blinky_bsp-rp2040" },
-  { arg = "env", default = "rp2040_mouse_joystick" },
+  { arg = "example", default = "examples/dpp_bsp-teensy4" },
+  { arg = "env", default = "teensy41" },
   { arg = "port", default = "/dev/ttyACM0" },
 ]
 cmd = "python tools/pio_task.py upload --example {{ example }} --env {{ env }} --port {{ port }}"
 
 [tasks.monitor]
-description = "Open the serial monitor (USB CDC on the RP2040 fixture)."
+description = "Open the serial monitor (QS output is binary; use qspy for that)."
 args = [
   { arg = "port", default = "/dev/ttyACM0" },
   { arg = "baud", default = "115200" },
 ]
 cmd = "python tools/pio_task.py monitor --port {{ port }} --baud {{ baud }}"
 
-# Fixed build sets used as regression gates. `pixi run check` runs everything.
-[tasks.build-rp2040-blinky]
-cmd = "python tools/pio_task.py build --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick"
-[tasks.build-rp2040]
-description = "Build every RP2040 example."
-depends-on = ["build-rp2040-blinky"]
+# Per-example tasks. Upload tasks take the port as their only argument:
+#   pixi run upload-blinky-bsp-teensy4 /dev/ttyACM0
 
-[tasks.build-teensy-blinky]
+# Teensy 4.1 (retained regression set)
+[tasks.build-blinky-bsp-teensy4]
 cmd = "python tools/pio_task.py build --example examples/blinky_bsp-teensy4 --env teensy41"
-[tasks.build-teensy-dpp]
+[tasks.upload-blinky-bsp-teensy4]
+args = [{ arg = "port", default = "/dev/ttyACM0" }]
+cmd = "python tools/pio_task.py upload --example examples/blinky_bsp-teensy4 --env teensy41 --port {{ port }}"
+
+[tasks.build-dpp-bsp-teensy4]
 cmd = "python tools/pio_task.py build --example examples/dpp_bsp-teensy4 --env teensy41"
-[tasks.build-teensy-port-validation]
+[tasks.upload-dpp-bsp-teensy4]
+args = [{ arg = "port", default = "/dev/ttyACM0" }]
+cmd = "python tools/pio_task.py upload --example examples/dpp_bsp-teensy4 --env teensy41 --port {{ port }}"
+
+[tasks.build-port-validation-teensy4]
 cmd = "python tools/pio_task.py build --example examples/port_validation-teensy4 --env teensy41"
+[tasks.upload-port-validation-teensy4]
+args = [{ arg = "port", default = "/dev/ttyACM0" }]
+cmd = "python tools/pio_task.py upload --example examples/port_validation-teensy4 --env teensy41 --port {{ port }}"
+
+# RP2040 qualification fixture: mouse-joystick-pcb rev 0 (see UPGRADE_QPCPP_V7.md)
+[tasks.build-blinky-bsp-rp2040]
+cmd = "python tools/pio_task.py build --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick"
+[tasks.upload-blinky-bsp-rp2040]
+args = [{ arg = "port", default = "/dev/ttyACM0" }]
+cmd = "python tools/pio_task.py upload --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick --port {{ port }}"
+
+# Arduino Due / ATSAM3X8E (retained SAM examples, best effort, not a support claim)
+[tasks.build-blinky-sam]
+cmd = "python tools/pio_task.py build --example examples/blinky-sam --env due"
+[tasks.upload-blinky-sam]
+args = [{ arg = "port", default = "/dev/ttyACM0" }]
+cmd = "python tools/pio_task.py upload --example examples/blinky-sam --env due --port {{ port }}"
+
+[tasks.build-blinky2-sam]
+cmd = "python tools/pio_task.py build --example examples/blinky2-sam --env due"
+[tasks.upload-blinky2-sam]
+args = [{ arg = "port", default = "/dev/ttyACM0" }]
+cmd = "python tools/pio_task.py upload --example examples/blinky2-sam --env due --port {{ port }}"
+
+[tasks.build-blinky-bsp-sam]
+cmd = "python tools/pio_task.py build --example examples/blinky_bsp-sam --env due"
+[tasks.upload-blinky-bsp-sam]
+args = [{ arg = "port", default = "/dev/ttyACM0" }]
+cmd = "python tools/pio_task.py upload --example examples/blinky_bsp-sam --env due --port {{ port }}"
+
+[tasks.build-dpp-bsp-sam]
+cmd = "python tools/pio_task.py build --example examples/dpp_bsp-sam --env due"
+[tasks.upload-dpp-bsp-sam]
+args = [{ arg = "port", default = "/dev/ttyACM0" }]
+cmd = "python tools/pio_task.py upload --example examples/dpp_bsp-sam --env due --port {{ port }}"
+
+# Regression sets and the combined check.
 [tasks.build-teensy]
 description = "Build the Teensy 4.1 examples (retained regression set)."
-depends-on = ["build-teensy-blinky", "build-teensy-dpp", "build-teensy-port-validation"]
+depends-on = ["build-blinky-bsp-teensy4", "build-dpp-bsp-teensy4", "build-port-validation-teensy4"]
+
+[tasks.build-rp2040]
+description = "Build every RP2040 example."
+depends-on = ["build-blinky-bsp-rp2040"]
+
+[tasks.build-sam]
+description = "Build the Arduino Due examples (best effort)."
+depends-on = ["build-blinky-sam", "build-blinky2-sam", "build-blinky-bsp-sam", "build-dpp-bsp-sam"]
 
 [tasks.check]
-description = "Provenance check plus every example build."
+description = "Provenance check plus the Teensy and RP2040 build sets."
 depends-on = ["provenance", "build-teensy", "build-rp2040"]
+
+# --------------------------------------------------------------------------------------
+# Quantum Leaps host tools pinned for qpcpp v7.3.4:
+#   QM      6.1.1  (binaries for Linux and Windows)
+#   QTools  7.3.4  (QSPY, QUTest; no binary release, built from the git tag)
+#
+# Installed into ./.tools/quantum-leaps/ (gitignored); override with QL_TOOLS_DIR.
+# --------------------------------------------------------------------------------------
+[tasks.ql-install]
+description = "Install QM 6.1.1 and build QTools 7.3.4 into .tools/quantum-leaps."
+cmd = "python tools/quantum_leaps_tools.py install"
+
+[tasks.qm]
+description = "Launch QM (installs it first if missing)."
+cmd = "python tools/quantum_leaps_tools.py qm"
+
+[tasks.qm-install]
+cmd = "python tools/quantum_leaps_tools.py qm --install-only"
+
+[tasks.qtools-install]
+description = "Clone QTools v7.3.4 and build qspy."
+cmd = "python tools/quantum_leaps_tools.py qtools-install"
+
+[tasks.qspy]
+description = "Run qspy; arguments are forwarded, e.g. pixi run qspy -c /dev/ttyACM0 -b 115200"
+cmd = "python tools/quantum_leaps_tools.py qspy"
+
+# Build tooling for qspy (QTools 7.3.4 ships qspy as source).
+[target.linux-64.dependencies]
+make = "*"
+c-compiler = "*"
+
+[target.osx-64.dependencies]
+make = "*"
+c-compiler = "*"
+
+[target.osx-arm64.dependencies]
+make = "*"
+c-compiler = "*"
+
+# Windows: QTools' qspy/win32 Makefile expects MinGW gcc. Untested here.
+[target.win-64.dependencies]
+make = "*"
+m2w64-gcc = "*"

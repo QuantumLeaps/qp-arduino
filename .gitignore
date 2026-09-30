@@ -62,4 +62,11 @@ lint/MISRA_Exemplar_Suite_test/*.txt
 venv
 .pio
 .pio-core
+
+# pixi environments
 .pixi
+*.egg-info
+__pycache__/
+
+# Local tool installs (QM/QTools downloads)
+.tools/

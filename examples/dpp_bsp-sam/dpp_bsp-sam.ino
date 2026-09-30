@@ -22,8 +22,6 @@
 
 using namespace QP;
 
-Q_DEFINE_THIS_FILE
-
 //............................................................................
 void setup() {
     QF::init(); // initialize the framework

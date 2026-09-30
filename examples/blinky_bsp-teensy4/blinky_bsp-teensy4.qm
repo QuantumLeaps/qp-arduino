@@ -92,8 +92,8 @@ using namespace QP;
 //----------------------------------------------------------------------------
 // QS facilities
 
-// un-comment if QS instrumentation needed
-//#define QS_ON
+// QS instrumentation enabled by default
+#define QS_ON
 
 static QP::QSpyId const l_TIMER_ID = { 0U }; // QSpy source ID
 
@@ -132,7 +132,7 @@ void BSP::ledOn(void) {
 
 //
 // NOTE: The usual source of system clock tick in ARM Cortex-M (SysTick timer)
-// is aready used by the Arduino library. Therefore, this code uses a different
+// is already used by the Arduino library. Therefore, this code uses a different
 // hardware Timer1 of the Teensy 4 board for providing the system clock tick.
 //
 // NOTE: You can re-define the macros to use a different ATSAM timer/channel.

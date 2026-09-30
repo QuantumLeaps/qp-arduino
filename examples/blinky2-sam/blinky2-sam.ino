@@ -94,7 +94,7 @@ void QF::onStartup(void) {
     TC_SetRC(TIMER, TIMER_CHANNEL,
              TIMER_CLCK_HZ / TICKS_PER_SEC); // set the RC compare value
     TC_Start(TIMER, TIMER_CHANNEL);
-    // enable interrrupt for RC compare
+    // enable interrupt for RC compare
     TIMER->TC_CHANNEL[TIMER_CHANNEL].TC_IER = TC_IER_CPCS;
     TIMER->TC_CHANNEL[TIMER_CHANNEL].TC_IDR = ~TC_IER_CPCS;
     pmc_set_writeprotect(true); // enable write protection

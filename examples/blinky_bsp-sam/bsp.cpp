@@ -25,8 +25,8 @@ using namespace QP;
 //----------------------------------------------------------------------------
 // QS facilities
 
-// un-comment if QS instrumentation needed
-//#define QS_ON
+// QS instrumentation enabled by default
+#define QS_ON
 
 static QP::QSpyId const l_TIMER_ID = { 0U }; // QSpy source ID
 
@@ -66,7 +66,7 @@ void BSP::ledOn(void) {
 // ATSAM3X timer used for the system clock tick
 //
 // NOTE: The usual source of system clock tick in ARM Cortex-M (SysTick timer)
-// is aready used by the Arduino library. Therefore, this code uses a different
+// is already used by the Arduino library. Therefore, this code uses a different
 // hardware timer of the ATSAM MCU for providing the system clock tick.
 //
 // NOTE: You can re-define the macros to use a different ATSAM timer/channel.
@@ -94,7 +94,7 @@ void QF::onStartup(void) {
     TC_SetRC(TIMER, TIMER_CHANNEL,
              TIMER_CLCK_HZ / BSP::TICKS_PER_SEC); // set the RC compare value
     TC_Start(TIMER, TIMER_CHANNEL);
-    // enable interrrupt for RC compare
+    // enable interrupt for RC compare
     TIMER->TC_CHANNEL[TIMER_CHANNEL].TC_IER = TC_IER_CPCS;
     TIMER->TC_CHANNEL[TIMER_CHANNEL].TC_IDR = ~TC_IER_CPCS;
     pmc_set_writeprotect(true); // enable write protection
