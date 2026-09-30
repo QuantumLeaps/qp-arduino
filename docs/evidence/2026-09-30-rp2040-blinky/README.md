@@ -6,6 +6,13 @@ from branch `upgrade/qpcpp-v7`; the exact tree is named per capture in
 "Firmware under test". Interpretation lives in `UPGRADE_QPCPP_V7.md`
 ("RP2040 Target Results — 2026-09-30"); this directory holds the raw evidence.
 
+> **Raw captures and large logs live outside this repository** to keep it
+> small: `../qp-arduino-example/evidence/2026-09-30-rp2040-blinky/` mirrors this directory
+> and holds every `.sr`, `.vcd`, `.gz`, `.bin` and log over 100 KB named
+> below. This directory keeps the READMEs, the analysis scripts, the
+> `result_*.json` outputs, summaries and short logs.
+
+
 ## Fixture
 
 - `mouse-joystick-pcb` rev 0, unit E4654C159F2C2534, 36 V input unplugged,
@@ -102,3 +109,26 @@ Notes:
 - `qspy/qspy-fastflash-25s.txt`, `qspy/qspy-final-build-15s.txt`: sanity
   sessions for images D and B.
 - `captures/sigrok-session-*.log`: the sigrok-cli invocations and results.
+
+## QS over UART0, decoded by the analyzer (added 13:24)
+
+Firmware **E**: `rp2040_mouse_joystick_uart` (QS on `Serial1` = UART0, GP0
+TX, no host wait). `captures/blinky_uart_1MHz_6s.sr` records CH8 (GP0 = LA5032
+channel 8 through InstrumentPort-40 `DIG8`) with the two probes at 1 MSa/s for
+6 s. `uart/uart_bytes_hex.txt` is sigrok's UART decode at 115200 8N1
+(`-P uart:rx=CH8:baudrate=115200:format=hex -A uart=rx-data`, 1,081 bytes),
+`uart/qs_from_uart.bin` the same bytes as a raw QS stream, and
+`uart/qspy-offline-decode.txt` what `qspy -f` makes of them: 48 records, 12
+state transitions, no checksum error. Dictionaries are absent only because the
+capture began 5 s after boot. This is the transport for the transmit-only
+observation profile: no USB host is involved, and the analyzer holds the trace
+next to the probe signals in one file.
+
+Probe results with QS on UART (`analysis/result_blinky_uart_1MHz_6s.json`):
+tick period 9,999.99 µs (min 9,997, max 10,003), no missed tick; tick ISR
+2 µs typical and **10 µs maximum, including the posting tick**; tick→LED
+latency **34 to 46 µs**; LED interval 499,999.5 µs (min 499,988, max
+500,006). Compared with QS over USB CDC and no host attached (35 µs posting
+tick, 95 to 123 µs latency), this narrows the unexplained cost to the USB CDC
+transport's presence in the idle loop rather than to QP or to QS record
+emission.

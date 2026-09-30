@@ -430,8 +430,12 @@ Post-merge software checks, all from the repository `.venv` (PlatformIO
 ## RP2040 Target Results — 2026-09-30
 
 First target run, performed automatically from this branch with the fixture
-and analyzer path recorded above. Raw evidence, capture files, trace logs and
-the analysis scripts are in `docs/evidence/2026-09-30-rp2040-blinky/`. The
+and analyzer path recorded above. The evidence directories under
+`docs/evidence/` hold READMEs, analysis scripts, `result_*.json` outputs,
+summaries and short logs; the raw analyzer captures (`.sr`), exported VCDs,
+compressed trace dumps and logs over 100 KB live in the sibling repository
+`qp-arduino-example` under `evidence/<same directory name>/` so this library
+stays small to clone. Blinky: `docs/evidence/2026-09-30-rp2040-blinky/`. The
 application under test is `examples/blinky_bsp-rp2040`, not the
 port-validation firmware, so these numbers are a Blinky baseline under the
 stated conditions and do not by themselves close the coverage gates.
@@ -566,16 +570,70 @@ Changes made after the first Blinky target run, all on this branch:
   against 1.7 µs for Blinky's single time event on non-expiring ticks; the
   cost is in the tick path and is host independent. Root cause still open.
 
+## RP2040 Port-Validation Results — 2026-09-30
+
+`examples/port_validation-rp2040` on the fixture, driven by
+`tools/port_validation_rp2040.py` through QSPY's UDP front-end (no QUTest
+build), with all six QS record groups streaming over USB CDC. Evidence:
+`docs/evidence/2026-09-30-rp2040-port-validation/`.
+
+- **Host-driven procedures: 8 of 8 pass** (`port_validation_results.json`):
+  QS-RX round trip (`QS_RX_INFO` answered), tick rate 100.0 ticks/s from the
+  Validator's own reports with one published event and one pool event per
+  tick, publish/subscribe from a host command, host-posted pool event
+  (pool get, dispatch, pool put), probe-role switching, counter reset, and
+  the assertion path: `Q_ERROR_ID(400)` produced an `=ASSERT=` record, the
+  USB port disappeared on the watchdog reset and reappeared, and the target
+  answered again with `Trg-RST` and target info. The first attempt failed
+  three checks through driver defects, all fixed (binary target-info packet,
+  periodic reports mistaken for replies, device node held open across the
+  reboot so the board re-enumerated as another tty; use the
+  `/dev/serial/by-id/...` path).
+- **ISR-to-active-object dispatch latency under the validation load** (tick
+  ISR rising edge to the first dispatch's rising edge, exactly three
+  dispatches per tick): QSPY attached p99 121 µs, maximum 133 µs over 599
+  ticks at 1 MSa/s (41.3 / 91.0 / 121.1 µs min / p50 / max at 20 MSa/s over
+  50 ticks); host detached 40 / 52 / 63 / 66 µs min / p50 / p99 / max.
+  Tick to dynamic-event receipt (third dispatch) 148 to 244 µs with the host
+  attached. Dispatch durations 20 µs typical, 37 µs maximum detached, 83 µs
+  maximum attached. All below 3 % of one tick.
+- **Load profile:** idle callback high 85.4 % of the time (about 1,089 idle
+  passes of 8 µs per tick), dispatch 0.6 %; the remainder is the tick callback
+  and the idle loop's USB CDC service. Tick period 9,999.99 to 10,000.00 µs
+  mean, min 9,995, max 10,005 µs, no missed or doubled tick in any capture.
+- **QS over UART0** (Blinky, `rp2040_mouse_joystick_uart`): the LA5032
+  captured GP0 on channel 8 alongside the probes, sigrok decoded the 115200
+  8N1 stream (1,081 bytes in 6 s) and `qspy -f` reconstructed 48 records with
+  no checksum error. With the UART transport the posting-tick ISR cost falls
+  to 10 µs and tick-to-LED latency to 34 to 46 µs, against 35 µs and 95 to
+  123 µs with the USB CDC transport and no host; the open post-path cost
+  therefore tracks the USB CDC transport in the idle loop, not QP.
+- **Anomaly, open:** in the second post-soak run, after the (then defective)
+  assertion test and three role sessions, the target stopped: both probes
+  low, no QS output, USB CDC still enumerated, recovered by the 1200 baud
+  touch reflash (`captures/pv_wedged_snapshot.sr`, `second-run.log`). The
+  follow-up run repeated the sequence with the fixed driver and did not
+  reproduce it: the liveness session received 19,143 records and the tick was
+  running (`pv_after_roles_snapshot.sr`). One occurrence, cause unknown; a
+  long host attach/detach cycling test is the next step. `Trg-ERR 0x42` in
+  these logs is the target reporting a QS-RX sequence restart at the start of
+  each new host session and is benign.
+
 ## Active RP2040 Hardware Acceptance
 
 - [ ] Upload the fixture firmware and establish the target QSPY/QUTest
       handshake with qtools `v7.3.4`; retain exact tool/configuration logs.
-      **QSPY half done 2026-09-30** with Blinky (upload log, QSPY logs and
-      versions in the evidence directory); QUTest not yet attempted.
-- [ ] Pass the RP2040 target coverage for queues, publish/subscribe, dynamic
+      **QSPY done 2026-09-30** with Blinky, DPP and the port-validation
+      firmware (upload logs, QSPY logs and versions in the evidence
+      directories). QUTest on the target is deferred; see "On-target QUTest
+      is deferred" above.
+- [x] Pass the RP2040 target coverage for queues, publish/subscribe, dynamic
       events, time events, active-object dispatch, idle behavior, assertions,
       QS TX and bench QS RX. Record expected assertion tests separately from
-      the assertion-free soak.
+      the assertion-free soak. **Met 2026-09-30** by the host-driven
+      procedures (8 of 8) plus the role captures; the expected assertion is
+      its own procedure and the soak above ran assertion-free. Open beside it:
+      the single unexplained stall in the second run.
 - [x] Use a qualified analyzer path on the fixture's actual probe map to
       measure a 100 Hz tick average within +/-1%, with no missed or doubled
       ticks during a 10-minute run. **Met 2026-09-30 with Blinky**: tick
@@ -585,16 +643,26 @@ Changes made after the first Blinky target run, all on this branch:
       600 s edge capture done later the same day with DPP running and QSPY
       attached** (2 MSa/s, 1.2 G samples): 60,000 consecutive ticks, mean
       9,999.998 µs (−0.00002 %), min 9,981, max 10,015.5, stdev 4.6 µs, no
-      missed or doubled tick; `docs/evidence/2026-09-30-rp2040-dpp/`.
+      missed or doubled tick; and the 2 h soak capture at 100 kSa/s,
+      720,001 ticks, mean 9,999.995 µs, min 9,980, max 10,020, none missed
+      or doubled; `docs/evidence/2026-09-30-rp2040-dpp/`.
 - [ ] Record ISR-to-active-object dispatch p99 and maximum latency under
       documented validation load; maximum must remain below one 100 Hz tick.
-      **Blinky baseline recorded 2026-09-30**: p99 360 µs, maximum 430 µs
-      with QSPY attached over 600 s; 123 µs maximum with the host detached.
-      Still open under the port-validation load.
+      **Met 2026-09-30 under the port-validation load**: p99 121 µs,
+      maximum 133 µs with QSPY attached (599 ticks); 66 µs maximum detached.
+      Blinky baseline earlier the same day: p99 360 µs, maximum 430 µs over
+      600 s attached.
 - [ ] Complete a two-hour soak without unexpected port assertions, recording
       load, resets and trace/capture coverage rather than assuming silence
-      establishes success. **11 minutes recorded 2026-09-30** (continuous
-      trace, no assertions, no resets); the two-hour run is still open.
+      establishes success. **Met 2026-09-30 with DPP**: 2 h 15 min of
+      continuous QSPY trace (420,595 records, 0 `=ASSERT=`, 0 `Trg-RST`, the
+      only two `<COMMS>` lines at the session-start boundary, largest gap
+      between records 1.45 s from DPP's own rhythm) while the analyzer
+      recorded 720,001 consecutive ticks over 7,200 s at 100 kSa/s (mean
+      9,999.995 µs, min 9,980, max 10,020, none missed or doubled) and
+      19,074 LED edges with at least 151 per minute. Load: five Philo and one
+      Table active object, pool events, QS at about 55 records/s.
+      `docs/evidence/2026-09-30-rp2040-dpp/`.
 - [ ] Demonstrate bounded application response and continued local control
       with the trace reader absent, slow or disconnected and under declared
       trace/queue pressure. **Reader absent and disconnected shown 2026-09-30**
@@ -606,6 +674,10 @@ Changes made after the first Blinky target run, all on this branch:
       QS RX/QUTest profile. Experiment observation must not accept QS reset,
       memory-write, event-injection or command input. Preserve dictionaries,
       clock/reset interpretation and explicit loss reporting in saved traces.
+      **Transport shown 2026-09-30**: QS over UART0 captured and decoded by
+      the analyzer (`rp2040_mouse_joystick_uart`). Still open: a build that
+      disables QS-RX processing, dictionary preservation in saved captures,
+      and loss reporting.
 
 These gates use a standalone fixture and available qualified bench connections.
 Their completion does not depend on a new debug connector, reusable probe

@@ -1,0 +1,46 @@
+{
+  "file": "/tmp/claude-1001/-home-peter-Repositories-orb-weaver-qp-arduino/e82c616e-e5ea-4fa0-8354-b513af92835e/scratchpad/la/pv_role2_1MHz_6s_host.vcd",
+  "tick_period_us": {
+    "n": 600,
+    "mean": 9999.991666666667,
+    "min": 9997.0,
+    "max": 10003.0,
+    "stdev": 1.581643835451655,
+    "p50": 10000.0,
+    "p99": 10003.0,
+    "missed_intervals": 0,
+    "doubled_intervals": 0
+  },
+  "role_pulse_width_us": {
+    "n": 653701,
+    "mean": 7.837150317958822,
+    "min": 7.0,
+    "max": 111.0,
+    "stdev": 3.4786555474796796,
+    "p50": 8.0,
+    "p99": 13.0
+  },
+  "role_pulses_per_tick": {
+    "n": 600,
+    "mean": 1089.285,
+    "min": 1080,
+    "max": 1096,
+    "stdev": 2.556776942428364,
+    "p50": 1089,
+    "p99": 1094
+  },
+  "tick_to_first_role_rise_us": {
+    "n": 600,
+    "mean": 209.77833333333334,
+    "min": 168.0,
+    "max": 292.0,
+    "stdev": 30.79619885454841,
+    "p50": 222.0,
+    "p99": 276.0
+  },
+  "role_high_fraction": 0.8536353231512216,
+  "counts": {
+    "tick_rising_edges": 601,
+    "role_rising_edges": 653701
+  }
+}

@@ -178,7 +178,8 @@ def wait_for_port(port: str, present: bool, timeout_s: float) -> bool:
 
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--port", default="/dev/ttyACM0")
+    ap.add_argument("--port", default="/dev/ttyACM0",
+                    help="serial device; prefer the stable /dev/serial/by-id/... path so the reboot test can find the board again")
     ap.add_argument("--baud", type=int, default=115200)
     ap.add_argument("--qspy", default=".tools/quantum-leaps/qtools-7.3.4/bin/qspy")
     ap.add_argument("--udp-port", type=int, default=7701)
@@ -201,11 +202,11 @@ def main(argv: list[str]) -> int:
         time.sleep(0.5)
         link.drain()
         link.command(5, args.only_set_role)
-        m = link.expect(r"PROBE_ROLE\s+(\d+)", 3.0, [])
+        m = link.expect(r"(?:PROBE_ROLE|USER\+001)\s+(\d+)", 3.0, [])
         print(f"role set: {m.group(1) if m else 'no echo'}", flush=True)
         time.sleep(args.hold)
         link.command(5, 1)
-        link.expect(r"PROBE_ROLE\s+1", 3.0, [])
+        link.expect(r"(?:PROBE_ROLE|USER\+001)\s+1\b", 3.0, [])
         link.stop()
         return 0 if m else 1
 
@@ -228,26 +229,39 @@ def main(argv: list[str]) -> int:
     time.sleep(1.0)
     link.drain()
 
-    # info: QS-RX round trip
+    # info: QS-RX round trip. QSPY forwards the target's answer as a binary
+    # target-info packet (record 64) rather than a text line.
+    link.target_info = None
     link.send(struct.pack("<B", TO_TRG_INFO))
-    m = link.expect(r"Trg-Info\s+QP-Ver=(\d+)", 3.0, transcript)
-    record("info", m is not None, f"Trg-Info QP-Ver={m.group(1)}" if m else "no Trg-Info within 3 s")
+    deadline = time.time() + 3.0
+    while time.time() < deadline and link.target_info is None:
+        time.sleep(0.05)
+    ok = link.target_info is not None
+    record("info", ok, f"target info received, QP-Ver={link.target_info['qp_version']}" if ok else "no target info within 3 s")
 
-    # ticking: counters advance between two reports one second apart
+    # ticking: the Validator reports VALIDATION_STAT every 100 dynamic events;
+    # the tick rate follows from the reports' own QS timestamps (microseconds).
     def counters() -> tuple[int, int, int] | None:
+        link.drain()
         link.command(6)
         mm = link.expect(r"VALIDATION_STAT\s+(\d+)\s+(\d+)\s+(\d+)", 3.0, transcript)
         return tuple(int(x) for x in mm.groups()) if mm else None
 
-    c1 = counters()
-    time.sleep(1.0)
-    c2 = counters()
-    if c1 and c2:
-        dt = c2[0] - c1[0]
-        ok = 90 <= dt <= 115 and c2[1] - c1[1] >= dt - 2 and c2[2] - c1[2] >= dt - 2
-        record("ticking", ok, f"ticks {c1[0]}->{c2[0]} (+{dt} in ~1 s), events +{c2[1]-c1[1]}, dynamic +{c2[2]-c1[2]}")
+    link.drain()
+    reports: list[tuple[int, int, int, int]] = []
+    deadline = time.time() + 3.5
+    while time.time() < deadline:
+        mm = link.expect(r"^(\d{10}) VALIDATION_STAT\s+(\d+)\s+(\d+)\s+(\d+)", 0.5, transcript)
+        if mm:
+            reports.append(tuple(int(x) for x in mm.groups()))
+    if len(reports) >= 2:
+        (t0, k0, e0, d0), (t1, k1, e1, d1) = reports[0], reports[-1]
+        dt_s = ((t1 - t0) & 0xFFFFFFFF) / 1e6
+        rate = (k1 - k0) / dt_s if dt_s > 0 else 0.0
+        ok = 95.0 <= rate <= 105.0 and (e1 - e0) == (k1 - k0) and (d1 - d0) == (k1 - k0)
+        record("ticking", ok, f"{len(reports)} reports over {dt_s:.3f} s: {rate:.1f} ticks/s, events +{e1-e0}, dynamic +{d1-d0} for ticks +{k1-k0}")
     else:
-        record("ticking", False, "no VALIDATION_STAT reply to command 6")
+        record("ticking", False, f"only {len(reports)} VALIDATION_STAT reports in 3.5 s")
 
     # publish: command 1 publishes VALIDATE_SIG from the command source
     link.drain()
@@ -269,7 +283,8 @@ def main(argv: list[str]) -> int:
     for role in (0, 2, 3, 1):
         link.drain()
         link.command(5, role)
-        mm = link.expect(r"PROBE_ROLE\s+(\d+)", 3.0, transcript)
+        # Without dictionaries (QSPY attached after boot) the user record prints as USER+001.
+        mm = link.expect(r"(?:PROBE_ROLE|USER\+001)\s+(\d+)", 3.0, transcript)
         roles_ok = roles_ok and mm is not None and int(mm.group(1)) == role
     record("roles", roles_ok, "PROBE_ROLE echoed 0,2,3,1" if roles_ok else "role echo missing or wrong")
 
@@ -290,18 +305,37 @@ def main(argv: list[str]) -> int:
         m = link.expect(r"=ASSERT=\s+Mod=(\S+),Loc=(\d+)", 5.0, transcript)
         seen = m is not None
         detail = f"=ASSERT= Mod={m.group(1)} Loc={m.group(2)}" if m else "no =ASSERT= record within 5 s"
+        # Release the port now: a device node held open by qspy would make the
+        # re-enumerated board appear under a different name.
+        link.stop()
         gone = wait_for_port(args.port, False, 8.0)
         back = wait_for_port(args.port, True, 8.0) if gone else False
-        link.stop()
         link2 = None
         rst = False
+        alive = False
         if back:
             time.sleep(0.3)
             link2 = QSpyLink(args.qspy, args.port, args.baud, args.udp_port, workdir, "session2")
             if link2.start():
-                rst = link2.expect(r"Trg-RST\s+QP-Ver", 8.0, transcript) is not None
-        record("assertion", seen and gone and back and rst,
-               f"{detail}; port disappeared={gone}; came back={back}; Trg-RST after reboot={rst}")
+                # The reboot banner (Trg-RST) goes out as soon as qspy opens the
+                # port, usually before the UDP attach completes, so look for it
+                # in qspy's own screen output rather than on the UDP channel.
+                stdout_file = workdir / "qspy-session2-stdout.txt"
+                deadline = time.time() + 8.0
+                while time.time() < deadline and not rst:
+                    try:
+                        rst = "Trg-RST" in stdout_file.read_text(errors="replace")
+                    except OSError:
+                        pass
+                    time.sleep(0.2)
+                link2.target_info = None
+                link2.send(struct.pack("<B", TO_TRG_INFO))
+                deadline = time.time() + 3.0
+                while time.time() < deadline and link2.target_info is None:
+                    time.sleep(0.05)
+                alive = link2.target_info is not None
+        record("assertion", seen and gone and back and rst and alive,
+               f"{detail}; port disappeared={gone}; came back={back}; Trg-RST after reboot={rst}; QS-RX alive after reboot={alive}")
         if link2 is not None:
             link2.stop()
         link = None  # type: ignore

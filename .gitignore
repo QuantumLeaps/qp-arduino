@@ -70,3 +70,10 @@ __pycache__/
 
 # Local tool installs (QM/QTools downloads)
 .tools/
+
+# Raw bench evidence (analyzer captures, trace dumps) lives in
+# ../qp-arduino-example/evidence/, not in this library repository.
+docs/evidence/**/*.sr
+docs/evidence/**/*.vcd
+docs/evidence/**/*.gz
+docs/evidence/**/*.bin
