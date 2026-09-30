@@ -1,0 +1,11 @@
+firmware.uf2 images, sha256 (first 16 hex) and size in bytes
+
+rp2040_mouse_joystick            275617c88eab9a9a 177152   # image B: final state of the fixture, hashed from the artifact that was flashed
+rp2040_mouse_joystick_noqs       33b21bbdd8994cb3 166912   # image C: rebuilt with the .venv PlatformIO for hashing; the flashed copy was a Pixi build of the same sources
+rp2040_mouse_joystick_fastflash  5bdd880f38192ed2 177152   # image D: same remark as C
+
+Images A (host wait added, before the write-path fix) were not hashed before
+they were overwritten; upload.log and the QSPY logs identify them. PlatformIO
+keeps one project checksum per build directory, so alternating between the
+.venv (6.1.19) and Pixi (6.2.0) installations rebuilt and replaced sibling
+environment directories during the session. Use one installation per checkout.

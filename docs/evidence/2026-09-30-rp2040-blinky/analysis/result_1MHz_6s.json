@@ -1,0 +1,50 @@
+{
+  "file": "/tmp/claude-1001/-home-peter-Repositories-orb-weaver-qp-arduino/e82c616e-e5ea-4fa0-8354-b513af92835e/scratchpad/la/blinky_1MHz_6s.vcd",
+  "vcd_time_unit_us": 1.0,
+  "tick_period_us": {
+    "n": 600,
+    "mean": 10000.031666666666,
+    "min": 9987.0,
+    "max": 10013.0,
+    "stdev": 1.9901416755821404,
+    "p50": 10000.0,
+    "p99": 10008.0,
+    "deviation_from_nominal_pct": 0.0003166666666584206,
+    "missed_intervals": 0,
+    "doubled_intervals": 0,
+    "span_s": 6.000019
+  },
+  "tick_pulse_width_us": {
+    "n": 601,
+    "mean": 3.3261231281198005,
+    "min": 1.0,
+    "max": 89.0,
+    "stdev": 9.9559829809159,
+    "p50": 2.0,
+    "p99": 68.0
+  },
+  "led_toggle_interval_us": {
+    "n": 11,
+    "mean": 500012.8181818182,
+    "min": 499870.0,
+    "max": 500164.0,
+    "stdev": 81.88219717909402,
+    "p50": 500006.0,
+    "p99": 500164.0,
+    "expected_us": 500000.0,
+    "deviation_from_expected_pct": 0.0025636363636353052
+  },
+  "tick_to_led_latency_us": {
+    "n": 12,
+    "mean": 193.25,
+    "min": 137.0,
+    "max": 314.0,
+    "stdev": 58.379683966256614,
+    "p50": 176.0,
+    "p99": 314.0
+  },
+  "counts": {
+    "tick_rising_edges": 601,
+    "led_edges": 12
+  }
+}

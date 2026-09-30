@@ -63,3 +63,7 @@ sigrok-cli --driver kingst-la2016 --config samplerate=1m --samples 5m \
 - `-DQS_ON`: QS output on `QP_ARDUINO_QS_SERIAL` (default `Serial`, the USB CDC
   port). `-DQP_ARDUINO_QS_SERIAL=Serial1` moves it to UART0 on GP0/GP1, which
   the fixture exposes on LA5032 channels 8 and 7 for an analyzer-side decode.
+- `-DQP_ARDUINO_QS_HOST_WAIT_MS=<ms>` (default 5000): how long the BSP waits
+  for a USB CDC host before starting QS, so that a QSPY started right after
+  flashing receives the dictionaries. USB CDC discards output written before
+  a host opens the port. Use 0 to boot without waiting.

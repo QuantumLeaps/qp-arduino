@@ -427,25 +427,125 @@ Post-merge software checks, all from the repository `.venv` (PlatformIO
   upstream `qs.hpp`; SAM remains best effort.
 - Provenance check passed; `git diff --check` passed; no conflict markers.
 
-## Active RP2040 Hardware Acceptance — All Open
+## RP2040 Target Results — 2026-09-30
+
+First target run, performed automatically from this branch with the fixture
+and analyzer path recorded above. Raw evidence, capture files, trace logs and
+the analysis scripts are in `docs/evidence/2026-09-30-rp2040-blinky/`. The
+application under test is `examples/blinky_bsp-rp2040`, not the
+port-validation firmware, so these numbers are a Blinky baseline under the
+stated conditions and do not by themselves close the coverage gates.
+
+Firmware under test (all built from the merge commit `55ee412` plus the
+uncommitted example changes recorded in this section's commit):
+
+- **A** `rp2040_mouse_joystick` with the QS host wait (uploaded twice: once
+  without it, once with it), `-DQS_ON`, universal single-lane `boot2`.
+- **B** the same environment after the QS write-path fix below (final state
+  of the fixture at the end of the session).
+- **C** `rp2040_mouse_joystick_noqs`: QS compiled out, idle loop sleeps.
+- **D** `rp2040_mouse_joystick_fastflash`: A plus the quad-lane
+  `boot2_w25q128jvxq` second-stage loader.
+
+Procedure: `pixi run upload-blinky-bsp-rp2040 /dev/ttyACM0` (1200 baud
+touch, `picotool`), `qspy -k -c /dev/ttyACM0 -b 115200 -o` (QSPY 7.3.3 built
+from the QTools `v7.3.4` tag), and `sigrok-cli --driver kingst-la2016` from
+`instrument-control`'s Guix manifest with LA5032 CH16 = GP25 (LED) and
+CH17 = GP21 (tick-ISR probe), exported to VCD and analyzed by
+`analysis/analyze_blinky_capture.py`.
+
+Results:
+
+- **QSPY/QS handshake over USB CDC works.** Records decode with names once
+  QSPY attaches within the 5 s host wait: `Trg-RST QP-Ver=733`, object,
+  function and signal dictionaries, `St-Init`, then five records per
+  transition (`AO-Post`, `AO-GetL`, `Disp`, `St-Entry`, `Tran`). A first
+  attach 25 s after boot showed why the wait was added: USB CDC discards
+  everything written before a host opens the port, so the dictionaries were
+  lost and objects printed as addresses (resolved against the ELF: `0x20001818`
+  = `Blinky::instance`, `0x10003338/0x1000336c` = `Blinky::off/on`).
+  QUTest was not exercised.
+- **Trace continuity, 11 minutes:** 1,319 consecutive `AO-Post` intervals,
+  mean 500,000.01 µs, min 499,975, max 500,029, standard deviation 8.5 µs; no
+  assertion, error or drop records. The one `<COMMS>` checksum error and
+  sequence discontinuity in that log mark the boundary between QSPY sessions
+  (52.5 s with no host attached), not a stall during the run.
+- **Tick period (direct, ISR probe edges):** 601 ticks over 6 s at 1 MSa/s,
+  mean 10,000.03 µs, min 9,987, max 10,013 µs with QSPY attached; 10,000.01 µs
+  with min 9,997 / max 10,003 µs with the host detached or QS compiled out.
+  Zero missed or doubled ticks in every capture (50 or 600 ticks each).
+- **Tick average and continuity over 10 minutes:** the 600 s capture ran at
+  100 kSa/s, which under-samples the 1.7 µs tick pulse, so its tick column is
+  invalid. The LED channel is valid: 1,199 consecutive intervals of exactly
+  50 ticks, mean 500,000.94 µs (tick average 10,000.02 µs, +0.0002 %), min
+  499,770, max 500,260 µs. A missed or doubled tick would shift an interval by
+  10 ms; the largest deviation was 0.26 ms. A direct 10-minute edge capture
+  needs ≥ 2 MSa/s (1.2 G samples; the device reports a 10 G-sample limit) and
+  was not run.
+- **ISR duration:** 1.7 µs per tick (20 MSa/s), except the tick that posts the
+  time event: 35 µs with the host detached or QS compiled out, 65 to 92 µs
+  with QSPY attached, and 12 µs on the following tick. The quad-lane loader
+  (D) gives the same 36 µs, so XIP cache misses are not the cause. The
+  post path's cost is above expectation and remains an open item for the
+  port-validation work; it is 0.35 % of the tick.
+- **Tick-to-LED latency** (ISR rising edge to the LED write in the active
+  object's entry action, i.e. ISR plus QV dispatch): host detached 95 to 123
+  µs, QS compiled out 93 to 150 µs, quad-lane loader 90 to 123 µs; with QSPY
+  attached 137 to 314 µs (6 s) and 110 to 430 µs over the 600 s run (p99 360
+  µs). The maximum is 4.3 % of one tick. The trace transport's share is the
+  idle loop servicing USB CDC writes (`tud_task()` runs inside `Serial.write`),
+  which delays the QV loop's next pass.
+- **Tick jitter under trace load:** ±13 µs with QSPY attached versus ±3 µs
+  without; both far inside the ±1 % criterion.
+- **Application unaffected by the reader:** LED intervals stayed at 500 ms
+  ±0.05 % with the host attached, detached and never attached; QS records were
+  dropped, not blocked, when no host was reading.
+- **Fixes made during the run:** the QS host wait
+  (`QP_ARDUINO_QS_HOST_WAIT_MS`, default 5 s); QS callbacks are now defined
+  unconditionally because the port always compiles `Q_SPY` (the no-QS variant
+  otherwise fails to link); the bounded QS write path now honours the byte
+  count `Serial.write()` returns instead of assuming the whole block went
+  out. Two new environments, `rp2040_mouse_joystick_noqs` and
+  `rp2040_mouse_joystick_fastflash`, exist for these comparisons.
+
+What this does and does not establish: the imported ARMv6-M QV port runs on
+the fixture with the pinned core, the tick and dispatch paths behave, and QS
+over USB CDC is usable on the bench. Framework coverage (queues, pub/sub,
+dynamic events, assertions, QS RX), QUTest, the two-hour soak, the slow-reader
+case and the transmit-only profile remain open below.
+
+## Active RP2040 Hardware Acceptance
 
 - [ ] Upload the fixture firmware and establish the target QSPY/QUTest
       handshake with qtools `v7.3.4`; retain exact tool/configuration logs.
+      **QSPY half done 2026-09-30** with Blinky (upload log, QSPY logs and
+      versions in the evidence directory); QUTest not yet attempted.
 - [ ] Pass the RP2040 target coverage for queues, publish/subscribe, dynamic
       events, time events, active-object dispatch, idle behavior, assertions,
       QS TX and bench QS RX. Record expected assertion tests separately from
       the assertion-free soak.
-- [ ] Use a qualified analyzer path on the fixture's actual probe map to
+- [x] Use a qualified analyzer path on the fixture's actual probe map to
       measure a 100 Hz tick average within +/-1%, with no missed or doubled
-      ticks during a 10-minute run.
+      ticks during a 10-minute run. **Met 2026-09-30 with Blinky**: tick
+      average 10,000.02 µs over 600 s derived from 1,199 consecutive 50-tick
+      LED intervals (largest deviation 0.26 ms, so no tick was missed or
+      doubled), plus direct edge captures of 600 ticks at ±13 µs. Re-run with
+      the port-validation firmware, ideally as a direct edge capture at
+      ≥ 2 MSa/s.
 - [ ] Record ISR-to-active-object dispatch p99 and maximum latency under
       documented validation load; maximum must remain below one 100 Hz tick.
+      **Blinky baseline recorded 2026-09-30**: p99 360 µs, maximum 430 µs
+      with QSPY attached over 600 s; 123 µs maximum with the host detached.
+      Still open under the port-validation load.
 - [ ] Complete a two-hour soak without unexpected port assertions, recording
       load, resets and trace/capture coverage rather than assuming silence
-      establishes success.
+      establishes success. **11 minutes recorded 2026-09-30** (continuous
+      trace, no assertions, no resets); the two-hour run is still open.
 - [ ] Demonstrate bounded application response and continued local control
       with the trace reader absent, slow or disconnected and under declared
-      trace/queue pressure. Record RAM/flash, queue/pool margins, trace loss,
+      trace/queue pressure. **Reader absent and disconnected shown 2026-09-30**
+      with Blinky (LED period unchanged, records dropped not blocked); slow
+      reader and declared queue pressure still open. Record RAM/flash, queue/pool margins, trace loss,
       handler duration and transport overhead against budgets declared before
       the run.
 - [ ] Qualify a transmit-only observation profile separately from the bench
