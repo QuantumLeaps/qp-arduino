@@ -7,6 +7,17 @@
 - Preserve upstream generated framework metadata exactly, including the known `QP_VERSION_STR "7.3.3"` value in qpcpp `v7.3.4`; document this mismatch instead of locally patching generated files.
 - Teensy 4.1 is the required target. SAM examples are updated best-effort but are not hardware acceptance gates.
 
+## Observability Workstream
+
+The [observability development plan](docs/observability-plan.md) tracks
+`OBS-QP` in the cross-repository experimental-system roadmap: finish this
+plan's Teensy 4.1 hardware gates, then measure a representative QV trace pilot.
+This document remains the sole port acceptance and provenance ledger. The
+observability work does not broaden the `v7.3.4`/QV scope, require application
+migration, or imply RP2040 validation. BSP, tick and trace transport remain in
+examples/applications. No new validation result is recorded by this planning
+addition.
+
 ## Port Provenance and Local Deltas
 
 The v7 port was created from the local `../qpcpp` repository at tag

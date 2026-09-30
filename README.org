@@ -12,6 +12,13 @@
 
 This README provides a quick overview of QP for Arduino.
 
+The [[./UPGRADE_QPCPP_V7.md][v7 migration plan]] owns port provenance and
+validation status. The [[./docs/observability-plan.md][observability development
+plan]] tracks =OBS-QP=: Teensy 4.1 QV validation and a trace pilot within the
+shared [[../orb-weaver-context/context/experimental-system-observability-plan.md][experimental-system roadmap]].
+Hardware gates remain open; this work does not establish a release or broader
+board support.
+
 More detailed documentation for qpcpp, qm, and qtools can be found at:
 
 https://QuantumLeaps.github.io/qp-arduino/
