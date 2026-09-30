@@ -74,11 +74,14 @@ documented in =UPGRADE_QPCPP_V7.md=. The script
 =scripts/check_upstream_provenance.sh= verifies that imported files still match
 qpcpp =v7.3.4= except for the documented Arduino deltas.
 
-The recorded software migration baseline built the Teensy 4.1 examples. New
-RP2040 examples, BSP/core integration and target tests remain development work;
-the initial fixture will be non-actuating and separate from the working
-joystick. The imported ARMv6-M QV path is a starting point, not RP2040 target
-evidence. Start with QP/QS and application drivers on core 0 only.
+The recorded software migration baseline built the Teensy 4.1 examples. RP2040
+work uses a recorded non-actuating fixture, a spare =mouse-joystick-pcb= rev 0
+board watched by a Kingst LA5032, with the Earle Philhower =arduino-pico= core
+pinned in =platformio.ini= (environment =rp2040_mouse_joystick=); see the
+fixture record in =UPGRADE_QPCPP_V7.md=. =examples/blinky_bsp-rp2040= is the
+first RP2040 example. Further RP2040 examples, BSP/core integration and target
+tests remain development work. The imported ARMv6-M QV path is a starting
+point, not RP2040 target evidence. QP/QS and application drivers stay on core 0.
 
 =library.properties= still uses =architectures=avr= for the earlier Teensy
 packaging decision: Teensyduino installs in Arduino's =avr= namespace. This
@@ -175,12 +178,36 @@ https://github.com/QuantumLeaps/qp-arduino/archive/refs/heads/main.zip
 git clone https://github.com/QuantumLeaps/qp-arduino.git
 #+END_SRC
 
+** Pixi (Linux, macOS, Windows)
+
+[[https://pixi.sh][Pixi]] gives every operating system the same PlatformIO
+installation from =pixi.toml= and =pixi.lock=, without a system Python or a
+virtual environment. Install Pixi, then from the repository root:
+
+#+BEGIN_SRC sh
+pixi install                 # creates the environment (PlatformIO, Python, git)
+pixi run build               # compile the default example for the default env
+pixi run build --example examples/blinky_bsp-teensy4 --env teensy41
+pixi run upload --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick --port /dev/ttyACM0
+pixi run monitor --port /dev/ttyACM0
+pixi run provenance          # compare the imported framework files with qpcpp v7.3.4
+pixi run check               # provenance plus every example build
+pixi task list               # everything else
+#+END_SRC
+
+On Windows use =COM3=-style port names. Every task is a thin wrapper around
+=pio= or a Python script in =tools/=, so the same commands work in any shell
+that has PlatformIO on its =PATH=; nothing requires Pixi. PlatformIO keeps its
+platforms and toolchains inside the repository in =.pio-core= (set
+=PLATFORMIO_CORE_DIR= to share one elsewhere), and each example builds in its
+own directory under =.pio/build-examples=.
+
 ** PlatformIO
 
 PlatformIO can be used as an alternative to the Arduino IDE for compiling and
 uploading Arduino code to embedded boards using a command line interface.
 
-Download and setup PlatformIO if necessary:
+Download and setup PlatformIO if necessary, or use Pixi as above:
 
 https://platformio.org/install/cli
 
@@ -202,19 +229,23 @@ git clone https://github.com/QuantumLeaps/qp-arduino.git
 Navigate inside the qp-arduino directory where the platformio.ini file is
 contained.
 
-Modify the platformio.ini file to compile the example that you prefer.
-
-Compile and upload the example with a command like this:
-
-#+BEGIN_SRC sh
-pio run -e teensy41 -t upload
-#+END_SRC
-
-To use the serial monitor to observe the output of the dpp examples run:
+Pick the example and environment on the command line instead of editing
+=platformio.ini= (the script sets =PLATFORMIO_SRC_DIR= and a per-example build
+directory, on any operating system):
 
 #+BEGIN_SRC sh
-pio device monitor
+python tools/pio_task.py build  --example examples/blinky_bsp-teensy4 --env teensy41
+python tools/pio_task.py upload --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick --port /dev/ttyACM0
+python tools/pio_task.py monitor --port /dev/ttyACM0
 #+END_SRC
+
+Environments: =teensy41= for the Teensy 4.1 examples and =rp2040_mouse_joystick=
+for the RP2040 fixture, whose platform, core and toolchain are pinned to exact
+versions in =platformio.ini=.
+
+Plain =pio= still works if you prefer; =pio run -e teensy41 -t upload= builds
+whatever =src_dir= in =platformio.ini= points at, and =pio device monitor=
+opens the serial monitor.
 
 ** QM
 

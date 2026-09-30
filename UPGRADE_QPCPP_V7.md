@@ -5,7 +5,7 @@
 - Upgrade `qp-arduino` from qpcpp v6-derived files to qpcpp tag `v7.3.4` (`10441f7a03fa956b9e4772a073a05a96487983e2`).
 - Use strict v7 API by default: `QP_API_VERSION` defaults to `9999`; do not add v6 public-header compatibility shims.
 - Preserve upstream generated framework metadata exactly, including the known `QP_VERSION_STR "7.3.3"` value in qpcpp `v7.3.4`; document this mismatch instead of locally patching generated files.
-- As decided 2026-09-30, RP2040 with the Earle Philhower Arduino core family is the primary qualification target. Exact fixture/core versions and all RP2040 software/hardware gates remain open.
+- As decided 2026-09-30, RP2040 with the Earle Philhower Arduino core family is the primary qualification target. The fixture and the exact platform/core/toolchain versions were selected and recorded on 2026-09-30 (see "RP2040 Fixture And Toolchain Record"); the remaining RP2040 software and all hardware gates stay open.
 - Preserve the completed Teensy software baseline and future build regressions. Teensy hardware gates are deferred and nonblocking for RP2040; STM32G0B1CEU6 is the later second target. SAM examples are best-effort, not a support claim.
 
 ## Observability Workstream
@@ -51,7 +51,23 @@ Intentional Arduino-local deltas are:
   definitions are reused instead of producing macro redefinition warnings; it
   also removes one trailing blank line at EOF.
 - `platformio.ini`: keeps `src/qp-arduino` as an explicit local dependency so
-  PlatformIO links the QP library with `lib_ldf_mode = off`.
+  PlatformIO links the QP library with `lib_ldf_mode = off`. Since 2026-09-30
+  it is referenced as `symlink://src/qp-arduino`, so PlatformIO links the
+  source tree instead of copying it into `.pio/libdeps` (a bare path is copied
+  once and never refreshed). PlatformIO requires a manifest for a linked
+  library, so `src/qp-arduino/library.json` was added: a PlatformIO-only
+  manifest that mirrors `library.properties` and is not an upstream file. The
+  same date added the pinned `rp2040_mouse_joystick` environment described in
+  the fixture record below.
+- `scripts/check_upstream_provenance.sh` is, since 2026-09-30, a thin wrapper
+  around `tools/check_upstream_provenance.py`, the single implementation of the
+  check, so it runs identically on Linux, macOS and Windows (`pixi run
+  provenance`). Its checks, exit codes and `QPCPP_DIR`/`QPCPP_TAG` overrides
+  are unchanged.
+- `pixi.toml`, `pixi.lock` and `tools/pio_task.py` (added 2026-09-30) give
+  every platform a reproducible PlatformIO environment and example-selection
+  wrapper; the plain Python virtual environment documented in the README keeps
+  working without Pixi.
 - `scripts/build_teensy_examples.sh`: removes PlatformIO's generated
   `.pio/libdeps/teensy41/qp-arduino` cache before each verification build so
   tests compile the current source tree instead of stale copied sources.
@@ -165,6 +181,8 @@ not a support claim. Select and record the exact simple RP2040 fixture, core,
 PlatformIO platform/toolchain versions, clock settings and pin map before
 building the qualification baseline. Do not use the working joystick as the
 initial port fixture or require a new Digital-50 board before port work starts.
+**Done 2026-09-30**: see the fixture and toolchain record below. The fixture is
+a spare rev 0 board, not either of the two boards driving the rig.
 
 The original v7 framework import and Teensy software baseline above are
 completed historical work. RP2040 introduces new **open software and hardware
@@ -178,15 +196,101 @@ Cortex-M0+ devices without SWO/ITM trace. Plan QS output over a qualified UART
 or other explicitly measured transport; SWD is programming/debug access, not
 a replacement for QS output.
 
-## Active RP2040 Software Gates — All Open
+## RP2040 Fixture And Toolchain Record — 2026-09-30
 
-- [ ] Select a simple non-actuating fixture with accessible programming,
+The fixture was selected on 2026-09-30 from bench hardware the joystick project
+had already validated. It is a spare unit, not one of the two boards driving
+the rig, and it is non-actuating as long as its 36 V input stays unplugged; the
+QP examples never enable the 36 V switch or the GPIO isolation bus. Board and
+adapter facts below were read from the tagged design records
+(`mouse-joystick-pcb` tag `v0.2`, `la5032-instrument-port-adapter` tag `v1.0`)
+and from `mouse-joystick-firm/src/BoardPins.hpp`, without checking those
+repositories out.
+
+- **Board:** `mouse-joystick-pcb` rev 0, unit "Board 1", RP2040 flash unique
+  ID `E4654C159F2C2534`. Rev 0 is PCB git tags `v0.1`/`v0.2`, whose RP2040
+  pad-to-net maps are byte-identical. Its `R203` LATCH strap was removed on
+  2026-09-02; that only affects the 36 V switch, which this fixture never
+  enables. USB CDC enumerates as `2e8a:f00a`. A v0.3 board also exists; it adds
+  only switched-domain DAC strands and no debug access, so it offers nothing
+  extra for port work and is left with the rig.
+- **Clock:** 12 MHz crystal `Y501` (±30 ppm), `clk_sys` 133 MHz, `clk_peri`,
+  `clk_usb` and `clk_adc` 48 MHz, measured 2026-09-01 in that board's bring-up
+  log. Crystal absolute error measured below the ±110 ppm noise floor of the
+  host method used there.
+- **Debug access:** none. No SWD header, no RUN connection, no LED, no test
+  points. Programming is BOOTSEL (`SW501`, needs USB and pyControl unplugged
+  for the button) or the 1200-baud touch through `picotool`; both verified on
+  this board family in the joystick bring-up log.
+- **Analyzer path:** InstrumentPort-40 `J1501` (Molex 5051104091, bottom
+  contact) → 40-pin 0.5 mm FFC, confirmed not mirrored functionally on
+  2026-09-01 → `la5032-instrument-port-adapter` v1.0 (only unit built) →
+  Kingst LA5032 (`77a1:01a2` before firmware load). Host capture path validated
+  the same day: `sigrok-cli` 0.7.2, libsigrok 0.6.0, driver `kingst-la2016`,
+  from `instrument-control`'s Guix manifest, firmware in
+  `~/.local/share/sigrok-firmware`.
+- **Probe map** (RP2040 GPIO → board net → `J1501` pin → LA5032 channel):
+
+  | GPIO | Net | `J1501` pin | LA5032 | Fixture role |
+  |------|-----|-------------|--------|--------------|
+  | GP25 | `FW_TRIG0` (also `LED_BUILTIN`) | 26 (`TRIG0`) | 16 | Blinky LED; validation marker |
+  | GP21 | `FW_TRIG1` | 28 (`TRIG1`) | 17 | tick-ISR probe |
+  | GP0 | `PYC_UART_TX` (UART0 TX) | 14 (`DIG8`) | 8 | optional QS TX over UART |
+  | GP1 | `PYC_UART_RX` (UART0 RX) | 13 (`DIG7`) | 7 | optional QS RX over UART |
+
+  All four bypass the GPIO isolation switch and are buffered by always-on
+  `SN74LVC125A` packages that stay high-Z until GP24 `~INSTR_BUF_OE` is driven
+  low. Only two RP2040 pins are free markers, so the Teensy probe roles (timer,
+  dispatch, idle, event, marker on pins 2-6) cannot be mapped one-to-one; the
+  RP2040 port-validation example must define how roles share GP25/GP21 or use
+  the UART. The TMC SPI taps on channels 2-5 sit on the switched domain behind
+  the bus switch and are not used. Odd `J1501` pins 1-31 not listed are `GND`.
+- **Safe state** the BSP applies before anything else (from the joystick
+  firmware's `SafeState`): GP9 `~BUS_SW_EN` high, GP19 `HV_EN` low, GP14
+  `HV_DIAG_EN` low, GP2 `~TMC_CS` high, GP3 `~TMC_DRV_EN` high, markers low;
+  then GP24 low to enable the instrument port. `Serial2` (GP8/GP9) and `Wire1`
+  (GP26/GP27) must never be used on this board.
+- **Core 1:** the Earle Philhower core launches core 1 only when `setup1` or
+  `loop1` is defined; the QP examples define neither, so QP, QS and all drivers
+  stay on core 0 as required.
+
+Toolchain pinned to the set the joystick firmware qualified on this board:
+
+- PlatformIO platform `https://github.com/janelia-arduino/platform-raspberrypi.git`
+  at commit `5e4e06bb9c9971ad003a415bb32796da307b5676` (version 1.14.0, a fork
+  of the maxgerhardt community platform). That platform manifest pins:
+- `framework-arduinopico` 1.40200.0 = arduino-pico 4.2.0, commit
+  `c4b6521849570c465e073255c983941dc6adf4fb` (bundles its pico-sdk);
+- `toolchain-rp2040-earlephilhower` 5.140200.240929 = GCC 14.2.0;
+- `tool-picotool-rp2040-earlephilhower` 5.140200.240929.
+- Build configuration (`platformio.ini` env `rp2040_mouse_joystick`): board
+  `generic`, `board_build.core = earlephilhower`, `cortex-m0plus`, `F_CPU`
+  133 MHz, 16 MiB flash, no filesystem, universal
+  `boot2_generic_03h_4_padded_checksum.S`, `-DQP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB=1`,
+  `-DQS_ON`, strict v7 defaults from `qpcpp.hpp`.
+- USB servicing while QV owns the run loop: this core services USB with
+  `tud_task()` from a spare IRQ that a periodic alarm pends (`RP2040USB.cpp`),
+  and `main()` calls `Serial.begin()` before `setup()`. `QF::run()` therefore
+  never returning to `loop()` costs only the `serialEvent` hooks, which the
+  examples do not use. This is from reading the core source; behaviour on the
+  target remains a hardware gate.
+
+## Active RP2040 Software Gates
+
+- [x] Select a simple non-actuating fixture with accessible programming,
       trace and measurement pins. Record its identity, revision, actual wiring
-      and clock setup. Adapt validation probe roles to that pin map; Teensy
-      pins 2-6 are not an RP2040 allocation.
-- [ ] Pin and record the Earle Philhower core version/commit, PlatformIO
-      platform, compiler, SDK dependencies and build configuration. The core
-      family is decided; exact versions and fixture are still open.
+      and clock setup. **Recorded 2026-09-30** in the fixture record above:
+      `mouse-joystick-pcb` rev 0 unit `E4654C159F2C2534` with 36 V unplugged.
+- [ ] Adapt validation probe roles to that pin map; Teensy pins 2-6 are not an
+      RP2040 allocation. Only GP25 and GP21 reach the analyzer as free markers,
+      so the RP2040 port-validation example must define how the timer,
+      dispatch, idle, event and marker roles share them. Blinky uses GP25 as
+      the LED and GP21 as the tick-ISR probe.
+- [x] Pin and record the Earle Philhower core version/commit, PlatformIO
+      platform, compiler, SDK dependencies and build configuration.
+      **Recorded 2026-09-30** in the fixture record above and pinned in
+      `platformio.ini` (`rp2040_mouse_joystick`); the Blinky build recorded
+      below is the first build with that configuration.
 - [ ] Audit the imported ARMv6-M QV path as the starting point. Cortex-M0+
       critical sections use PRIMASK/global interrupt masking, not BASEPRI.
       Verify architecture selection, assembly/linkage, ISR entry/exit and
@@ -205,6 +309,8 @@ a replacement for QS output.
       defaults. Supply concrete host-driven procedures for queues, pub/sub,
       dynamic events, time events, active-object dispatch, idle, assertions,
       QS TX and bench QS RX; do not count a planned test as implemented.
+      **Blinky built 2026-09-30** (see "RP2040 Software Build Results");
+      DPP, port-validation and every host-driven procedure remain open.
 - [ ] Run provenance checks after framework/port changes and retain the
       existing Teensy example build regressions. Re-run the recorded upstream
       host baseline when framework/test-tool changes warrant it; distinguish
@@ -215,6 +321,60 @@ a replacement for QS output.
       Teensy packaging decision. It is unchanged by this documentation update
       and does not advertise or establish RP2040 support. Record any later
       metadata change as an intentional delta; do not broaden it speculatively.
+
+## RP2040 Software Build Results — 2026-09-30
+
+First build with the pinned configuration, run from the repository root on
+branch `upgrade/qpcpp-v7`. Cross-compilation only: no firmware was uploaded
+and no target behaviour, timing or trace result is implied.
+
+- `examples/blinky_bsp-rp2040`, env `rp2040_mouse_joystick`: **success**, no
+  compiler warnings. PlatformIO reported 76,272 bytes of flash and 11,980
+  bytes of RAM; `firmware.bin` is 88,304 bytes and `firmware.uf2` 176,640
+  bytes. Resolved packages matched the record above exactly: platform
+  `1.14.0+sha.5e4e06b`, `framework-arduinopico 1.40200.0+sha.c4b65218`,
+  `toolchain-rp2040-earlephilhower 5.140200.240929` (GCC 14.2.0),
+  `tool-picotool-rp2040-earlephilhower 5.140200.240929`. The ELF carries
+  `Tag_CPU_arch v6S-M`, `QF_int_disable_` disassembles to `mrs r0, PRIMASK` /
+  `cpsid i`, and `QF_qlog2` is linked, so the ARMv6-M/PRIMASK port path is the
+  one compiled. Built identically through the repository `.venv` (PlatformIO
+  Core 6.1.19) and through Pixi (`pixi run build-rp2040`, PlatformIO Core
+  6.2.0 from conda-forge).
+- The example's BSP applies the fixture safe state, enables the instrument
+  port buffers, drives the 100 Hz tick from a pico-sdk repeating timer
+  (start-to-start period, alarm IRQ on core 0), toggles GP25 at 2 Hz, pulses
+  GP21 per tick and emits QS records over USB CDC with a bounded, non-blocking
+  transmit path. `Q_onError` holds GP25 high for two seconds and resets
+  through the watchdog because the board has no reset button or SWD.
+- Retained Teensy regression (`scripts/build_teensy_examples.sh`, `.venv`
+  PlatformIO 6.1.19) passed with the `symlink://` dependency and the new
+  manifest: `blinky_bsp-teensy4` 16,160 bytes code, 4,040 data, 5,152 RAM1
+  variables; `dpp_bsp-teensy4` 26,132 / 4,040 / 6,976; `port_validation-teensy4`
+  24,704 / 4,040 / 7,744. The packages actually present in `.pio-core` were
+  Teensy platform 5.1.0, `framework-arduinoteensy` 1.160.0 and
+  `toolchain-gccarmnoneeabi-teensy` 1.110301.0 (GCC 11.3.1), with TimerOne at
+  commit `953f240`. That differs from the platform 5.2.0 / framework 1.162.0 /
+  toolchain 1.150201.0 set recorded on 2026-07-14, which explains the small
+  code-size differences; the Teensy pins should be made explicit in
+  `platformio.ini` before any Teensy claim is refreshed.
+- `scripts/check_upstream_provenance.sh` (wrapper) and
+  `tools/check_upstream_provenance.py` passed against qpcpp `v7.3.4`
+  (`10441f7a03fa956b9e4772a073a05a96487983e2`), including through
+  `pixi run provenance`. The Python port was checked against deliberate
+  failures (wrong tag, modified import, edits beyond the documented
+  `qv_port.cpp`/`qs_port.hpp` deltas, an obsolete v6 file, a missing port
+  setting) before replacing the bash implementation. `../qpcpp` stayed at its
+  `v6.9.3` checkout throughout.
+- `git diff --check` passed.
+
+Commands used for the post-change software checks:
+
+```sh
+pixi run provenance
+pixi run build-rp2040
+scripts/build_teensy_examples.sh
+git diff --check
+```
 
 ## Active RP2040 Hardware Acceptance — All Open
 

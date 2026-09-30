@@ -17,10 +17,12 @@ QK, QXK, QP 8.x, an application transport framework and v6 compatibility remain
 outside this work.
 
 RP2040 is now the primary qualification target, using the Earle Philhower
-Arduino core family already used by `mouse-joystick-firm`. Exact fixture, core,
-platform and toolchain versions are open selections, not recorded results.
-Start on a simple non-actuating RP2040 fixture, separate from the working
-joystick. Teensy 4.1 builds remain reference/regression evidence; its hardware
+Arduino core family already used by `mouse-joystick-firm`. The fixture (a spare
+`mouse-joystick-pcb` rev 0 board with 36 V unplugged, watched by an LA5032) and
+the exact platform, core and toolchain versions were recorded in the migration
+ledger on 2026-09-30, and the RP2040 Blinky example builds with them; no
+target result exists yet. The fixture is non-actuating and separate from the
+working joystick. Teensy 4.1 builds remain reference/regression evidence; its hardware
 gates are deferred and do not block RP2040 work. STM32G0B1CEU6 is the later
 second target and will need its own core/BSP/build/target evidence.
 
