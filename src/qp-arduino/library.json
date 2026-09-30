@@ -1,0 +1,10 @@
+{
+  "name": "qp-arduino",
+  "version": "7.3.4",
+  "description": "QP/C++ 7.3.4 real-time embedded framework with the QV cooperative kernel, flat source tree imported from qpcpp v7.3.4 for ARM Cortex-M Arduino boards. PlatformIO manifest only; the Arduino library metadata is ../../library.properties.",
+  "keywords": ["qp", "qpcpp", "active object", "state machine", "rtos", "cortex-m"],
+  "license": "GPL-3.0-or-later",
+  "homepage": "https://www.state-machine.com/arduino/",
+  "frameworks": ["arduino"],
+  "platforms": ["*"]
+}
