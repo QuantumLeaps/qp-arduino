@@ -1,0 +1,19 @@
+##### A: 1 MSa/s, 6 s, trigger CH17 rising
+##### A exit=0
+##### A vcd exit=0
+##### B: 20 MSa/s, 0.5 s, trigger CH17 rising
+##### B exit=0
+##### B vcd exit=0
+##### C: 100 kSa/s, 600 s, untriggered
+##### C exit=0
+##### C vcd exit=0
+total 756
+drwxrwxr-x 2 peter peter    180 Sep 30 10:08 .
+drwx------ 8 peter peter    520 Sep 30 10:03 ..
+-rw-rw-r-- 1 peter peter 322391 Sep 30 10:08 blinky_100kHz_600s.sr
+-rw-rw-r-- 1 peter peter 351471 Sep 30 10:08 blinky_100kHz_600s.vcd
+-rw-rw-r-- 1 peter peter  31348 Sep 30 09:58 blinky_1MHz_6s.sr
+-rw-rw-r-- 1 peter peter  15830 Sep 30 09:58 blinky_1MHz_6s.vcd
+-rw-rw-r-- 1 peter peter  40759 Sep 30 09:58 blinky_20MHz_500ms.sr
+-rw-rw-r-- 1 peter peter   1693 Sep 30 09:58 blinky_20MHz_500ms.vcd
+-rw-rw-r-- 1 peter peter    230 Sep 30 10:08 captures.log

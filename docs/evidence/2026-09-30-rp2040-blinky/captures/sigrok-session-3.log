@@ -1,0 +1,13 @@
+##### build fastflash
+##### flash fastflash
+##### F1: fastflash, host detached, 1 MSa/s 6 s
+##### F1 exit=0
+##### F2: fastflash, QSPY attached, 1 MSa/s 6 s
+##### F2 exit=0
+##### reflash standard QS build (with write fix)
+RAM:   [          ]   4.6% (used 11980 bytes from 262144 bytes)
+Flash: [          ]   0.5% (used 76344 bytes from 16773120 bytes)
+The device was rebooted to start the application.
+========================= [SUCCESS] Took 5.03 seconds =========================
+rp2040_mouse_joystick  SUCCESS   00:00:05.034
+##### done

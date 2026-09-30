@@ -1,0 +1,50 @@
+{
+  "file": "/tmp/claude-1001/-home-peter-Repositories-orb-weaver-qp-arduino/e82c616e-e5ea-4fa0-8354-b513af92835e/scratchpad/la/thr_txonly_1MHz_30s.vcd",
+  "vcd_time_unit_us": 1.0,
+  "tick_period_us": {
+    "n": 2999,
+    "mean": 9999.99333111037,
+    "min": 9983.0,
+    "max": 10017.0,
+    "stdev": 2.4855612804814955,
+    "p50": 10000.0,
+    "p99": 10009.0,
+    "deviation_from_nominal_pct": -6.668889629509067e-05,
+    "missed_intervals": 0,
+    "doubled_intervals": 0,
+    "span_s": 29.98998
+  },
+  "tick_pulse_width_us": {
+    "n": 2999,
+    "mean": 3.8626208736245413,
+    "min": 3.0,
+    "max": 31.0,
+    "stdev": 1.359319382278787,
+    "p50": 4.0,
+    "p99": 12.0
+  },
+  "led_toggle_interval_us": {
+    "n": 59,
+    "mean": 499999.5254237288,
+    "min": 499954.0,
+    "max": 500045.0,
+    "stdev": 16.151146186123714,
+    "p50": 499993.0,
+    "p99": 500040.0,
+    "expected_us": 500000.0,
+    "deviation_from_expected_pct": -9.49152542394586e-05
+  },
+  "tick_to_led_latency_us": {
+    "n": 60,
+    "mean": 32.06666666666667,
+    "min": 28.0,
+    "max": 67.0,
+    "stdev": 7.51635254332549,
+    "p50": 30.0,
+    "p99": 62.0
+  },
+  "counts": {
+    "tick_rising_edges": 3000,
+    "led_edges": 60
+  }
+}

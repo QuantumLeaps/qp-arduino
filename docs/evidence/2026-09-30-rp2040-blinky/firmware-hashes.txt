@@ -9,3 +9,12 @@ they were overwritten; upload.log and the QSPY logs identify them. PlatformIO
 keeps one project checksum per build directory, so alternating between the
 .venv (6.1.19) and Pixi (6.2.0) installations rebuilt and replaced sibling
 environment directories during the session. Use one installation per checkout.
+
+Afternoon images (idle-loop transport throttle, hardware-alarm tick with the
+fixed watchdog, transmit-only profile), built 15:21 with the .venv PlatformIO
+from the working tree that the results commit records:
+
+rp2040_mouse_joystick            9de26163d4f59296 180224   # image F: throttled USB CDC service; final state of the fixture
+rp2040_mouse_joystick_noqs       e1c80f84cbb5cc0c 169472   # image G
+rp2040_mouse_joystick_uart       6d2a534f438acc46 184320   # image H: QS on UART0
+rp2040_mouse_joystick_txonly     07214d5fd66bda4e 178688   # image I: transmit-only, dictionaries every 10 s, TRACE_STAT every 1 s

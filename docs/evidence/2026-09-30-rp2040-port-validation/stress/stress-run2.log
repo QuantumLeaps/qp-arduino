@@ -1,0 +1,319 @@
+[    0.0s] cycle   1 fast info=True ticks=114 rate=None/s hold=2.8s
+[    7.7s] cycle   2 fast info=True ticks=880 rate=99.9/s hold=6.5s
+[   16.9s] cycle   3 fast info=True ticks=1799 rate=99.9/s hold=4.0s
+[   27.2s] cycle   4 fast info=True ticks=2836 rate=99.9/s hold=2.9s
+[   36.7s] cycle   5 slow info=True ticks=4790 rate=99.9/s hold=1.7s slow=9.5s/24262B
+[   52.4s] cycle   6 fast info=True ticks=5350 rate=100.0/s hold=7.6s
+[   64.2s] cycle   7 fast info=True ticks=6532 rate=99.9/s hold=6.1s
+[   75.4s] cycle   8 fast info=True ticks=7645 rate=99.9/s hold=7.6s
+[   88.1s] cycle   9 fast info=True ticks=8919 rate=99.9/s hold=6.3s
+[  101.8s] cycle  10 slow info=True ticks=11503 rate=100.0/s hold=3.9s slow=11.6s/29172B
+[  125.1s] cycle  11 fast info=True ticks=12611 rate=99.9/s hold=1.7s
+[  132.4s] cycle  12 fast info=True ticks=13341 rate=100.0/s hold=3.1s
+[  141.7s] cycle  13 fast info=True ticks=14270 rate=99.9/s hold=7.8s
+[  154.4s] cycle  14 fast info=True ticks=15540 rate=100.0/s hold=4.6s
+[  166.1s] cycle  15 slow info=True ticks=17480 rate=99.9/s hold=3.0s slow=7.1s/18224B
+[  184.2s] cycle  16 fast info=True ticks=18527 rate=99.9/s hold=5.1s
+[  191.7s] cycle  17 fast info=True ticks=19274 rate=100.0/s hold=3.9s
+[  198.7s] cycle  18 fast info=True ticks=19974 rate=99.9/s hold=5.9s
+[  210.5s] cycle  19 fast info=True ticks=21150 rate=99.9/s hold=5.6s
+[  218.9s] cycle  20 slow info=True ticks=22741 rate=100.0/s hold=6.9s slow=7.0s/17733B
+[  237.5s] cycle  21 fast info=True ticks=23845 rate=99.9/s hold=4.3s
+[  245.6s] cycle  22 fast info=True ticks=24657 rate=100.0/s hold=5.3s
+[  256.2s] cycle  23 fast info=True ticks=25718 rate=99.9/s hold=2.2s
+[  261.8s] cycle  24 fast info=True ticks=26274 rate=99.9/s hold=4.8s
+[  273.4s] cycle  25 slow info=True ticks=28232 rate=100.0/s hold=4.6s slow=7.4s/18816B
+[  293.3s] cycle  26 fast info=True ticks=29428 rate=99.9/s hold=4.2s
+[  301.2s] cycle  27 fast info=True ticks=30211 rate=100.0/s hold=7.7s
+[  311.0s] cycle  28 fast info=True ticks=31197 rate=99.9/s hold=6.7s
+[  324.8s] cycle  29 fast info=True ticks=32571 rate=99.9/s hold=6.7s
+[  336.4s] cycle  30 slow info=True ticks=34728 rate=100.0/s hold=4.0s slow=9.4s/23866B
+[  352.8s] cycle  31 fast info=True ticks=35370 rate=99.9/s hold=5.0s
+[  361.0s] cycle  32 fast info=True ticks=36192 rate=99.9/s hold=4.4s
+[  369.5s] cycle  33 fast info=True ticks=37041 rate=100.0/s hold=4.2s
+[  376.0s] cycle  34 fast info=True ticks=37692 rate=99.9/s hold=4.9s
+[  384.0s] cycle  35 slow info=True ticks=39204 rate=100.0/s hold=4.9s slow=6.5s/16666B
+[  402.8s] cycle  36 fast info=True ticks=40371 rate=99.9/s hold=1.2s
+[  411.4s] cycle  37 fast info=True ticks=41225 rate=99.8/s hold=4.2s
+[  421.9s] cycle  38 fast info=True ticks=42273 rate=100.0/s hold=1.8s
+[  429.2s] cycle  39 fast info=True ticks=43008 rate=99.9/s hold=2.2s
+[  435.0s] cycle  40 slow info=True ticks=44804 rate=100.0/s hold=5.6s slow=11.7s/29697B
+[  458.5s] cycle  41 fast info=True ticks=45933 rate=99.9/s hold=4.5s
+[  465.7s] cycle  42 fast info=True ticks=46658 rate=99.8/s hold=3.9s
+[  472.9s] cycle  43 fast info=True ticks=47372 rate=100.0/s hold=7.8s
+[  485.2s] cycle  44 fast info=True ticks=48600 rate=99.9/s hold=2.6s
+[  492.1s] cycle  45 slow info=True ticks=49961 rate=100.0/s hold=7.7s slow=6.2s/15705B
+[  511.1s] cycle  46 fast info=True ticks=51191 rate=99.9/s hold=4.0s
+[  521.8s] cycle  47 fast info=True ticks=52260 rate=99.9/s hold=5.4s
+[  533.2s] cycle  48 fast info=True ticks=53397 rate=100.0/s hold=3.8s
+[  542.2s] cycle  49 fast info=True ticks=54302 rate=99.9/s hold=1.4s
+[  547.4s] cycle  50 slow info=True ticks=56056 rate=100.0/s hold=7.1s slow=11.8s/29753B
+[  570.7s] cycle  51 fast info=True ticks=57150 rate=99.9/s hold=3.2s
+[  581.2s] cycle  52 fast info=True ticks=58197 rate=99.9/s hold=3.9s
+[  588.6s] cycle  53 fast info=True ticks=58941 rate=100.0/s hold=5.1s
+[  597.1s] cycle  54 fast info=True ticks=59789 rate=99.9/s hold=4.2s
+[  608.0s] cycle  55 slow info=True ticks=62061 rate=99.9/s hold=6.5s slow=11.2s/28589B
+[  631.9s] cycle  56 fast info=True ticks=63263 rate=100.0/s hold=3.4s
+[  638.6s] cycle  57 fast info=True ticks=63934 rate=99.9/s hold=4.0s
+[  645.8s] cycle  58 fast info=True ticks=64657 rate=99.9/s hold=3.1s
+[  653.8s] cycle  59 fast info=True ticks=65452 rate=100.0/s hold=7.3s
+[  663.3s] cycle  60 slow info=True ticks=67178 rate=99.9/s hold=3.3s slow=7.2s/18304B
+[  681.9s] cycle  61 fast info=True ticks=68263 rate=99.9/s hold=3.4s
+[  688.6s] cycle  62 fast info=True ticks=68931 rate=100.0/s hold=6.9s
+[  702.7s] cycle  63 fast info=True ticks=70343 rate=99.9/s hold=6.4s
+[  714.2s] cycle  64 fast info=True ticks=71488 rate=99.9/s hold=1.6s
+[  718.9s] cycle  65 slow info=True ticks=73158 rate=100.0/s hold=2.5s slow=11.5s/29039B
+[  739.7s] cycle  66 fast info=True ticks=74038 rate=100.0/s hold=6.9s
+[  750.7s] cycle  67 fast info=True ticks=75139 rate=99.9/s hold=2.6s
+[  760.7s] cycle  68 fast info=True ticks=76139 rate=100.0/s hold=6.0s
+[  771.5s] cycle  69 fast info=True ticks=77218 rate=99.9/s hold=6.4s
+[  781.8s] cycle  70 slow info=True ticks=79145 rate=99.9/s hold=3.7s slow=8.4s/21568B
+[  802.0s] cycle  71 fast info=True ticks=80269 rate=99.9/s hold=3.4s
+[  811.0s] cycle  72 fast info=True ticks=81162 rate=100.0/s hold=3.6s
+[  819.9s] cycle  73 fast info=True ticks=82053 rate=99.9/s hold=7.7s
+[  831.7s] cycle  74 fast info=True ticks=83235 rate=99.9/s hold=4.2s
+[  839.6s] cycle  75 slow info=True ticks=85156 rate=100.0/s hold=6.8s slow=10.7s/27286B
+[  859.9s] cycle  76 fast info=True ticks=86055 rate=99.9/s hold=1.6s
+[  864.3s] cycle  77 fast info=True ticks=86492 rate=99.8/s hold=1.3s
+[  869.1s] cycle  78 fast info=True ticks=86966 rate=100.1/s hold=3.9s
+[  875.7s] cycle  79 fast info=True ticks=87634 rate=99.9/s hold=2.1s
+[  884.7s] cycle  80 slow info=True ticks=89437 rate=100.0/s hold=7.8s slow=8.6s/21672B
+[  908.1s] cycle  81 fast info=True ticks=90868 rate=99.9/s hold=6.7s
+[  920.0s] cycle  82 fast info=True ticks=92057 rate=100.0/s hold=3.2s
+[  926.5s] cycle  83 fast info=True ticks=92704 rate=99.8/s hold=1.1s
+[  935.1s] cycle  84 fast info=True ticks=93567 rate=99.9/s hold=4.1s
+[  943.1s] cycle  85 slow info=True ticks=95061 rate=100.0/s hold=7.4s slow=6.4s/16067B
+[  964.9s] cycle  86 fast info=True ticks=96547 rate=100.0/s hold=1.8s
+[  970.0s] cycle  87 fast info=True ticks=97056 rate=99.8/s hold=7.9s
+[  983.0s] cycle  88 fast info=True ticks=98354 rate=100.0/s hold=5.6s
+[  992.2s] cycle  89 fast info=True ticks=99272 rate=99.8/s hold=3.2s
+[  998.8s] cycle  90 slow info=True ticks=100638 rate=100.0/s hold=3.0s slow=6.5s/16323B
+[ 1016.4s] cycle  91 fast info=True ticks=101688 rate=99.9/s hold=7.6s
+[ 1028.3s] cycle  92 fast info=True ticks=102876 rate=99.9/s hold=2.3s
+[ 1037.1s] cycle  93 fast info=True ticks=103758 rate=99.9/s hold=7.4s
+[ 1048.0s] cycle  94 fast info=True ticks=104852 rate=100.0/s hold=2.7s
+[ 1053.0s] cycle  95 slow info=True ticks=106151 rate=99.9/s hold=1.5s slow=7.5s/18908B
+[ 1067.7s] cycle  96 fast info=True ticks=106818 rate=99.9/s hold=1.2s
+[ 1071.1s] cycle  97 fast info=True ticks=107154 rate=99.9/s hold=3.5s
+[ 1079.3s] cycle  98 fast info=True ticks=107974 rate=100.0/s hold=1.7s
+[ 1087.4s] cycle  99 fast info=True ticks=108785 rate=99.8/s hold=2.3s
+[ 1092.6s] cycle 100 slow info=True ticks=110050 rate=100.0/s hold=7.1s slow=6.8s/17409B
+[ 1110.9s] cycle 101 fast info=True ticks=111137 rate=99.9/s hold=6.8s
+[ 1123.2s] cycle 102 fast info=True ticks=112365 rate=99.9/s hold=2.0s
+[ 1132.4s] cycle 103 fast info=True ticks=113281 rate=100.0/s hold=6.7s
+[ 1144.7s] cycle 104 fast info=True ticks=114514 rate=100.0/s hold=4.9s
+[ 1156.9s] cycle 105 slow info=True ticks=116975 rate=99.9/s hold=2.4s slow=11.9s/30173B
+[ 1175.5s] cycle 106 fast info=True ticks=117596 rate=99.8/s hold=1.3s
+[ 1183.8s] cycle 107 fast info=True ticks=118418 rate=100.0/s hold=5.8s
+[ 1194.2s] cycle 108 fast info=True ticks=119456 rate=99.9/s hold=4.8s
+[ 1205.8s] cycle 109 fast info=True ticks=120619 rate=100.0/s hold=6.9s
+[ 1215.7s] cycle 110 slow info=True ticks=122555 rate=99.9/s hold=6.6s slow=8.9s/22562B
+[ 1238.9s] cycle 111 fast info=True ticks=123933 rate=100.0/s hold=1.1s
+[ 1246.0s] cycle 112 fast info=True ticks=124640 rate=99.9/s hold=5.2s
+[ 1254.1s] cycle 113 fast info=True ticks=125445 rate=99.9/s hold=2.9s
+[ 1262.2s] cycle 114 fast info=True ticks=126262 rate=99.9/s hold=2.6s
+[ 1267.1s] cycle 115 slow info=True ticks=127717 rate=100.0/s hold=4.5s slow=9.2s/23174B
+[ 1287.0s] cycle 116 fast info=True ticks=128737 rate=99.9/s hold=2.7s
+[ 1294.6s] cycle 117 fast info=True ticks=129492 rate=100.0/s hold=6.0s
+[ 1304.6s] cycle 118 fast info=True ticks=130491 rate=99.9/s hold=6.1s
+[ 1316.4s] cycle 119 fast info=True ticks=131673 rate=99.9/s hold=2.5s
+[ 1326.1s] cycle 120 slow info=True ticks=133759 rate=100.0/s hold=5.5s slow=10.6s/26790B
+[ 1346.9s] cycle 121 fast info=True ticks=134727 rate=100.0/s hold=6.5s
+[ 1356.7s] cycle 122 fast info=True ticks=135706 rate=99.8/s hold=6.9s
+[ 1367.9s] cycle 123 fast info=True ticks=136820 rate=100.0/s hold=6.2s
+[ 1379.5s] cycle 124 fast info=True ticks=137976 rate=100.0/s hold=7.3s
+[ 1394.2s] cycle 125 slow info=True ticks=140446 rate=99.9/s hold=2.2s slow=9.4s/24043B
+[ 1409.9s] cycle 126 fast info=True ticks=141021 rate=100.0/s hold=4.5s
+[ 1418.7s] cycle 127 fast info=True ticks=141899 rate=99.9/s hold=3.7s
+[ 1429.2s] cycle 128 fast info=True ticks=142946 rate=99.9/s hold=8.0s
+[ 1442.2s] cycle 129 fast info=True ticks=144243 rate=99.9/s hold=5.4s
+[ 1451.2s] cycle 130 slow info=True ticks=146347 rate=99.9/s hold=7.7s slow=11.5s/29124B
+[ 1473.8s] cycle 131 fast info=True ticks=147408 rate=99.9/s hold=6.9s
+[ 1486.5s] cycle 132 fast info=True ticks=148673 rate=99.9/s hold=4.1s
+[ 1497.8s] cycle 133 fast info=True ticks=149803 rate=100.0/s hold=3.7s
+[ 1508.0s] cycle 134 fast info=True ticks=150825 rate=99.9/s hold=7.4s
+[ 1520.0s] cycle 135 slow info=True ticks=153050 rate=100.0/s hold=4.4s slow=9.7s/24669B
+[ 1538.0s] cycle 136 fast info=True ticks=153821 rate=99.9/s hold=7.4s
+[ 1551.2s] cycle 137 fast info=True ticks=155136 rate=100.0/s hold=6.2s
+[ 1559.6s] cycle 138 fast info=True ticks=155978 rate=99.9/s hold=5.1s
+[ 1567.0s] cycle 139 fast info=True ticks=156715 rate=99.8/s hold=2.7s
+[ 1573.2s] cycle 140 slow info=True ticks=158099 rate=99.9/s hold=2.0s slow=7.0s/17829B
+[ 1586.1s] cycle 141 fast info=True ticks=158627 rate=100.0/s hold=6.8s
+[ 1597.5s] cycle 142 fast info=True ticks=159770 rate=99.9/s hold=7.0s
+[ 1607.6s] cycle 143 fast info=True ticks=160774 rate=99.9/s hold=7.0s
+[ 1621.0s] cycle 144 fast info=True ticks=162111 rate=99.9/s hold=3.7s
+[ 1628.3s] cycle 145 slow info=True ticks=163570 rate=100.0/s hold=6.7s slow=6.6s/16977B
+[ 1645.0s] cycle 146 fast info=True ticks=164513 rate=99.9/s hold=4.8s
+[ 1657.3s] cycle 147 fast info=True ticks=165738 rate=99.9/s hold=7.8s
+[ 1668.0s] cycle 148 fast info=True ticks=166808 rate=100.0/s hold=5.0s
+[ 1676.8s] cycle 149 fast info=True ticks=167693 rate=99.9/s hold=3.5s
+[ 1685.4s] cycle 150 slow info=True ticks=169198 rate=100.0/s hold=4.1s slow=6.0s/15169B
+[ 1700.6s] cycle 151 fast info=True ticks=170068 rate=99.9/s hold=3.4s
+[ 1710.1s] cycle 152 fast info=True ticks=171023 rate=99.9/s hold=1.8s
+[ 1719.1s] cycle 153 fast info=True ticks=171920 rate=99.9/s hold=8.0s
+[ 1732.7s] cycle 154 fast info=True ticks=173281 rate=99.9/s hold=6.2s
+[ 1745.1s] cycle 155 slow info=True ticks=175283 rate=100.0/s hold=7.5s slow=7.2s/18136B
+[ 1765.7s] cycle 156 fast info=True ticks=176572 rate=99.9/s hold=7.6s
+[ 1779.3s] cycle 157 fast info=True ticks=177933 rate=99.9/s hold=5.9s
+[ 1789.8s] cycle 158 fast info=True ticks=178986 rate=100.0/s hold=2.4s
+[ 1797.2s] cycle 159 fast info=True ticks=179723 rate=99.9/s hold=5.1s
+[ 1809.7s] cycle 160 slow info=True ticks=181837 rate=100.0/s hold=5.4s slow=8.0s/20486B
+[ 1831.2s] cycle 161 fast info=True ticks=183121 rate=99.9/s hold=7.8s
+[ 1841.5s] cycle 162 fast info=True ticks=184148 rate=99.9/s hold=2.7s
+[ 1851.7s] cycle 163 fast info=True ticks=185167 rate=100.0/s hold=3.8s
+[ 1861.1s] cycle 164 fast info=True ticks=186113 rate=99.9/s hold=7.6s
+[ 1875.1s] cycle 165 slow info=True ticks=188675 rate=100.0/s hold=6.4s slow=11.1s/28212B
+[ 1899.8s] cycle 166 fast info=True ticks=189973 rate=99.9/s hold=3.4s
+[ 1906.8s] cycle 167 fast info=True ticks=190676 rate=99.9/s hold=7.1s
+[ 1919.0s] cycle 168 fast info=True ticks=191900 rate=99.9/s hold=4.4s
+[ 1928.2s] cycle 169 fast info=True ticks=192812 rate=100.0/s hold=6.2s
+[ 1938.9s] cycle 170 slow info=True ticks=194753 rate=100.0/s hold=5.6s slow=8.1s/20698B
+[ 1955.4s] cycle 171 fast info=True ticks=195536 rate=99.8/s hold=7.6s
+[ 1969.0s] cycle 172 fast info=True ticks=196891 rate=99.9/s hold=5.2s
+[ 1977.5s] cycle 173 fast info=True ticks=197745 rate=100.0/s hold=2.9s
+[ 1983.0s] cycle 174 fast info=True ticks=198290 rate=99.9/s hold=4.7s
+[ 1991.8s] cycle 175 slow info=True ticks=200133 rate=99.9/s hold=6.2s slow=9.1s/23052B
+[ 2010.6s] cycle 176 fast info=True ticks=201055 rate=100.0/s hold=6.0s
+[ 2023.3s] cycle 177 fast info=True ticks=202315 rate=99.9/s hold=3.7s
+[ 2031.4s] cycle 178 fast info=True ticks=203125 rate=99.9/s hold=7.1s
+[ 2042.4s] cycle 179 fast info=True ticks=204229 rate=100.0/s hold=6.9s
+[ 2051.6s] cycle 180 slow info=True ticks=206343 rate=99.9/s hold=5.4s slow=11.4s/28863B
+[ 2072.8s] cycle 181 fast info=True ticks=207266 rate=99.9/s hold=6.5s
+[ 2082.5s] cycle 182 fast info=True ticks=208236 rate=100.0/s hold=2.2s
+[ 2092.2s] cycle 183 fast info=True ticks=209200 rate=99.9/s hold=5.2s
+[ 2101.0s] cycle 184 fast info=True ticks=210084 rate=100.0/s hold=2.0s
+[ 2105.9s] cycle 185 slow info=True ticks=211652 rate=99.9/s hold=3.5s slow=10.3s/26155B
+[ 2126.5s] cycle 186 fast info=True ticks=212628 rate=99.9/s hold=6.0s
+[ 2136.3s] cycle 187 fast info=True ticks=213611 rate=99.9/s hold=3.2s
+[ 2146.8s] cycle 188 fast info=True ticks=214662 rate=100.0/s hold=1.3s
+[ 2154.7s] cycle 189 fast info=True ticks=215452 rate=99.9/s hold=5.8s
+[ 2165.4s] cycle 190 slow info=True ticks=217489 rate=100.0/s hold=6.1s slow=9.2s/23251B
+[ 2188.2s] cycle 191 fast info=True ticks=218797 rate=100.0/s hold=1.8s
+[ 2196.0s] cycle 192 fast info=True ticks=219576 rate=100.0/s hold=2.6s
+[ 2203.2s] cycle 193 fast info=True ticks=220302 rate=99.9/s hold=7.8s
+[ 2214.5s] cycle 194 fast info=True ticks=221426 rate=99.9/s hold=2.5s
+[ 2223.1s] cycle 195 slow info=True ticks=223134 rate=99.9/s hold=5.2s slow=8.0s/20190B
+[ 2243.9s] cycle 196 fast info=True ticks=224363 rate=100.0/s hold=1.3s
+[ 2251.7s] cycle 197 fast info=True ticks=225147 rate=99.9/s hold=3.2s
+[ 2259.2s] cycle 198 fast info=True ticks=225895 rate=100.0/s hold=7.4s
+[ 2271.0s] cycle 199 fast info=True ticks=227071 rate=99.9/s hold=6.3s
+[ 2280.2s] cycle 200 slow info=True ticks=229201 rate=100.0/s hold=1.1s slow=11.5s/29030B
+[ 2296.3s] cycle 201 fast info=True ticks=229605 rate=99.9/s hold=1.4s
+[ 2301.9s] cycle 202 fast info=True ticks=230167 rate=99.9/s hold=5.6s
+[ 2311.3s] cycle 203 fast info=True ticks=231105 rate=99.9/s hold=4.7s
+[ 2318.9s] cycle 204 fast info=True ticks=231859 rate=100.0/s hold=6.5s
+[ 2329.9s] cycle 205 slow info=True ticks=233727 rate=99.9/s hold=4.5s slow=7.1s/18182B
+[ 2344.9s] cycle 206 fast info=True ticks=234462 rate=100.0/s hold=5.6s
+[ 2354.9s] cycle 207 fast info=True ticks=235456 rate=100.0/s hold=7.8s
+[ 2368.3s] cycle 208 fast info=True ticks=236800 rate=99.9/s hold=5.1s
+[ 2379.9s] cycle 209 fast info=True ticks=237960 rate=99.9/s hold=5.2s
+[ 2390.4s] cycle 210 slow info=True ticks=239979 rate=100.0/s hold=1.4s slow=9.1s/23137B
+[ 2405.6s] cycle 211 fast info=True ticks=240529 rate=99.9/s hold=6.0s
+[ 2416.7s] cycle 212 fast info=True ticks=241637 rate=99.9/s hold=1.5s
+[ 2421.8s] cycle 213 fast info=True ticks=242147 rate=100.0/s hold=7.8s
+[ 2432.1s] cycle 214 fast info=True ticks=243177 rate=99.9/s hold=2.1s
+[ 2441.4s] cycle 215 slow info=True ticks=245275 rate=100.0/s hold=7.0s slow=11.1s/28256B
+[ 2462.5s] cycle 216 fast info=True ticks=246213 rate=99.9/s hold=4.5s
+[ 2469.7s] cycle 217 fast info=True ticks=246931 rate=100.0/s hold=4.7s
+[ 2479.0s] cycle 218 fast info=True ticks=247862 rate=99.9/s hold=6.3s
+[ 2492.4s] cycle 219 fast info=True ticks=249205 rate=99.9/s hold=1.6s
+[ 2500.6s] cycle 220 slow info=True ticks=250735 rate=100.0/s hold=1.2s slow=6.5s/16580B
+[ 2513.2s] cycle 221 fast info=True ticks=251281 rate=100.0/s hold=3.2s
+[ 2519.3s] cycle 222 fast info=True ticks=251885 rate=99.9/s hold=6.6s
+[ 2532.8s] cycle 223 fast info=True ticks=253233 rate=99.9/s hold=6.9s
+[ 2544.5s] cycle 224 fast info=True ticks=254411 rate=100.0/s hold=4.6s
+[ 2553.4s] cycle 225 slow info=True ticks=256489 rate=99.9/s hold=4.4s slow=11.4s/28726B
+[ 2572.5s] cycle 226 fast info=True ticks=257211 rate=100.0/s hold=4.7s
+[ 2582.4s] cycle 227 fast info=True ticks=258198 rate=99.9/s hold=5.1s
+[ 2592.5s] cycle 228 fast info=True ticks=259204 rate=99.9/s hold=6.2s
+[ 2602.0s] cycle 229 fast info=True ticks=260150 rate=100.0/s hold=1.7s
+[ 2607.7s] cycle 230 slow info=True ticks=261725 rate=99.9/s hold=1.3s slow=9.4s/23964B
+[ 2625.6s] cycle 231 fast info=True ticks=262517 rate=99.9/s hold=3.2s
+[ 2632.6s] cycle 232 fast info=True ticks=263214 rate=99.9/s hold=6.2s
+[ 2643.9s] cycle 233 fast info=True ticks=264340 rate=100.0/s hold=2.0s
+[ 2653.1s] cycle 234 fast info=True ticks=265259 rate=99.9/s hold=5.0s
+[ 2662.7s] cycle 235 slow info=True ticks=267045 rate=99.9/s hold=4.2s slow=7.7s/19373B
+[ 2679.3s] cycle 236 fast info=True ticks=267877 rate=100.0/s hold=3.7s
+[ 2690.0s] cycle 237 fast info=True ticks=268946 rate=100.0/s hold=1.9s
+[ 2696.9s] cycle 238 fast info=True ticks=269643 rate=99.8/s hold=7.9s
+[ 2711.3s] cycle 239 fast info=True ticks=271082 rate=99.9/s hold=6.2s
+[ 2721.7s] cycle 240 slow info=True ticks=273339 rate=100.0/s hold=5.5s slow=11.7s/29656B
+[ 2743.8s] cycle 241 fast info=True ticks=274324 rate=99.9/s hold=4.7s
+[ 2751.6s] cycle 242 fast info=True ticks=275104 rate=99.9/s hold=4.9s
+[ 2763.7s] cycle 243 fast info=True ticks=276312 rate=100.0/s hold=7.6s
+[ 2776.8s] cycle 244 fast info=True ticks=277622 rate=99.9/s hold=7.9s
+[ 2790.5s] cycle 245 slow info=True ticks=280077 rate=100.0/s hold=2.4s slow=10.3s/25962B
+[ 2806.3s] cycle 246 fast info=True ticks=280570 rate=99.9/s hold=5.5s
+[ 2818.6s] cycle 247 fast info=True ticks=281802 rate=99.9/s hold=2.5s
+[ 2827.8s] cycle 248 fast info=True ticks=282726 rate=100.0/s hold=4.0s
+[ 2837.2s] cycle 249 fast info=True ticks=283666 rate=99.9/s hold=4.4s
+[ 2848.2s] cycle 250 slow info=True ticks=285555 rate=99.9/s hold=2.4s slow=7.3s/18545B
+[ 2863.4s] cycle 251 fast info=True ticks=286280 rate=99.9/s hold=2.6s
+[ 2870.7s] cycle 252 fast info=True ticks=287007 rate=100.0/s hold=6.6s
+[ 2883.4s] cycle 253 fast info=True ticks=288280 rate=99.9/s hold=8.0s
+[ 2895.0s] cycle 254 fast info=True ticks=289432 rate=99.9/s hold=4.6s
+[ 2904.4s] cycle 255 slow info=True ticks=291277 rate=100.0/s hold=7.2s slow=8.4s/21552B
+[ 2927.1s] cycle 256 fast info=True ticks=292646 rate=100.0/s hold=1.3s
+[ 2935.2s] cycle 257 fast info=True ticks=293455 rate=99.9/s hold=7.7s
+[ 2948.9s] cycle 258 fast info=True ticks=294825 rate=99.9/s hold=4.8s
+[ 2960.4s] cycle 259 fast info=True ticks=295969 rate=100.0/s hold=8.0s
+[ 2972.2s] cycle 260 slow info=True ticks=298273 rate=100.0/s hold=5.5s slow=10.7s/26957B
+[ 2996.5s] cycle 261 fast info=True ticks=299584 rate=99.9/s hold=4.8s
+[ 3008.0s] cycle 262 fast info=True ticks=300729 rate=100.0/s hold=3.9s
+[ 3017.4s] cycle 263 fast info=True ticks=301671 rate=99.9/s hold=1.9s
+[ 3023.9s] cycle 264 fast info=True ticks=302323 rate=100.0/s hold=2.8s
+[ 3028.9s] cycle 265 slow info=True ticks=303732 rate=99.9/s hold=5.6s slow=8.5s/21795B
+[ 3046.0s] cycle 266 fast info=True ticks=304528 rate=99.9/s hold=7.6s
+[ 3060.6s] cycle 267 fast info=True ticks=305992 rate=100.0/s hold=7.3s
+[ 3075.2s] cycle 268 fast info=True ticks=307443 rate=99.9/s hold=3.7s
+[ 3083.5s] cycle 269 fast info=True ticks=308280 rate=99.9/s hold=3.6s
+[ 3093.4s] cycle 270 slow info=True ticks=310208 rate=100.0/s hold=3.4s slow=8.9s/22451B
+[ 3110.8s] cycle 271 fast info=True ticks=311007 rate=99.8/s hold=2.0s
+[ 3115.8s] cycle 272 fast info=True ticks=311506 rate=100.1/s hold=6.7s
+[ 3126.6s] cycle 273 fast info=True ticks=312588 rate=99.9/s hold=7.6s
+[ 3138.7s] cycle 274 fast info=True ticks=313795 rate=99.9/s hold=3.0s
+[ 3146.2s] cycle 275 slow info=True ticks=315362 rate=99.9/s hold=3.4s slow=7.6s/19557B
+[ 3164.9s] cycle 276 fast info=True ticks=316413 rate=99.9/s hold=7.6s
+[ 3176.9s] cycle 277 fast info=True ticks=317614 rate=100.0/s hold=1.9s
+[ 3186.3s] cycle 278 fast info=True ticks=318551 rate=99.9/s hold=1.7s
+[ 3191.0s] cycle 279 fast info=True ticks=319025 rate=100.0/s hold=1.7s
+[ 3198.5s] cycle 280 slow info=True ticks=320536 rate=99.9/s hold=1.0s slow=7.1s/18079B
+[ 3211.6s] cycle 281 fast info=True ticks=321084 rate=100.0/s hold=1.4s
+[ 3216.3s] cycle 282 fast info=True ticks=321553 rate=99.9/s hold=7.6s
+[ 3231.5s] cycle 283 fast info=True ticks=323064 rate=100.0/s hold=6.8s
+[ 3244.5s] cycle 284 fast info=True ticks=324371 rate=99.9/s hold=5.8s
+[ 3253.5s] cycle 285 slow info=True ticks=326404 rate=100.0/s hold=5.9s slow=10.8s/27535B
+[ 3273.2s] cycle 286 fast info=True ticks=327236 rate=99.9/s hold=7.1s
+[ 3283.1s] cycle 287 fast info=True ticks=328226 rate=100.0/s hold=7.3s
+[ 3293.2s] cycle 288 fast info=True ticks=329238 rate=99.9/s hold=1.7s
+[ 3299.3s] cycle 289 fast info=True ticks=329838 rate=99.9/s hold=2.4s
+[ 3306.7s] cycle 290 slow info=True ticks=331481 rate=100.0/s hold=7.2s slow=8.5s/21528B
+[ 3330.5s] cycle 291 fast info=True ticks=332961 rate=99.9/s hold=5.4s
+[ 3342.5s] cycle 292 fast info=True ticks=334165 rate=99.9/s hold=6.5s
+[ 3354.6s] cycle 293 fast info=True ticks=335373 rate=99.9/s hold=1.7s
+[ 3362.7s] cycle 294 fast info=True ticks=336176 rate=100.0/s hold=3.4s
+[ 3373.1s] cycle 295 slow info=True ticks=338300 rate=99.9/s hold=1.4s slow=10.3s/26124B
+[ 3390.9s] cycle 296 fast info=True ticks=338994 rate=100.0/s hold=2.6s
+[ 3397.1s] cycle 297 fast info=True ticks=339621 rate=100.0/s hold=3.9s
+[ 3403.9s] cycle 298 fast info=True ticks=340294 rate=99.9/s hold=4.7s
+[ 3414.1s] cycle 299 fast info=True ticks=341317 rate=99.9/s hold=2.9s
+[ 3421.8s] cycle 300 slow info=True ticks=342927 rate=99.9/s hold=4.4s slow=7.8s/19994B
+[ 3439.5s] cycle 301 fast info=True ticks=343859 rate=100.0/s hold=2.7s
+[ 3445.3s] cycle 302 fast info=True ticks=344438 rate=99.8/s hold=6.2s
+[ 3456.8s] cycle 303 fast info=True ticks=345588 rate=99.9/s hold=1.4s
+[ 3462.2s] cycle 304 fast info=True ticks=346124 rate=100.0/s hold=5.5s
+[ 3474.3s] cycle 305 slow info=True ticks=348527 rate=99.9/s hold=3.2s slow=11.3s/28933B
+[ 3494.3s] cycle 306 fast info=True ticks=349333 rate=100.0/s hold=7.2s
+[ 3507.5s] cycle 307 fast info=True ticks=350653 rate=99.9/s hold=4.9s
+[ 3518.4s] cycle 308 fast info=True ticks=351739 rate=99.9/s hold=4.5s
+[ 3528.7s] cycle 309 fast info=True ticks=352769 rate=99.9/s hold=1.0s
+[ 3532.0s] cycle 310 slow info=True ticks=353940 rate=100.0/s hold=5.3s slow=7.8s/19868B
+[ 3548.3s] cycle 311 fast info=True ticks=354731 rate=100.0/s hold=2.9s
+[ 3557.3s] cycle 312 fast info=True ticks=355630 rate=99.9/s hold=3.3s
+[ 3563.6s] cycle 313 fast info=True ticks=356253 rate=99.9/s hold=5.8s
+[ 3571.7s] cycle 314 fast info=True ticks=357067 rate=99.8/s hold=3.1s
+[ 3578.3s] cycle 315 slow info=True ticks=358701 rate=100.0/s hold=3.5s slow=9.2s/23234B
+[ 3594.2s] cycle 316 fast info=True ticks=359311 rate=100.0/s hold=3.6s
+
+DONE: 316 cycles, 0 flagged, 3603.9 s -> /tmp/claude-1001/-home-peter-Repositories-orb-weaver-qp-arduino/e82c616e-e5ea-4fa0-8354-b513af92835e/scratchpad/stress/stress.json
+exit=0

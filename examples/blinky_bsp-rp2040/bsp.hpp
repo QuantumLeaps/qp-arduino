@@ -37,6 +37,10 @@ public:
     static void init();
     static void ledOff();
     static void ledOn();
+
+    // application dictionaries, re-emitted periodically in the transmit-only
+    // trace profile (QP_ARDUINO_QS_DICT_PERIOD_MS)
+    static void setDictionaryHook(void (*hook)());
 };
 
 #endif // BSP_HPP

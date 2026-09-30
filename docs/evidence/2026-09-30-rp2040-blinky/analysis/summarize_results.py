@@ -13,6 +13,13 @@ ROWS = [
     ("result_blinky_20MHz_500ms_noqs.json", "C (no QS)", "20 MSa/s, 0.5 s", "n/a"),
     ("result_blinky_1MHz_6s_fastflash_nohost.json", "D (quad-lane boot2)", "1 MSa/s, 6 s", "detached"),
     ("result_blinky_1MHz_6s_fastflash_host.json", "D (quad-lane boot2)", "1 MSa/s, 6 s", "attached"),
+    ("result_blinky_uart_1MHz_6s.json", "E (QS on UART0)", "1 MSa/s, 6 s", "analyzer"),
+    # Throttled idle-loop transport service (afternoon builds, images F to I)
+    ("result_thr_std_host_1MHz_6s.json", "F (throttled, USB CDC)", "1 MSa/s, 6 s", "attached"),
+    ("result_thr_std_nohost_1MHz_6s.json", "F (throttled, USB CDC)", "1 MSa/s, 6 s", "detached"),
+    ("result_thr_noqs_1MHz_6s.json", "G (no QS)", "1 MSa/s, 6 s", "n/a"),
+    ("result_thr_uart_1MHz_6s.json", "H (QS on UART0)", "1 MSa/s, 6 s", "analyzer"),
+    ("result_thr_txonly_1MHz_30s.json", "I (transmit-only, UART0)", "1 MSa/s, 30 s", "analyzer"),
 ]
 
 here = os.path.dirname(os.path.abspath(__file__))

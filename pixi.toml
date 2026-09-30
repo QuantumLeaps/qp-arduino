@@ -159,6 +159,11 @@ description = "Run the host-driven port-validation procedures against the fixtur
 args = [{ arg = "port", default = "/dev/ttyACM0" }]
 cmd = "python tools/port_validation_rp2040.py --port {{ port }} --qspy .tools/quantum-leaps/qtools-7.3.4/bin/qspy --out .tools/port_validation_results.json"
 
+[tasks.stress-rp2040]
+description = "Cycle a fast/slow trace host against port_validation-rp2040 for an hour and flag any stopped tick (needs that firmware flashed)."
+args = [{ arg = "port", default = "/dev/ttyACM0" }, { arg = "duration", default = "3600" }]
+cmd = "python tools/port_validation_stress.py --port {{ port }} --duration {{ duration }} --qspy .tools/quantum-leaps/qtools-7.3.4/bin/qspy --out .tools/port_validation_stress.json"
+
 [tasks.build-rp2040]
 description = "Build every RP2040 example."
 depends-on = ["build-blinky-bsp-rp2040", "build-dpp-bsp-rp2040", "build-port-validation-rp2040"]

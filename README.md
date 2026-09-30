@@ -109,6 +109,7 @@ pixi run build-blinky-bsp-rp2040           pixi run upload-blinky-bsp-rp2040 /de
 pixi run build-dpp-bsp-rp2040              pixi run upload-dpp-bsp-rp2040 /dev/ttyACM0
 pixi run build-port-validation-rp2040      pixi run upload-port-validation-rp2040 /dev/ttyACM0
 pixi run validate-rp2040 /dev/ttyACM0      # host-driven QS-RX procedures
+pixi run stress-rp2040 /dev/serial/by-id/usb-Orb_Weaver_qp-arduino-rp2040_XXXX-if00 3600   # hour-long reader-cycling stress
 # Arduino Due (best effort)
 pixi run build-blinky-sam   pixi run build-blinky2-sam   pixi run build-blinky-bsp-sam   pixi run build-dpp-bsp-sam
 # checks
@@ -193,8 +194,18 @@ the `dpp_bsp-*` examples include QView scripts under `qview/`.
 The `rp2040_mouse_joystick_uart` environment sends the trace out UART0
 (GP0/GP1) instead, which the fixture exposes to the analyzer on channels 8 and
 7, so a capture can carry the trace alongside the probe signals independently
-of USB; `rp2040_mouse_joystick_noqs` compiles the trace out for baseline
-timing, and `rp2040_mouse_joystick_fastflash` uses the quad-lane boot2.
+of USB. `rp2040_mouse_joystick_txonly` is the transmit-only observation
+profile on that UART: QS-RX is never read, the dictionaries are re-emitted
+periodically so a capture that misses boot is still decodable, and a
+`TRACE_STAT` record reports the QS buffer's fill and overwrite count.
+`rp2040_mouse_joystick_noqs` compiles the trace out for baseline timing, and
+`rp2040_mouse_joystick_fastflash` uses the quad-lane boot2.
+
+The RP2040 BSPs drive the QP tick from a hardware timer alarm they claim
+themselves, not from the core's shared alarm pool, and watch it from the idle
+loop (`TICK_LOST` record). They touch the USB CDC port only when trace bytes
+are pending or once per millisecond (`QP_ARDUINO_QS_SERVICE_BYTES`,
+`QP_ARDUINO_QS_SERVICE_US`).
 
 # QP Licensing
 

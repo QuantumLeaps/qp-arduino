@@ -281,11 +281,10 @@ Toolchain pinned to the set the joystick firmware qualified on this board:
       trace and measurement pins. Record its identity, revision, actual wiring
       and clock setup. **Recorded 2026-09-30** in the fixture record above:
       `mouse-joystick-pcb` rev 0 unit `E4654C159F2C2534` with 36 V unplugged.
-- [ ] Adapt validation probe roles to that pin map; Teensy pins 2-6 are not an
-      RP2040 allocation. Only GP25 and GP21 reach the analyzer as free markers,
-      so the RP2040 port-validation example must define how the timer,
-      dispatch, idle, event and marker roles share them. Blinky uses GP25 as
-      the LED and GP21 as the tick-ISR probe.
+- [x] Adapt validation probe roles to that pin map; Teensy pins 2-6 are not an
+      RP2040 allocation. **Done 2026-09-30**: GP21 is the fixed tick-ISR probe
+      and GP25 takes the marker, dispatch, idle or event-receipt role selected
+      at run time by QS command 5 in `examples/port_validation-rp2040`.
 - [x] Pin and record the Earle Philhower core version/commit, PlatformIO
       platform, compiler, SDK dependencies and build configuration.
       **Recorded 2026-09-30** in the fixture record above and pinned in
@@ -309,8 +308,10 @@ Toolchain pinned to the set the joystick firmware qualified on this board:
       defaults. Supply concrete host-driven procedures for queues, pub/sub,
       dynamic events, time events, active-object dispatch, idle, assertions,
       QS TX and bench QS RX; do not count a planned test as implemented.
-      **Blinky built 2026-09-30** (see "RP2040 Software Build Results");
-      DPP, port-validation and every host-driven procedure remain open.
+      **Met 2026-09-30**: Blinky, DPP and port-validation build from strict
+      v7 defaults, and `tools/port_validation_rp2040.py` supplies the
+      host-driven procedures, which pass on the fixture (see "RP2040
+      Port-Validation Results").
 - [ ] Run provenance checks after framework/port changes and retain the
       existing Teensy example build regressions. Re-run the recorded upstream
       host baseline when framework/test-tool changes warrant it; distinguish
@@ -435,7 +436,10 @@ and analyzer path recorded above. The evidence directories under
 summaries and short logs; the raw analyzer captures (`.sr`), exported VCDs,
 compressed trace dumps and logs over 100 KB live in the sibling repository
 `qp-arduino-example` under `evidence/<same directory name>/` so this library
-stays small to clone. Blinky: `docs/evidence/2026-09-30-rp2040-blinky/`. The
+stays small to clone. (The upstream `*.log` ignore rule had kept the short
+bench logs these READMEs cite out of the first two evidence commits;
+`.gitignore` exempts `docs/evidence/**/*.log` since the stress-results
+commit, which adds them.) Blinky: `docs/evidence/2026-09-30-rp2040-blinky/`. The
 application under test is `examples/blinky_bsp-rp2040`, not the
 port-validation firmware, so these numbers are a Blinky baseline under the
 stated conditions and do not by themselves close the coverage gates.
@@ -490,8 +494,10 @@ Results:
   time event: 35 µs with the host detached or QS compiled out, 65 to 92 µs
   with QSPY attached, and 12 µs on the following tick. The quad-lane loader
   (D) gives the same 36 µs, so XIP cache misses are not the cause. The
-  post path's cost is above expectation and remains an open item for the
-  port-validation work; it is 0.35 % of the tick.
+  post path's cost is above expectation; it is 0.35 % of the tick. (Resolved
+  later the same day: the alarm-pool timer that carried the tick cost most
+  of it; 20 µs with the BSP-owned hardware alarm. See "Tick Source Defect
+  Found And Fixed".)
 - **Tick-to-LED latency** (ISR rising edge to the LED write in the active
   object's entry action, i.e. ISR plus QV dispatch): host detached 95 to 123
   µs, QS compiled out 93 to 150 µs, quad-lane loader 90 to 123 µs; with QSPY
@@ -607,17 +613,102 @@ build), with all six QS record groups streaming over USB CDC. Evidence:
   no checksum error. With the UART transport the posting-tick ISR cost falls
   to 10 µs and tick-to-LED latency to 34 to 46 µs, against 35 µs and 95 to
   123 µs with the USB CDC transport and no host; the open post-path cost
-  therefore tracks the USB CDC transport in the idle loop, not QP.
+  therefore tracks the USB CDC transport in the idle loop, not QP. (Resolved
+  later the same day: see the measurements in "Tick Source Defect Found And
+  Fixed"; the tick source itself carried most of the cost.)
 - **Anomaly, open:** in the second post-soak run, after the (then defective)
   assertion test and three role sessions, the target stopped: both probes
   low, no QS output, USB CDC still enumerated, recovered by the 1200 baud
   touch reflash (`captures/pv_wedged_snapshot.sr`, `second-run.log`). The
   follow-up run repeated the sequence with the fixed driver and did not
   reproduce it: the liveness session received 19,143 records and the tick was
-  running (`pv_after_roles_snapshot.sr`). One occurrence, cause unknown; a
-  long host attach/detach cycling test is the next step. `Trg-ERR 0x42` in
+  running (`pv_after_roles_snapshot.sr`). **Reproduced and root-caused later
+  the same day; see "Tick Source Defect Found And Fixed".** `Trg-ERR 0x42` in
   these logs is the target reporting a QS-RX sequence restart at the start of
   each new host session and is benign.
+
+## Tick Source Defect Found And Fixed — 2026-09-30
+
+The single stall recorded above was reproduced deliberately and root-caused.
+
+- **Reproduction:** `tools/port_validation_stress.py` cycles a trace host
+  against `port_validation-rp2040` (attach QSPY, check QS-RX and the tick
+  counters, hold a few seconds, detach; every fifth cycle a deliberately slow
+  reader instead). Run 1 stalled at 141 s, cycle 13: from then on every cycle
+  still attached, still answered `QS_RX_INFO` and still returned the counters,
+  but the tick counter stayed at 17,841
+  (`docs/evidence/2026-09-30-rp2040-port-validation/stress/stress-run1.*`).
+- **Diagnosis** (`stall-diagnosis-transcript.txt`): with the target stalled,
+  no `Tick<0>` records arrived in 3 s, yet three host-injected `QS_RX_TICK`
+  commands each drove the complete chain (time-event post, publish, pool
+  event, three dispatches, pool put) and advanced the counters to 17,844. QP,
+  QS-RX, QS-TX and the QV loop were healthy; only the tick interrupt had
+  stopped. The tick came from a pico-sdk repeating timer in the default alarm
+  pool, which the Arduino core shares with its USB task and `delay()`; a
+  failed re-add ends a repeating timer silently.
+- **Fix:** every RP2040 BSP now claims a hardware timer alarm of its own
+  (`hardware_alarm_claim_unused`), re-arms it from its own interrupt before
+  calling `QTimeEvt::tick()`, and catches up rather than stopping if a target
+  is already in the past. The idle loop watches the tick and, should it ever
+  stop, re-arms it and emits a `TICK_LOST` user record (tick count, re-arms,
+  catch-ups), so a stopped tick can no longer be silent. The stress driver is
+  `pixi run`-able through `tools/port_validation_stress.py`; run 2 with the
+  new tick is recorded below when it completes.
+- **Also in this change:** the idle loop services the trace transport only
+  when at least `QP_ARDUINO_QS_SERVICE_BYTES` (64) are pending or
+  `QP_ARDUINO_QS_SERVICE_US` (1000) have passed, because every call into the
+  USB CDC port runs TinyUSB's task; and Blinky gained the transmit-only
+  profile (`rp2040_mouse_joystick_txonly`: UART0, `QP_ARDUINO_QS_TX_ONLY`
+  never reads QS-RX, dictionaries re-emitted every `QP_ARDUINO_QS_DICT_PERIOD_MS`
+  through `BSP::setDictionaryHook`, and a `TRACE_STAT` record every
+  `QP_ARDUINO_QS_STAT_PERIOD_MS` with the QS fill high-water mark, buffer-full
+  count and tick count).
+- **Measurements with the hardware-alarm tick and the throttled service**
+  (Blinky, 1 MSa/s, `docs/evidence/2026-09-30-rp2040-blinky/`, images F to
+  I): the typical tick ISR is 4 µs (was 2; the callback now re-arms its own
+  alarm). The posting tick fell from 35 to 20 µs without QS and the tick→LED
+  latency from 93–150 to 24–25 µs, so the "open" post-path cost of the
+  morning was mostly the alarm-pool handler around the old repeating-timer
+  callback. With QSPY attached over USB CDC the posting tick fell from 85–92
+  to 68 µs and the latency p99 from 314 to 218 µs; what remains is TinyUSB's
+  task running inside the idle loop's transport service. QS over UART0:
+  posting tick 29 µs, latency 45–86 µs. The transmit-only profile, captured
+  and decoded by the analyzer over 30 s (6,709 bytes, 270 records, 60
+  transitions, no checksum error): the dictionaries arrived three times so a
+  capture that missed boot was fully named after 10 s, and the 30
+  `TRACE_STAT` records reported a high-water mark of 90 to 102 of 2,048
+  bytes with zero buffer-full events; posting tick 31 µs, latency 28 to
+  67 µs. No `TICK_LOST` in any of these captures.
+- **Stress run 2 (hardware-alarm tick, first version): 316 cycles in 3,604 s,
+  63 of them slow-reader cycles, 0 flagged**, tick rate 99.8 to 100.1 per
+  second in every cycle. The first analyzer capture spans both runs: 17,840
+  exact ticks, silence from 181 s until the reflash at 724 s, then 293,391
+  ticks of the new firmware without a gap over 49 minutes.
+- **Second defect, in the new watchdog itself, found from that capture:** the
+  period histogram was bimodal, a main lobe at 10,000 µs plus about 6 % of
+  intervals at +60 to +110 µs with no matching short ones, and the run-2
+  traces held 20,097 `TICK_LOST` records although the tick never stopped (the
+  firmware's own re-arm counter in the last record read 23,856 spurious
+  re-arms in 359,702 ticks, 6.6 %). The watchdog read the clock before the
+  tick's timestamp; when the tick interrupt landed between the two reads, the
+  unsigned difference wrapped, the watchdog "recovered" a running tick and
+  re-based the next target by the idle loop's latency. The second analyzer
+  capture (`pv_stress2_100kHz_1200s`, `analysis/tick_periods.py`) quantifies
+  the defect: 6.42 % of periods more than 40 µs late while the host cycled,
+  2.34 % with no host, maximum 10,160 µs, none missed or doubled. Fixed by
+  reading the timestamp first and comparing a signed elapsed time.
+- **Stress run 3 (hardware-alarm tick, watchdog race fixed): 78 cycles in
+  876 s, 15 of them slow-reader cycles, 0 flagged**, tick rate 99.9 to 100.1
+  per second in every cycle, and not one `TICK_LOST` record in the 78
+  session logs (`stress/stress-run3.*`, counted by
+  `analysis/stress_summary.py`). The parallel analyzer capture
+  (`pv_stress3_100kHz_900s`, 89,717 consecutive periods over 897 s) is
+  unimodal: mean 9,999.99 µs, stdev 7.8 µs, min 9,960, max 10,030 µs on the
+  10 µs sampling grid, none more than 40 µs late, none missed or doubled
+  (`analysis/result_pv_stress3_100kHz_900s.json`). The tick source and its
+  watchdog are closed. Across runs 2 and 3 the target survived 394 host
+  attach/detach cycles and 78 slow-reader cycles (1.8 MB read at a trickle
+  while its QS buffer overflowed) with the tick unaffected.
 
 ## Active RP2040 Hardware Acceptance
 
@@ -632,8 +723,10 @@ build), with all six QS record groups streaming over USB CDC. Evidence:
       QS TX and bench QS RX. Record expected assertion tests separately from
       the assertion-free soak. **Met 2026-09-30** by the host-driven
       procedures (8 of 8) plus the role captures; the expected assertion is
-      its own procedure and the soak above ran assertion-free. Open beside it:
-      the single unexplained stall in the second run.
+      its own procedure and the soak above ran assertion-free. The single
+      stall seen in the second run was reproduced, root-caused to the tick
+      source and fixed the same day ("Tick Source Defect Found And Fixed");
+      stress run 3 and its analyzer capture verify the fix.
 - [x] Use a qualified analyzer path on the fixture's actual probe map to
       measure a 100 Hz tick average within +/-1%, with no missed or doubled
       ticks during a 10-minute run. **Met 2026-09-30 with Blinky**: tick
@@ -646,13 +739,13 @@ build), with all six QS record groups streaming over USB CDC. Evidence:
       missed or doubled tick; and the 2 h soak capture at 100 kSa/s,
       720,001 ticks, mean 9,999.995 µs, min 9,980, max 10,020, none missed
       or doubled; `docs/evidence/2026-09-30-rp2040-dpp/`.
-- [ ] Record ISR-to-active-object dispatch p99 and maximum latency under
+- [x] Record ISR-to-active-object dispatch p99 and maximum latency under
       documented validation load; maximum must remain below one 100 Hz tick.
       **Met 2026-09-30 under the port-validation load**: p99 121 µs,
       maximum 133 µs with QSPY attached (599 ticks); 66 µs maximum detached.
       Blinky baseline earlier the same day: p99 360 µs, maximum 430 µs over
       600 s attached.
-- [ ] Complete a two-hour soak without unexpected port assertions, recording
+- [x] Complete a two-hour soak without unexpected port assertions, recording
       load, resets and trace/capture coverage rather than assuming silence
       establishes success. **Met 2026-09-30 with DPP**: 2 h 15 min of
       continuous QSPY trace (420,595 records, 0 `=ASSERT=`, 0 `Trg-RST`, the
@@ -666,18 +759,32 @@ build), with all six QS record groups streaming over USB CDC. Evidence:
 - [ ] Demonstrate bounded application response and continued local control
       with the trace reader absent, slow or disconnected and under declared
       trace/queue pressure. **Reader absent and disconnected shown 2026-09-30**
-      with Blinky (LED period unchanged, records dropped not blocked); slow
-      reader and declared queue pressure still open. Record RAM/flash, queue/pool margins, trace loss,
-      handler duration and transport overhead against budgets declared before
-      the run.
-- [ ] Qualify a transmit-only observation profile separately from the bench
+      with Blinky (LED period unchanged, records dropped not blocked). **Slow
+      reader shown 2026-09-30** by stress runs 2 and 3 against the
+      port-validation firmware: 78 slow-reader cycles in which the host read
+      at a trickle until the target's QS buffer overflowed, with the tick at
+      99.8 to 100.1 per second in every cycle and QS-RX answering afterwards.
+      Still open: declared queue/pool pressure, and recording RAM/flash,
+      queue/pool margins, trace loss, handler duration and transport overhead
+      against budgets declared before the run (the transmit-only profile's
+      `TRACE_STAT` record now reports trace loss; budgets are not yet
+      declared).
+- [x] Qualify a transmit-only observation profile separately from the bench
       QS RX/QUTest profile. Experiment observation must not accept QS reset,
       memory-write, event-injection or command input. Preserve dictionaries,
       clock/reset interpretation and explicit loss reporting in saved traces.
-      **Transport shown 2026-09-30**: QS over UART0 captured and decoded by
-      the analyzer (`rp2040_mouse_joystick_uart`). Still open: a build that
-      disables QS-RX processing, dictionary preservation in saved captures,
-      and loss reporting.
+      **Met 2026-09-30 on the Blinky fixture build**
+      (`rp2040_mouse_joystick_txonly`: QS on UART0, `QP_ARDUINO_QS_TX_ONLY`
+      compiles the QS-RX path out of the idle loop, so no reset, command,
+      event-injection or memory-write input exists; dictionaries re-emitted
+      every 10 s; `TRACE_STAT` every second with the buffer high-water mark
+      and buffer-full count; `Trg-RST` and the 32-bit `micros()` timestamp
+      carry reset and clock interpretation). Verified by a 30 s analyzer
+      capture decoded offline: a capture that missed boot was fully named
+      after one dictionary period, zero buffer-full events, no checksum
+      error. Still to do before experiment use: apply the same profile to
+      the application firmware and declare its trace budget; the fixture
+      profile does not claim the joystick's record rate.
 
 These gates use a standalone fixture and available qualified bench connections.
 Their completion does not depend on a new debug connector, reusable probe

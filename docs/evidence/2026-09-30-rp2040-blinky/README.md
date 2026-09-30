@@ -47,6 +47,12 @@ from branch `upgrade/qpcpp-v7`; the exact tree is named per capture in
 | `captures/blinky_20MHz_500ms_noqs.sr` | 20 MSa/s | 0.5 s | CH17 rising | n/a | C |
 | `captures/blinky_1MHz_6s_fastflash_nohost.sr` | 1 MSa/s | 6 s | CH17 rising | none | D |
 | `captures/blinky_1MHz_6s_fastflash_host.sr` | 1 MSa/s | 6 s | CH17 rising | QSPY attached | D |
+| `captures/blinky_uart_1MHz_6s.sr` (CH8, CH16, CH17) | 1 MSa/s | 6 s | CH17 rising | analyzer decodes UART0 | E |
+| `captures/thr_std_host_1MHz_6s.sr` | 1 MSa/s | 6 s | CH17 rising | QSPY attached | F |
+| `captures/thr_std_nohost_1MHz_6s.sr` | 1 MSa/s | 6 s | CH17 rising | none (port closed) | F |
+| `captures/thr_noqs_1MHz_6s.sr` | 1 MSa/s | 6 s | CH17 rising | n/a | G |
+| `captures/thr_uart_1MHz_6s.sr` (CH8, CH16, CH17) | 1 MSa/s | 6 s | CH17 rising | analyzer decodes UART0 | H |
+| `captures/thr_txonly_1MHz_30s.sr` (CH8, CH16, CH17) | 1 MSa/s | 30 s | CH17 rising | analyzer decodes UART0 | I |
 
 Each `.sr` has a matching `.vcd` and a `analysis/result_*.json`.
 
@@ -63,6 +69,11 @@ the example changes committed with this directory. See `firmware-hashes.txt`.
 - **C** `rp2040_mouse_joystick_noqs`: QS compiled out, idle loop sleeps.
 - **D** `rp2040_mouse_joystick_fastflash`: A plus the quad-lane
   `boot2_w25q128jvxq` second-stage loader.
+- **E** `rp2040_mouse_joystick_uart`: QS on UART0 (13:24 section below).
+- **F** to **I**: the afternoon builds with the BSP-owned hardware-alarm tick,
+  the throttled idle-loop transport service and the transmit-only profile
+  (`rp2040_mouse_joystick`, `_noqs`, `_uart`, `_txonly`; hashes in
+  `firmware-hashes.txt`; 15:44 section below).
 
 ## Results
 
@@ -87,7 +98,11 @@ Notes:
 - "ISR width posting tick" is the tick callback that expires the time event and
   posts it. It costs 35 µs without a trace host or without QS, 65 to 92 µs with
   QSPY attached, and the quad-lane loader does not change it, so XIP cache
-  misses are ruled out. Root cause is an open item.
+  misses are ruled out. **Resolved in the afternoon captures below**: most of
+  the 35 µs was the pico-sdk alarm-pool timer that carried the tick (its
+  handler ran the pool bookkeeping around the callback); with the BSP-owned
+  hardware alarm the same tick costs 20 µs, and the rest of the attached cost
+  is the USB CDC service in the idle loop.
 - Tick→LED latency spans the ISR, the QV loop's return from the idle callback
   and the dispatch; with QSPY attached the idle loop's USB CDC writes add
   100 to 300 µs.
@@ -132,3 +147,60 @@ latency **34 to 46 µs**; LED interval 499,999.5 µs (min 499,988, max
 tick, 95 to 123 µs latency), this narrows the unexplained cost to the USB CDC
 transport's presence in the idle loop rather than to QP or to QS record
 emission.
+
+## Hardware-alarm tick, throttled transport service and the transmit-only profile (added 15:44)
+
+Same procedure as the morning (`uart/throttle-run.log`), after two changes made
+during the port-validation stress work (see `UPGRADE_QPCPP_V7.md`, "Tick
+Source Defect Found And Fixed"): the tick now comes from a hardware timer
+alarm the BSP owns instead of a pico-sdk repeating timer in the shared alarm
+pool, and the idle loop services the trace transport only when at least 64
+bytes are pending or 1 ms has passed, because every call into the USB CDC
+port runs TinyUSB's task. Images F to I, results from
+`analysis/summarize_results.py` (`result_thr_*.json`):
+
+| Capture | Firmware | Trace host | Ticks | Tick period mean / min / max (µs) | ISR width typ / posting tick (µs) | LED interval mean / min / max (µs) | Tick→LED latency min / p99 / max (µs) |
+|---|---|---|---|---|---|---|---|
+| 1 MSa/s, 6 s | F (throttled, USB CDC) | attached | 600 | 9999.99 / 9998 / 10002 | 4.0 / 68 | 500001.7 / 499953 / 500063 | 143 / 218 / 218 |
+| 1 MSa/s, 6 s | F (throttled, USB CDC) | detached | 600 | 9999.99 / 9999 / 10001 | 4.0 / 25 | 499999.4 / 499940 / 500052 | 100 / 160 / 160 |
+| 1 MSa/s, 6 s | G (no QS) | n/a | 601 | 9999.99 / 9997 / 10003 | 4.0 / 20 | 499999.6 / 499999 / 500000 | 24 / 25 / 25 |
+| 1 MSa/s, 6 s | H (QS on UART0) | analyzer | 601 | 9999.99 / 9991 / 10010 | 4.0 / 29 | 499999.7 / 499960 / 500040 | 45 / 86 / 86 |
+| 1 MSa/s, 30 s | I (transmit-only, UART0) | analyzer | 3000 | 9999.99 / 9983 / 10017 | 4.0 / 31 | 499999.5 / 499954 / 500045 | 28 / 62 / 67 |
+
+What changed against the morning rows:
+
+- The typical tick ISR grew from 2 to 4 µs: the callback now re-arms its own
+  alarm (`hardware_alarm_set_target`) and stamps the watchdog before calling
+  `QTimeEvt::tick()`.
+- The posting tick fell from 35 to 20 µs without QS and the tick→LED latency
+  from 93–150 to 24–25 µs: the alarm-pool handler's bookkeeping around the
+  old callback, not QP, was the bulk of the "open" post-path cost.
+- With QSPY attached over USB CDC the posting tick fell from 85–92 to 68 µs
+  and the latency p99 from 314 to 218 µs. The remaining attached cost is
+  TinyUSB's task running inside the idle loop's transport service; a tick
+  that lands during that pass waits for it. The USB CDC transport is
+  therefore a bench convenience, not the observation path.
+- QS on UART0 (H) keeps the whole path under one tenth of a tick: posting
+  tick 29 µs, latency 45–86 µs.
+
+**Transmit-only profile (I)**, `rp2040_mouse_joystick_txonly`: QS on UART0,
+`QP_ARDUINO_QS_TX_ONLY=1` (the idle loop never reads QS-RX, so no reset,
+command, event-injection or memory-write input exists), dictionaries
+re-emitted every 10 s through `BSP::setDictionaryHook`, and a `TRACE_STAT`
+record every second with the QS buffer's high-water mark, its buffer-full
+count, its size and the tick count. `uart/txonly_uart_bytes_hex.txt` is
+sigrok's decode of CH8 over the 30 s capture (6,709 bytes),
+`txonly_qs_from_uart.bin` (raw-evidence repository) the same bytes as a QS
+stream, and `uart/txonly-qspy-offline-decode.txt` what `qspy -k -f` makes of
+them: 270 timestamped records from 4.0 s to 33.5 s after boot, 60 state
+transitions, no checksum error. The capture missed boot, so the first six
+seconds print `TRACE_STAT` as `USER+008`; the dictionaries then arrive three
+times (at about 10, 20 and 30 s after boot) and every record after the first
+set is named. The 30 `TRACE_STAT` records report a high-water mark of 90 to
+102 bytes in the 2,048-byte buffer, zero buffer-full events, and a tick
+count advancing by 100 per record. No `TICK_LOST` record. Timing is in the
+table: posting tick 31 µs, latency 28 to 67 µs, LED interval 499,954 to
+500,045 µs over 59 intervals.
+
+Trace log of the attached F session: `qspy/qspy-throttled-attached-20s.txt`
+(dictionaries received, `Trg-RST`, no `<COMMS>` line).

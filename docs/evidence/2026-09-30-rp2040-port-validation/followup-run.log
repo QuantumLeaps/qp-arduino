@@ -1,0 +1,32 @@
+##### follow-up start 2026-09-30T13:19:47-04:00
+##### flash port_validation-rp2040
+The device was rebooted to start the application.
+========================= [SUCCESS] Took 3.19 seconds =========================
+rp2040_mouse_joystick  SUCCESS   00:00:03.193
+##### driver procedures (fixed) 2026-09-30T13:19:53-04:00
+[PASS] attach: attached to qspy on UDP 7701
+[PASS] info: target info received, QP-Ver=733
+[PASS] ticking: 4 reports over 3.000 s: 100.0 ticks/s, events +300, dynamic +300 for ticks +300
+[PASS] publish: VALIDATE_SIG published by command 1 was dispatched to Validator
+[PASS] dynamic: pool get/QF-New=True dispatch=True pool put/QF-gc=True for a host-posted DYN_SIG
+[PASS] roles: PROBE_ROLE echoed 0,2,3,1
+[PASS] reset-count: counters after reset: (5, 5, 5)
+[PASS] assertion: =ASSERT= Mod=examples/port_validation-rp2040/bsp.cpp Loc=400; port disappeared=True; came back=True; Trg-RST after reboot=True; QS-RX alive after reboot=True
+
+ALL PASSED: 8/8 -> /tmp/claude-1001/-home-peter-Repositories-orb-weaver-qp-arduino/e82c616e-e5ea-4fa0-8354-b513af92835e/scratchpad/pv/results2.json
+##### driver exit=0 2026-09-30T13:20:03-04:00
+##### role 1 capture at 20 MSa/s, host attached 2026-09-30T13:20:05-04:00
+role set: no echo
+##### capture pv_role1_20MHz_500ms_host exit=0
+##### role 3 capture at 20 MSa/s, host attached 2026-09-30T13:20:23-04:00
+role set: no echo
+##### capture pv_role3_20MHz_500ms_host exit=0
+##### liveness check after role sessions 2026-09-30T13:20:40-04:00
+role set: no echo
+##### liveness exit=1
+##### untriggered probe snapshot 2 s 2026-09-30T13:20:51-04:00
+##### restore standard blinky 2026-09-30T13:20:54-04:00
+The device was rebooted to start the application.
+========================= [SUCCESS] Took 3.26 seconds =========================
+rp2040_mouse_joystick  SUCCESS   00:00:03.256
+##### follow-up done 2026-09-30T13:20:59-04:00

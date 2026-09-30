@@ -39,10 +39,35 @@ using namespace QP;
 // second from a periodic time event. Everything hardware-specific lives in
 // bsp.cpp; this file and blinky.hpp are board-independent.
 
+//============================================================================
+// generate declarations of all AO classes (state machines)...
+//$declare${AOs::Blinky} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+
+//${AOs::Blinky} .............................................................
+class Blinky : public QP::QActive {
+private:
+    QP::QTimeEvt m_timeEvt;
+
+public:
+    static Blinky instance;
+
+public:
+    Blinky();
+    static void dictionaries();
+
+protected:
+    Q_STATE_DECL(initial);
+    Q_STATE_DECL(off);
+    Q_STATE_DECL(on);
+}; // class Blinky
+//$enddecl${AOs::Blinky} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//...
+
 //............................................................................
 void setup() {
     QF::init();  // initialize the framework
     BSP::init(); // initialize the board (safe state, LED, QS)
+    BSP::setDictionaryHook(&Blinky::dictionaries); // re-emission in the TX-only profile
 
     static QEvt const *blinky_queueSto[10];
     AO_Blinky->start(1U, // QP priority
@@ -56,26 +81,7 @@ void loop() {
 }
 
 //============================================================================
-// generate declarations and definitions of all AO classes (state machines)...
-//$declare${AOs::Blinky} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-
-//${AOs::Blinky} .............................................................
-class Blinky : public QP::QActive {
-private:
-    QP::QTimeEvt m_timeEvt;
-
-public:
-    static Blinky instance;
-
-public:
-    Blinky();
-
-protected:
-    Q_STATE_DECL(initial);
-    Q_STATE_DECL(off);
-    Q_STATE_DECL(on);
-}; // class Blinky
-//$enddecl${AOs::Blinky} ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+// generate definitions of all AO classes (state machines)...
 //$skip${QP_VERSION} vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 // Check for the minimum required QP version
 #if (QP_VERSION < 730U) || (QP_VERSION != ((QP_RELEASE^4294967295U) % 0x3E8U))
@@ -94,16 +100,21 @@ Blinky::Blinky()
     m_timeEvt(this, TIMEOUT_SIG, 0U)
 {}
 
-//${AOs::Blinky::SM} .........................................................
-Q_STATE_DEF(Blinky, initial) {
-    //${AOs::Blinky::SM::initial}
+//${AOs::Blinky::dictionaries} ...............................................
+void Blinky::dictionaries() {
     #ifdef QS_ON
     QS_OBJ_DICTIONARY(&Blinky::instance);
-    QS_OBJ_DICTIONARY(&m_timeEvt);
-    QS_SIG_DICTIONARY(TIMEOUT_SIG, this);
+    QS_OBJ_DICTIONARY(&Blinky::instance.m_timeEvt);
+    QS_SIG_DICTIONARY(TIMEOUT_SIG, &Blinky::instance);
     QS_FUN_DICTIONARY(&Blinky::off);
     QS_FUN_DICTIONARY(&Blinky::on);
     #endif
+}
+
+//${AOs::Blinky::SM} .........................................................
+Q_STATE_DEF(Blinky, initial) {
+    //${AOs::Blinky::SM::initial}
+    dictionaries();
     // periodic time event: every TICKS_PER_SEC/2 ticks, i.e. 2 Hz toggling
     m_timeEvt.armX(BSP::TICKS_PER_SEC/2, BSP::TICKS_PER_SEC/2);
     (void)e; // unused parameter

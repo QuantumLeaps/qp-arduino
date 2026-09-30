@@ -1,0 +1,40 @@
+##### post-soak start 2026-09-30T13:11:30-04:00
+##### flash port_validation-rp2040
+The device was rebooted to start the application.
+========================= [SUCCESS] Took 4.91 seconds =========================
+rp2040_mouse_joystick  SUCCESS   00:00:04.908
+##### driver procedures 2026-09-30T13:11:38-04:00
+[PASS] attach: attached to qspy on UDP 7701
+[FAIL] info: no Trg-Info within 3 s
+[FAIL] ticking: ticks 479->500 (+21 in ~1 s), events +21, dynamic +21
+[PASS] publish: VALIDATE_SIG published by command 1 was dispatched to Validator
+[PASS] dynamic: pool get/QF-New=True dispatch=True pool put/QF-gc=True for a host-posted DYN_SIG
+[PASS] roles: PROBE_ROLE echoed 0,2,3,1
+[PASS] reset-count: counters after reset: (5, 5, 5)
+[FAIL] assertion: =ASSERT= Mod=examples/port_validation-rp2040/bsp.cpp Loc=400; port disappeared=True; came back=False; Trg-RST after reboot=False
+
+FAILURES: 5/8 -> /tmp/claude-1001/-home-peter-Repositories-orb-weaver-qp-arduino/e82c616e-e5ea-4fa0-8354-b513af92835e/scratchpad/pv/results.json
+##### driver exit=1 2026-09-30T13:11:55-04:00
+##### role 1 capture, host attached 2026-09-30T13:11:57-04:00
+could not attach to qspy
+Device only sent 5999985 samples.
+##### capture pv_role1_1MHz_6s_host exit=0
+##### role 2 capture, host attached 2026-09-30T13:12:08-04:00
+could not attach to qspy
+##### capture pv_role2_1MHz_6s_host exit=0
+##### role 3 capture, host attached 2026-09-30T13:12:20-04:00
+could not attach to qspy
+##### capture pv_role3_1MHz_6s_host exit=0
+##### role 1 capture, host detached 2026-09-30T13:12:32-04:00
+##### capture pv_role1_1MHz_6s_nohost exit=0
+##### flash blinky uart variant 2026-09-30T13:12:38-04:00
+========================== [FAILED] Took 5.01 seconds ==========================
+rp2040_mouse_joystick_uart  FAILED    00:00:05.010
+##### uart trace capture (CH8 = GP0 TX) 2026-09-30T13:12:47-04:00
+Device only sent 5999990 samples.
+##### capture blinky_uart_1MHz_6s exit=0
+##### uart decode exit=0 lines=0
+##### restore standard blinky 2026-09-30T13:12:54-04:00
+========================== [FAILED] Took 6.66 seconds ==========================
+rp2040_mouse_joystick  FAILED    00:00:06.660
+##### post-soak done 2026-09-30T13:13:01-04:00

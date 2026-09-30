@@ -37,6 +37,8 @@ PlatformIO environments in `platformio.ini`:
 - `rp2040_mouse_joystick`: the fixture, QS on, universal boot2 (default)
 - `rp2040_mouse_joystick_noqs`: QS compiled out, idle loop sleeps
 - `rp2040_mouse_joystick_fastflash`: quad-lane boot2 matched to the fixture's flash
+- `rp2040_mouse_joystick_uart`: QS on UART0 (GP0/GP1), no host wait
+- `rp2040_mouse_joystick_txonly`: transmit-only observation profile on UART0
 
 Build flags used by the BSP:
 
@@ -49,6 +51,19 @@ Build flags used by the BSP:
 - `-DQP_ARDUINO_QS_HOST_WAIT_MS=<ms>` (default 5000): how long the BSP waits
   for a USB CDC host before starting QS, so a QSPY started right after flashing
   receives the dictionaries. Use 0 to boot without waiting.
+- `-DQP_ARDUINO_QS_SERVICE_BYTES=<n>` (64) and `-DQP_ARDUINO_QS_SERVICE_US=<us>`
+  (1000): the idle loop services the transport only when this many QS bytes
+  are pending or this much time has passed.
+- `-DQP_ARDUINO_QS_TX_ONLY=1`: never read or parse QS-RX (no reset, poke,
+  event injection or command from the trace link).
+- `-DQP_ARDUINO_QS_DICT_PERIOD_MS=<ms>` (0 = off): re-emit the BSP's and the
+  application's dictionaries (`BSP::setDictionaryHook`) this often.
+- `-DQP_ARDUINO_QS_STAT_PERIOD_MS=<ms>` (0 = off): emit `TRACE_STAT` (QS fill
+  high-water mark, buffer-full count, buffer size, tick count) this often.
+
+The BSP drives the tick from a hardware timer alarm it claims itself and
+re-arms from its own interrupt; the idle loop re-arms it and emits `TICK_LOST`
+if it ever stops (see the ledger for the defect this replaced).
 
 ## Code Organization
 

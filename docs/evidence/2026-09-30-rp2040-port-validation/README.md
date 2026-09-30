@@ -103,3 +103,63 @@ reporting a QS-RX sequence-number mismatch on the first packet of each new
 host session (each session restarts its sequence counter), and a QSPY attached
 after boot prints the `PROBE_ROLE` user record as `USER+001` because it never
 received the dictionaries.
+
+## Reader-cycling stress and the tick defect
+
+`tools/port_validation_stress.py` attaches and detaches a trace host against
+this firmware for an hour: fast cycles start `qspy`, check QS-RX with
+`QS_RX_INFO`, read the counters, sometimes switch the GP25 role, hold for a
+few seconds and stop; every fifth cycle opens the port directly and reads at a
+trickle instead, so the target's QS buffer overflows. A cycle is flagged when
+the target does not answer or when the tick counter stops advancing at
+100 ticks per second between cycles.
+
+- `stress/stress-run1.log` and `.json`: the firmware with the pico-sdk
+  repeating-timer tick. Cycles 1 to 12 passed; from cycle 13 at 141 s the
+  target still attached, still answered `QS_RX_INFO` and still returned its
+  counters, but the tick count stayed at 17,841 for the remaining 16 cycles.
+- `stress/stall-diagnosis-transcript.txt`: with the target in that state, no
+  `Tick<0>` record arrived in 3 s, and three host-injected `QS_RX_TICK`
+  commands each drove the whole chain (time-event post, publish, pool event,
+  three dispatches, pool put) and advanced the counters to 17,844. Only the
+  tick interrupt had stopped; QP, both trace directions and the QV loop were
+  healthy. The repeating timer lived in the core's shared default alarm pool,
+  where a failed re-add ends a repeating timer silently.
+- The fix is a hardware timer alarm claimed and re-armed by the BSP, with an
+  idle-loop watchdog that re-arms it and emits `TICK_LOST` if it ever stops.
+  `stress/stress-run2.*` is the same stress against the fixed firmware; the
+  analyzer captures `pv_stress_100kHz_3660s` (run 1, tick stop visible) and
+  `pv_stress2_100kHz_1200s` (run 2) are in the raw-evidence repository.
+
+- `stress/stress-run2.log` and `.json`: the hardware-alarm firmware, 316
+  cycles in 3,604 s (63 slow-reader cycles, 1.4 MB read at a trickle), zero
+  flagged, tick rate 99.8 to 100.1 per second in every cycle. The analyzer
+  capture spanning both runs shows the old firmware's 17,840 exact ticks, the
+  543 s silence, and the new firmware's 293,391 ticks without a gap.
+- That capture also exposed a defect in the new watchdog: about 6 % of
+  periods were 60 to 110 µs long with no short partner, and the run-2 traces
+  contain 20,097 `TICK_LOST` records although the tick never stopped (51
+  named, 20,046 printed as `USER+009` by sessions that attached after the
+  dictionaries; the firmware's re-arm counter in the last record read 23,856
+  in 359,702 ticks). The watchdog read the clock before the tick timestamp,
+  so a tick landing between the reads wrapped the elapsed time and caused a
+  spurious re-arm that re-based the next target.
+  `analysis/result_pv_stress2_100kHz_1200s.json` (from
+  `analysis/tick_periods.py`) shows the defect on the second capture: 6.42 %
+  of periods more than 40 µs late while the host cycled, 2.34 % during the
+  quiet tail with no host, maximum 10,160 µs, none missed or doubled. Fixed
+  (timestamp read first, signed comparison); `stress/stress-run3.*` and
+  `pv_stress3_100kHz_900s` verify it.
+
+- `stress/stress-run3.log` and `.json`: the race-fixed firmware, 78 cycles
+  in 875.8 s (15 slow-reader cycles, 348 kB read at a trickle), zero flagged,
+  tick rate 99.9 to 100.1 per second, and no `TICK_LOST` record in any of the
+  78 session logs (`analysis/stress_summary.py stress/stress-run3.json
+  --qspy-logs <dir>`; the session logs are in the raw-evidence repository as
+  `stress/stress-run3-qspy-sessions.tar.gz`, run 2's as
+  `stress-run2-qspy-sessions.tar.gz`).
+  `analysis/result_pv_stress3_100kHz_900s.json` is the tick-period
+  distribution of the parallel capture `pv_stress3_100kHz_900s` (100 kSa/s,
+  897 s, 89,717 periods): one lobe, mean 9,999.99 µs, stdev 7.8 µs, min
+  9,960, max 10,030 µs, none more than 40 µs late, none missed or doubled.
+  The bimodal distribution of the run-2 capture is gone.

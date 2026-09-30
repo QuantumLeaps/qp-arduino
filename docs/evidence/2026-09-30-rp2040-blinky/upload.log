@@ -1,0 +1,106 @@
+✨ Pixi task (upload-blinky-bsp-rp2040): python tools/pio_task.py upload --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick --port /dev/ttyACM0
++ pio run -e rp2040_mouse_joystick --project-dir /home/peter/Repositories/orb-weaver/qp-arduino -t upload --upload-port /dev/ttyACM0
+Processing rp2040_mouse_joystick (platform: https://github.com/janelia-arduino/platform-raspberrypi.git#5e4e06bb9c9971ad003a415bb32796da307b5676; board: generic; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/raspberrypi/generic.html
+PLATFORM: Raspberry Pi RP2040 (1.14.0+sha.5e4e06b) > RP2040
+HARDWARE: RP2040 133MHz, 256KB RAM, 16MB Flash
+DEBUG: Current (blackmagic) External (blackmagic, cmsis-dap, jlink, picoprobe, raspberrypi-swd)
+PACKAGES: 
+ - framework-arduinopico @ 1.40200.0+sha.c4b65218 
+ - tool-mklittlefs-rp2040-earlephilhower @ 5.100300.230216 (10.3.0) 
+ - tool-openocd-rp2040-earlephilhower @ 5.140200.240929 (14.2.0) 
+ - tool-picotool-rp2040-earlephilhower @ 5.140200.240929 (14.2.0) 
+ - toolchain-rp2040-earlephilhower @ 5.140200.240929 (14.2.0)
+Converting blinky_bsp-rp2040.ino
+Flash size: 16.00MB
+Sketch size: 16.00MB
+Filesystem size: 0.00MB
+PSRAM size: 0.00MB
+Maximium Sketch size: 16773120 EEPROM start: 0x10fff000 Filesystem start: 0x10fff000 Filesystem end: 0x10fff000
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ off, Compatibility ~ soft
+Found 73 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- qp-arduino @ 7.3.4
+Building in release mode
+Compiling .pio/build-examples/examples/blinky_bsp-rp2040/rp2040_mouse_joystick/src/blinky_bsp-rp2040.ino.cpp.o
+Compiling .pio/build-examples/examples/blinky_bsp-rp2040/rp2040_mouse_joystick/src/bsp.cpp.o
+Linking .pio/build-examples/examples/blinky_bsp-rp2040/rp2040_mouse_joystick/firmware.elf
+Generating UF2 image
+picotool uf2 convert -t elf ".pio/build-examples/examples/blinky_bsp-rp2040/rp2040_mouse_joystick/firmware.elf" ".pio/build-examples/examples/blinky_bsp-rp2040/rp2040_mouse_joystick/firmware.uf2"
+Retrieving maximum program size .pio/build-examples/examples/blinky_bsp-rp2040/rp2040_mouse_joystick/firmware.elf
+Flash size: 16.00MB
+Sketch size: 16.00MB
+Filesystem size: 0.00MB
+PSRAM size: 0.00MB
+Maximium Sketch size: 16773120 EEPROM start: 0x10fff000 Filesystem start: 0x10fff000 Filesystem end: 0x10fff000
+Checking size .pio/build-examples/examples/blinky_bsp-rp2040/rp2040_mouse_joystick/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [          ]   4.6% (used 11980 bytes from 262144 bytes)
+Flash: [          ]   0.5% (used 76344 bytes from 16773120 bytes)
+Configuring upload protocol...
+AVAILABLE: blackmagic, cmsis-dap, jlink, picoprobe, picotool, raspberrypi-swd
+CURRENT: upload_protocol = picotool
+Looking for upload port...
+Using manually specified: /dev/ttyACM0
+Forcing reset using 1200bps open/close on port /dev/ttyACM0
+Device rebooted into BOOTSEL mode successfully.
+Uploading .pio/build-examples/examples/blinky_bsp-rp2040/rp2040_mouse_joystick/firmware.elf
+Loading into Flash: [                              ]  0%
+Loading into Flash: [=                             ]  4%
+Loading into Flash: [==                            ]  9%
+Loading into Flash: [===                           ]  13%
+Loading into Flash: [=====                         ]  18%
+Loading into Flash: [======                        ]  23%
+Loading into Flash: [========                      ]  27%
+Loading into Flash: [=========                     ]  32%
+Loading into Flash: [===========                   ]  37%
+Loading into Flash: [============                  ]  41%
+Loading into Flash: [=============                 ]  46%
+Loading into Flash: [===============               ]  50%
+Loading into Flash: [================              ]  55%
+Loading into Flash: [==================            ]  60%
+Loading into Flash: [===================           ]  64%
+Loading into Flash: [====================          ]  69%
+Loading into Flash: [======================        ]  74%
+Loading into Flash: [=======================       ]  78%
+Loading into Flash: [========================      ]  83%
+Loading into Flash: [==========================    ]  88%
+Loading into Flash: [===========================   ]  92%
+Loading into Flash: [============================= ]  97%
+Loading into Flash: [==============================]  100%
+Verifying Flash:    [                              ]  0%
+Verifying Flash:    [=                             ]  4%
+Verifying Flash:    [==                            ]  9%
+Verifying Flash:    [===                           ]  13%
+Verifying Flash:    [=====                         ]  18%
+Verifying Flash:    [======                        ]  23%
+Verifying Flash:    [========                      ]  27%
+Verifying Flash:    [=========                     ]  32%
+Verifying Flash:    [===========                   ]  37%
+Verifying Flash:    [============                  ]  41%
+Verifying Flash:    [=============                 ]  46%
+Verifying Flash:    [===============               ]  50%
+Verifying Flash:    [================              ]  55%
+Verifying Flash:    [==================            ]  60%
+Verifying Flash:    [===================           ]  64%
+Verifying Flash:    [====================          ]  69%
+Verifying Flash:    [======================        ]  74%
+Verifying Flash:    [=======================       ]  78%
+Verifying Flash:    [========================      ]  83%
+Verifying Flash:    [==========================    ]  88%
+Verifying Flash:    [===========================   ]  92%
+Verifying Flash:    [============================= ]  97%
+Verifying Flash:    [==============================]  100%
+  OK
+
+The device was rebooted to start the application.
+========================= [SUCCESS] Took 3.37 seconds =========================
+
+Environment            Status    Duration
+---------------------  --------  ------------
+rp2040_mouse_joystick  SUCCESS   00:00:03.371
+========================= 1 succeeded in 00:00:03.371 =========================

@@ -43,3 +43,14 @@ BSP waits that long for a USB host before it starts QS
 Same build flags as `blinky_bsp-rp2040`: `QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB`,
 `QS_ON`, `QP_ARDUINO_QS_SERIAL`, `QP_ARDUINO_QS_HOST_WAIT_MS`,
 `QP_ARDUINO_TICK_PROBE_PIN`.
+
+## Tick source and transport service
+
+The BSP drives the 100 Hz tick from a hardware timer alarm it claims itself
+(`hardware_alarm_claim_unused`) and re-arms from its own interrupt, catching
+up if a target was missed; the idle loop watches the tick and emits a
+`TICK_LOST` user record if it ever has to re-arm it. This replaced a pico-sdk
+repeating timer in the core's shared alarm pool, which stopped silently under
+trace-host attach/detach cycling. The trace transport is serviced only when
+`QP_ARDUINO_QS_SERVICE_BYTES` are pending or `QP_ARDUINO_QS_SERVICE_US` have
+passed.

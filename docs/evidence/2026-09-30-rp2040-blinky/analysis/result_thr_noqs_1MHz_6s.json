@@ -1,0 +1,50 @@
+{
+  "file": "/tmp/claude-1001/-home-peter-Repositories-orb-weaver-qp-arduino/e82c616e-e5ea-4fa0-8354-b513af92835e/scratchpad/la/thr_noqs_1MHz_6s.vcd",
+  "vcd_time_unit_us": 1.0,
+  "tick_period_us": {
+    "n": 600,
+    "mean": 9999.993333333334,
+    "min": 9997.0,
+    "max": 10003.0,
+    "stdev": 0.2448582356294261,
+    "p50": 10000.0,
+    "p99": 10000.0,
+    "deviation_from_nominal_pct": -6.666666666205855e-05,
+    "missed_intervals": 0,
+    "doubled_intervals": 0,
+    "span_s": 5.999996
+  },
+  "tick_pulse_width_us": {
+    "n": 601,
+    "mean": 3.9983361064891847,
+    "min": 3.0,
+    "max": 20.0,
+    "stdev": 2.2375550955231573,
+    "p50": 4.0,
+    "p99": 19.0
+  },
+  "led_toggle_interval_us": {
+    "n": 11,
+    "mean": 499999.63636363635,
+    "min": 499999.0,
+    "max": 500000.0,
+    "stdev": 0.48104569292083466,
+    "p50": 500000.0,
+    "p99": 500000.0,
+    "expected_us": 500000.0,
+    "deviation_from_expected_pct": -7.272727272938938e-05
+  },
+  "tick_to_led_latency_us": {
+    "n": 12,
+    "mean": 24.666666666666668,
+    "min": 24.0,
+    "max": 25.0,
+    "stdev": 0.4714045207910317,
+    "p50": 25.0,
+    "p99": 25.0
+  },
+  "counts": {
+    "tick_rising_edges": 601,
+    "led_edges": 12
+  }
+}

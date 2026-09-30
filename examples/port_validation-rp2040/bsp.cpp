@@ -5,7 +5,8 @@
 #include "validation.hpp"
 #include "bsp.hpp"
 
-#include <pico/time.h>
+#include <pico/time.h>          // time_us_64(), from_us_since_boot()
+#include <hardware/timer.h>     // hardware_alarm_*()
 #include <hardware/watchdog.h>
 
 using namespace QP;
@@ -18,8 +19,18 @@ Q_DEFINE_THIS_FILE
 #ifndef QP_ARDUINO_QS_HOST_WAIT_MS
 #define QP_ARDUINO_QS_HOST_WAIT_MS 5000U
 #endif
+#ifndef QP_ARDUINO_QS_SERVICE_US
+#define QP_ARDUINO_QS_SERVICE_US 1000U
+#endif
+#ifndef QP_ARDUINO_QS_SERVICE_BYTES
+#define QP_ARDUINO_QS_SERVICE_BYTES 64U
+#endif
 
 namespace {
+
+enum BspRecords { // BSP-level QS user records
+    TICK_LOST = QP::QS_USER + 9
+};
 
 QP::QSpyId const l_timerId = { 0U };
 QP::QSpyId const l_commandId = { 0U };
@@ -74,17 +85,84 @@ inline void tickProbe(PinStatus) {}
 volatile std::uint8_t l_role = BSP::ROLE_DISPATCH;
 
 //----------------------------------------------------------------------------
-// Tick
-repeating_timer_t l_tickTimer;
-bool tickCallback(repeating_timer_t *) {
+// System clock tick: a hardware timer alarm owned by this BSP.
+//
+// Earlier revisions used the pico-sdk repeating timer, which lives in the
+// default alarm pool shared with the core's USB task and delay(). On
+// 2026-09-30 that tick silently stopped after a few minutes of trace-host
+// attach/detach cycling while QS-RX, QS-TX and the QV loop kept running: an
+// alarm pool re-add can fail and the repeating timer then simply ends. A
+// claimed hardware alarm re-armed from its own interrupt has no shared
+// bookkeeping. The idle loop also watches the tick and re-arms it, reporting
+// the event as a TICK_LOST record, so a stopped tick can never be silent.
+constexpr std::uint32_t kTickPeriodUs = 1000000U / BSP::TICKS_PER_SEC;
+int l_tickAlarm = -1;                        // hardware alarm number, claimed at start-up
+std::uint64_t l_tickTarget = 0U;             // absolute time (us) of the next tick
+std::uint32_t volatile l_tickCount = 0U;     // ticks delivered
+std::uint32_t volatile l_tickCatchUps = 0U;  // targets already in the past when re-armed
+std::uint32_t volatile l_tickRearms = 0U;    // watchdog re-arms from the idle loop
+std::uint32_t volatile l_lastTick_us = 0U;   // micros() at the last tick
+
+void armTick() { // program the alarm for l_tickTarget, catching up if it already passed
+    while (hardware_alarm_set_target(static_cast<uint>(l_tickAlarm),
+                                     from_us_since_boot(l_tickTarget)))
+    {
+        l_tickTarget += kTickPeriodUs; // missed: move on without stopping
+        ++l_tickCatchUps;
+    }
+}
+void tickAlarmCallback(uint) {
     tickProbe(HIGH);
-    QTimeEvt::tick(0U, &l_timerId);
+    l_tickTarget += kTickPeriodUs;
+    armTick(); // re-arm first so a slow tick never loses the next one
+    ++l_tickCount;
+    l_lastTick_us = micros();
+    QTimeEvt::tick(0U, &l_timerId); // process time events for tick rate 0
     tickProbe(LOW);
-    return true;
+}
+void startTick() {
+    l_tickAlarm = hardware_alarm_claim_unused(true); // panics if none is free
+    hardware_alarm_set_callback(static_cast<uint>(l_tickAlarm), &tickAlarmCallback);
+    l_tickTarget = time_us_64() + kTickPeriodUs;
+    l_lastTick_us = micros();
+    armTick();
+}
+void tickWatchdog() { // idle loop: if the alarm ever stops, report it and re-arm
+    // Read the tick's timestamp BEFORE the clock: the tick interrupt can land
+    // between the two reads, and reading the clock first would then see a
+    // "last tick" from the future and wrap to a huge elapsed time. That race
+    // produced 20,098 spurious re-arms in the first hour-long run.
+    std::uint32_t const last = l_lastTick_us;
+    std::int32_t const elapsed = static_cast<std::int32_t>(micros() - last);
+    if (elapsed > static_cast<std::int32_t>(5U * kTickPeriodUs)) {
+        ++l_tickRearms;
+        QS_BEGIN_ID(TICK_LOST, 0U)
+            QS_U32(0U, l_tickCount);
+            QS_U32(0U, l_tickRearms);
+            QS_U32(0U, l_tickCatchUps);
+        QS_END()
+        l_tickTarget = time_us_64() + kTickPeriodUs;
+        l_lastTick_us = micros();
+        armTick();
+    }
 }
 
 //----------------------------------------------------------------------------
 // QS transport (see blinky_bsp-rp2040/bsp.cpp for the rationale)
+// True when the transport should be touched on this idle pass. Every call
+// into the USB CDC port runs TinyUSB's task, which inflated the tick and
+// dispatch timings when the transport was serviced on every pass.
+bool qsServiceDue() {
+    static std::uint32_t last_us = 0U;
+    std::uint32_t const now = micros();
+    std::uint32_t const pending = QP::QS::priv_.used; // volatile, read once
+    if ((pending < QP_ARDUINO_QS_SERVICE_BYTES) && ((now - last_us) < QP_ARDUINO_QS_SERVICE_US)) {
+        return false;
+    }
+    last_us = now;
+    return true;
+}
+
 void qsTransmitSome() {
     int const room = QP_ARDUINO_QS_SERIAL.availableForWrite();
     if (room > 0) {
@@ -141,6 +219,7 @@ void BSP::init() {
     QS_INIT(nullptr);
     QS_OBJ_DICTIONARY(&l_timerId);
     QS_OBJ_DICTIONARY(&l_commandId);
+    QS_USR_DICTIONARY(TICK_LOST);
 }
 void BSP::setRole(std::uint8_t role) {
     l_role = static_cast<std::uint8_t>(role & 0x03U);
@@ -167,23 +246,23 @@ void BSP::rolePulse(std::uint8_t role) {
 //============================================================================
 // QF callbacks
 void QF::onStartup() {
-    bool const ok = add_repeating_timer_us(
-        -static_cast<int64_t>(1000000 / BSP::TICKS_PER_SEC),
-        tickCallback, nullptr, &l_tickTimer);
-    Q_ASSERT_ID(100, ok);
+    startTick(); // interrupts start here, after the AOs are started
 }
 void QF::onCleanup() {
 }
 void QV::onIdle() { // called with interrupts DISABLED
     BSP::roleHigh(BSP::ROLE_IDLE);
     QF_INT_ENABLE();
-    qsTransmitSome();
-    int avail = QP_ARDUINO_QS_SERIAL.available();
-    if (avail > 0) {
-        do {
-            QS::rxPut(static_cast<std::uint8_t>(QP_ARDUINO_QS_SERIAL.read()));
-        } while (--avail > 0);
-        QS::rxParse();
+    tickWatchdog();
+    if (qsServiceDue()) {
+        qsTransmitSome();
+        int avail = QP_ARDUINO_QS_SERIAL.available();
+        if (avail > 0) {
+            do {
+                QS::rxPut(static_cast<std::uint8_t>(QP_ARDUINO_QS_SERIAL.read()));
+            } while (--avail > 0);
+            QS::rxParse();
+        }
     }
     BSP::roleLow(BSP::ROLE_IDLE);
 }

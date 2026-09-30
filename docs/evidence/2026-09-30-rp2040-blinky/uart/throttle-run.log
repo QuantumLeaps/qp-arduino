@@ -1,0 +1,32 @@
+##### throttle measurement start 2026-09-30T15:41:53-04:00
+##### standard build, host attached
+The device was rebooted to start the application.
+========================= [SUCCESS] Took 3.27 seconds =========================
+rp2040_mouse_joystick  SUCCESS   00:00:03.272
+##### capture thr_std_host_1MHz_6s exit=0
+##### standard build, host detached
+Device only sent 5999995 samples.
+##### capture thr_std_nohost_1MHz_6s exit=0
+##### noqs build
+The device was rebooted to start the application.
+========================= [SUCCESS] Took 3.14 seconds =========================
+rp2040_mouse_joystick_noqs  SUCCESS   00:00:03.138
+##### capture thr_noqs_1MHz_6s exit=0
+##### uart build
+The device was rebooted to start the application.
+========================= [SUCCESS] Took 3.30 seconds =========================
+rp2040_mouse_joystick_uart  SUCCESS   00:00:03.303
+##### capture thr_uart_1MHz_6s exit=0
+##### txonly build: 30 s to catch dictionaries (10 s) and TRACE_STAT (1 s)
+The device was rebooted to start the application.
+========================= [SUCCESS] Took 3.31 seconds =========================
+rp2040_mouse_joystick_txonly  SUCCESS   00:00:03.310
+Device only sent 29999231 samples.
+##### capture thr_txonly_1MHz_30s exit=0
+##### txonly decode lines=6709
+##### restore standard blinky
+The device was rebooted to start the application.
+========================= [SUCCESS] Took 3.26 seconds =========================
+rp2040_mouse_joystick  SUCCESS   00:00:03.259
+##### throttle measurement done 2026-09-30T15:43:45-04:00
+##### post-verify done (see post_verify.log) 2026-09-30T15:43:52-04:00

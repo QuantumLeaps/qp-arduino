@@ -77,3 +77,6 @@ docs/evidence/**/*.sr
 docs/evidence/**/*.vcd
 docs/evidence/**/*.gz
 docs/evidence/**/*.bin
+# The short bench logs the evidence READMEs cite are evidence, not build
+# output; exempt them from the upstream *.log rule above.
+!docs/evidence/**/*.log
