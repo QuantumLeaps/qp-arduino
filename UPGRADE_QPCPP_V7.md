@@ -792,6 +792,40 @@ product, Digital-50 PCB revision, or migration of the joystick application.
 Measurements on new board/probe/cable combinations require their own `OBS-HW`
 qualification before experiment use.
 
+## Status And Next Steps — End Of 2026-09-30
+
+Where the RP2040 qualification stands after this day's work, for whoever
+picks it up next (the gate lists above are authoritative; this is the
+summary).
+
+- **Met on the fixture:** QSPY handshake, target coverage (8 of 8
+  host-driven procedures, expected assertion included), 100 Hz tick within
+  ±1 % with no missed or doubled tick (10 min direct, 2 h soak, 15 min under
+  host cycling), dispatch latency below one tick (p99 121 µs, max 133 µs
+  attached), two-hour assertion-free soak, reader absent/slow/disconnected,
+  transmit-only observation profile. One defect was found and fixed in the
+  BSP (tick from the shared alarm pool) plus a race in its first watchdog;
+  none in the QP port itself.
+- **Still open before an RP2040-scoped release:** on-target QUTest
+  (deferred; `qv.cpp` is always compiled, see "On-target QUTest is
+  deferred"); declared queue/pool budgets and RAM/flash margins recorded
+  against them; the `library.properties` architecture selector (still
+  `avr`; the cores with build evidence are Teensy under `avr`, `rp2040`
+  and, best effort, `sam`); reconciling package metadata with the imported
+  tag; the release/support statement itself.
+- **Recommended order:** decide the architecture selector, then apply the
+  transmit-only profile to the joystick application with a declared trace
+  budget (that closes the "budgets" item with a real load), then the
+  STM32G0B1CEU6 BSP. Teensy hardware gates stay deferred.
+- **Fixture state at hand-off:** `mouse-joystick-pcb` rev 0 unit
+  E4654C159F2C2534 on the LA5032 adapter, 36 V unplugged, flashed with the
+  standard Blinky image F (`rp2040_mouse_joystick`, hash in
+  `docs/evidence/2026-09-30-rp2040-blinky/firmware-hashes.txt`); no host
+  process attached. The bench scripts that produced the evidence are kept
+  verbatim in `qp-arduino-example/evidence/bench-scripts/`; the
+  `pixi run` tasks `validate-rp2040` and `stress-rp2040` are the supported
+  entry points.
+
 ## Deferred Teensy 4.1 Hardware Gates — Nonblocking For RP2040
 
 No Teensy hardware result is implied by the software results above. The original
