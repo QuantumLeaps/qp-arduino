@@ -66,7 +66,7 @@ def _run(cmd: list[str], *, cwd: Path, env: dict[str, str]) -> int:
         return int(subprocess.run(cmd, cwd=str(cwd), env=env, check=False).returncode)
     except FileNotFoundError:
         print("ERROR: 'pio' not found. Run `pixi install`, or activate the .venv "
-              "described in README.org, or set PIO=/path/to/pio.", file=sys.stderr)
+              "described in README.md, or set PIO=/path/to/pio.", file=sys.stderr)
         return 127
 
 

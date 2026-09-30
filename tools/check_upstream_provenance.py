@@ -77,6 +77,13 @@ EXACT = [
     ("src/qs/qs_rx.cpp", "src/qp-arduino/qs_rx.cpp"),
     ("src/qs/qstamp.cpp", "src/qp-arduino/qstamp.cpp"),
     ("src/qv/qv.cpp", "src/qp-arduino/qv.cpp"),
+    # license texts are packaged verbatim from the imported tag
+    ("LICENSES/GPL-3.0-or-later.txt", "LICENSE"),
+    ("LICENSES/GPL-3.0-or-later.txt", "LICENSES/GPL-3.0-or-later.txt"),
+    ("LICENSES/QP-Arduino_GPL_Exception.txt", "QP-Arduino_GPL_Exception.txt"),
+    ("LICENSES/QP-Arduino_GPL_Exception.txt", "LICENSES/QP-Arduino_GPL_Exception.txt"),
+    ("LICENSES/LicenseRef-QL-commercial.txt", "LICENSES/LicenseRef-QL-commercial.txt"),
+    ("LICENSES/License.txt", "LICENSES/License.txt"),
 ]
 
 QS_PORT_UPSTREAM = "ports/arm-cm/qv/gnu/qs_port.hpp"

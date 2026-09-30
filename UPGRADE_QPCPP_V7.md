@@ -514,6 +514,58 @@ over USB CDC is usable on the bench. Framework coverage (queues, pub/sub,
 dynamic events, assertions, QS RX), QUTest, the two-hour soak, the slow-reader
 case and the transmit-only profile remain open below.
 
+## Repository Alignment And Further Examples — 2026-09-30
+
+Changes made after the first Blinky target run, all on this branch:
+
+- `README.org` became `README.md`, following the section order of the official
+  `qpcpp` README (What's New, Getting Started, QP/Spy, Licensing,
+  Documentation, Help). Example READMEs follow the `qpcpp-examples` layout
+  (Features Demonstrated, Build Configurations, Code Organization, Building).
+- `LICENSES/` mirrors the upstream license texts (`GPL-3.0-or-later.txt`,
+  `QP-Arduino_GPL_Exception.txt`, `LicenseRef-QL-commercial.txt`,
+  `License.txt`) from qpcpp `v7.3.4`; the root `LICENSE` and exception file
+  stay for Arduino tooling. The provenance check now verifies all six files
+  against the tag.
+- `platformio.ini` pins the Teensy platform to `teensy@5.1.0`, the version the
+  retained regression builds use (framework-arduinoteensy 1.160.0, GCC 11.3.1).
+- `examples/dpp_bsp-rp2040` is generated from `dpp_bsp-rp2040.qm` and
+  `examples/blinky_bsp-rp2040` from `blinky_bsp-rp2040.qm` with QM 6.1.1's
+  console generator (`qmc`), which the QTools installer now makes
+  executable; both models derive from the Teensy models with RP2040 BSPs. The model is the Teensy DPP model with an RP2040 fixture BSP;
+  regenerating the Teensy DPP model with `qmc` reproduces the checked-in code
+  except for QM 6 header comments, so the migrated models match their sources.
+- `examples/port_validation-rp2040` ports the Teensy validator to the fixture
+  with the two-marker scheme: GP21 is the tick probe; GP25's role (marker,
+  dispatch, idle, event receipt) is selected by QS command 5.
+  `tools/port_validation_rp2040.py` drives it through QSPY's UDP front-end
+  (QS-RX info, counters, publish, dynamic events, roles, counter reset,
+  assertion with reboot and re-attach); `pixi run validate-rp2040`.
+- **On-target QUTest is deferred.** A QUTest build replaces `QF::run()`,
+  `QActive::start()` and friends with the versions in `qutest.cpp` and uses the
+  separate `ports/arm-cm/qutest` port header, but the Arduino library always
+  compiles `qv.cpp` and the QV port header, so the two would collide. Running
+  the upstream `qutest/` suites on the RP2040 target therefore needs either
+  `#ifndef Q_UTEST` guards on the Arduino copies (a new documented delta) or a
+  second library layout, and is left for later. The host-driven procedures in
+  `tools/port_validation_rp2040.py` cover the same behaviours against the real
+  QV kernel instead; the upstream host QUTest baseline from July stays the
+  framework-level reference.
+- **QS transport defect found and fixed** with DPP's higher record rate: the
+  idle-loop writer took a block from the QS buffer before knowing the port
+  would accept all of it, and dropped the remainder, so QSPY saw 60 checksum
+  errors and sequence gaps in 25 s. The writer now asks the port for its free
+  space first and takes at most that much (`qsTransmitSome`), and the flush
+  path drains in the same way with a bound (`qsFlushBounded`). After the fix:
+  1,624 records in 30 s with no errors. Both RP2040 BSPs and the validator use
+  the same code.
+- DPP on the fixture: tick period 10,000.00 µs (min 9,983, max 10,015), no
+  missed or doubled ticks; the tick callback takes 34 µs typical and 49 to
+  62 µs when a philosopher's time event expires, with QSPY attached or not.
+  With five armed time events the per-tick cost is therefore about 34 µs
+  against 1.7 µs for Blinky's single time event on non-expiring ticks; the
+  cost is in the tick path and is host independent. Root cause still open.
+
 ## Active RP2040 Hardware Acceptance
 
 - [ ] Upload the fixture firmware and establish the target QSPY/QUTest
@@ -529,9 +581,11 @@ case and the transmit-only profile remain open below.
       ticks during a 10-minute run. **Met 2026-09-30 with Blinky**: tick
       average 10,000.02 µs over 600 s derived from 1,199 consecutive 50-tick
       LED intervals (largest deviation 0.26 ms, so no tick was missed or
-      doubled), plus direct edge captures of 600 ticks at ±13 µs. Re-run with
-      the port-validation firmware, ideally as a direct edge capture at
-      ≥ 2 MSa/s.
+      doubled), plus direct edge captures of 600 ticks at ±13 µs. **Direct
+      600 s edge capture done later the same day with DPP running and QSPY
+      attached** (2 MSa/s, 1.2 G samples): 60,000 consecutive ticks, mean
+      9,999.998 µs (−0.00002 %), min 9,981, max 10,015.5, stdev 4.6 µs, no
+      missed or doubled tick; `docs/evidence/2026-09-30-rp2040-dpp/`.
 - [ ] Record ISR-to-active-object dispatch p99 and maximum latency under
       documented validation load; maximum must remain below one 100 Hz tick.
       **Blinky baseline recorded 2026-09-30**: p99 360 µs, maximum 430 µs

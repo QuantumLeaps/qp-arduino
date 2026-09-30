@@ -104,7 +104,7 @@ neither shares a validation result merely because both use Cortex-M0+.
 ## Parallel agent ownership
 
 Claim the step and exact files before implementation. One integrator owns
-`AGENTS.md`, `UPGRADE_QPCPP_V7.md`, `README.org`, this plan, `platformio.ini`
+`AGENTS.md`, `UPGRADE_QPCPP_V7.md`, `README.md`, this plan, `platformio.ini`
 and package metadata. Proposed implementation boundaries, not new files from
 this documentation change:
 

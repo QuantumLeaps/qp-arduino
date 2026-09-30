@@ -256,7 +256,8 @@ def install_qm(*, force: bool = False) -> Path:
 
         # Ensure executable bits on Linux (zip archives can lose them)
         if sysname == "linux":
-            for exe in (install_dir / "bin" / "qm", install_dir / "bin" / "qm.sh"):
+            for exe in (install_dir / "bin" / "qm", install_dir / "bin" / "qm.sh",
+                        install_dir / "bin" / "qmc", install_dir / "bin" / "qmc.sh"):
                 if exe.exists():
                     exe.chmod(exe.stat().st_mode | 0o111)
 

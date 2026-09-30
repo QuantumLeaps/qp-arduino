@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="5.1.3" links="0">
+ <documentation>Blinky for RP2040 boards on the Earle Philhower arduino-pico core, using the QP/C++ 7.3.4 QV kernel from qp-arduino. Built for the qp-arduino RP2040 qualification fixture (mouse-joystick-pcb rev 0) with -DQP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB=1: the &quot;LED&quot; is FW_TRIG0 (GP25) and the tick-ISR probe is FW_TRIG1 (GP21), both visible on the LA5032 through InstrumentPort-40. Without that flag the LED is LED_BUILTIN. See examples/blinky_bsp-rp2040/README.md.</documentation>
+ <framework name="qpcpp"/>
+ <package name="AOs" stereotype="0x02">
+  <class name="Blinky" superclass="qpcpp::QActive">
+   <attribute name="m_timeEvt" type="QP::QTimeEvt" visibility="0x02" properties="0x00"/>
+   <attribute name="instance" type="Blinky" visibility="0x00" properties="0x01">
+    <documentation>static class instance (Singleton)</documentation>
+   </attribute>
+   <operation name="Blinky" type="" visibility="0x00" properties="0x00">
+    <code>: QActive(Q_STATE_CAST(&amp;Blinky::initial)),
+    m_timeEvt(this, TIMEOUT_SIG, 0U)</code>
+   </operation>
+   <statechart properties="0x00">
+    <initial target="../1">
+     <action>#ifdef QS_ON
+QS_OBJ_DICTIONARY(&amp;Blinky::instance);
+QS_OBJ_DICTIONARY(&amp;m_timeEvt);
+QS_SIG_DICTIONARY(TIMEOUT_SIG, this);
+QS_FUN_DICTIONARY(&amp;Blinky::off);
+QS_FUN_DICTIONARY(&amp;Blinky::on);
+#endif
+// periodic time event: every TICKS_PER_SEC/2 ticks, i.e. 2 Hz toggling
+m_timeEvt.armX(BSP::TICKS_PER_SEC/2, BSP::TICKS_PER_SEC/2);
+(void)e; // unused parameter</action>
+     <initial_glyph conn="2,2,5,1,20,8,-4">
+      <action box="0,-2,32,6"/>
+     </initial_glyph>
+    </initial>
+    <state name="off">
+     <entry>BSP::ledOff();</entry>
+     <tran trig="TIMEOUT" target="../../2">
+      <tran_glyph conn="2,16,3,1,18,8,-2">
+       <action box="0,-2,8,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,8,16,10">
+      <entry box="1,2,12,4"/>
+     </state_glyph>
+    </state>
+    <state name="on">
+     <entry>BSP::ledOn();</entry>
+     <tran trig="TIMEOUT" target="../../1">
+      <tran_glyph conn="2,30,3,1,20,-17,-4">
+       <action box="0,-2,8,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="2,22,16,10">
+      <entry box="1,2,12,4"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="34,34"/>
+   </statechart>
+  </class>
+  <attribute name="AO_Blinky" type="QP::QActive * const" visibility="0x00" properties="0x00">
+   <documentation>the opaque pointer to the Blinky AO</documentation>
+   <code>= &amp;Blinky::instance;</code>
+  </attribute>
+ </package>
+ <directory name=".">
+  <file name="bsp.hpp">
+   <text>#ifndef BSP_HPP
+#define BSP_HPP
+
+class BSP {
+public:
+    enum { TICKS_PER_SEC = 100 };
+    static void init();
+    static void ledOff();
+    static void ledOn();
+};
+
+#endif // BSP_HPP
+</text>
+  </file>
+  <file name="bsp.cpp">
+   <text>// Board Support Package for the RP2040 Blinky example: Earle Philhower
+// arduino-pico core, QP/C++ v7.3.4 QV kernel.
+//
+// Compile-time configuration (build_flags in platformio.ini):
+//
+//   QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB=1
+//       Target the mouse-joystick-pcb rev 0 qualification fixture (PCB tags
+//       v0.1/v0.2). Applies that board's safe state first, enables its
+//       InstrumentPort-40 buffers, and uses FW_TRIG0 (GP25) as the LED and
+//       FW_TRIG1 (GP21) as the tick-ISR probe, i.e. LA5032 channels 16 and 17.
+//       Without it the LED is LED_BUILTIN and there is no tick probe unless
+//       QP_ARDUINO_TICK_PROBE_PIN is defined.
+//   QS_ON
+//       Emit QS trace records over QP_ARDUINO_QS_SERIAL (default Serial, the
+//       USB CDC port; Serial1 is UART0 on GP0/GP1, which the fixture exposes
+//       on LA5032 channels 8/7). QSPY: qspy -c /dev/ttyACM0 -b 115200
+//   QP_ARDUINO_QS_HOST_WAIT_MS (default 5000)
+//       USB CDC discards everything written before a host opens the port, so
+//       the QS dictionaries emitted at start-up would be lost. The BSP waits
+//       up to this long for a host (DTR) before starting QS; a UART transport
+//       reports &quot;connected&quot; immediately, so the wait costs nothing there.
+//       Define it as 0 to boot without waiting.
+//
+#include &quot;qpcpp.hpp&quot;   // QP/C++ framework
+#include &quot;blinky.hpp&quot;  // Blinky application interface
+#include &quot;bsp.hpp&quot;     // Board Support Package
+
+#include &lt;pico/time.h&gt;          // add_repeating_timer_us()
+#include &lt;hardware/watchdog.h&gt;  // watchdog_reboot()
+
+using namespace QP;
+
+Q_DEFINE_THIS_FILE
+
+#ifndef QP_ARDUINO_QS_SERIAL
+#define QP_ARDUINO_QS_SERIAL Serial
+#endif
+#ifndef QP_ARDUINO_QS_HOST_WAIT_MS
+#define QP_ARDUINO_QS_HOST_WAIT_MS 5000U
+#endif
+
+namespace {
+
+//----------------------------------------------------------------------------
+// Pins
+#if defined(QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB) &amp;&amp; (QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB != 0)
+
+// mouse-joystick-pcb rev 0. Numbers from mouse-joystick-firm/src/BoardPins.hpp
+// and mouse-joystick-pcb/docs/interface-map.md at tag v0.2.
+constexpr std::uint8_t kLedPin            = 25U; // FW_TRIG0 -&gt; J1501 pin 26 -&gt; TRIG0 -&gt; LA5032 ch 16
+constexpr std::uint8_t kTickProbePin     = 21U; // FW_TRIG1 -&gt; J1501 pin 28 -&gt; TRIG1 -&gt; LA5032 ch 17
+constexpr std::uint8_t kInstrBufOeNPin = 24U; // ~{INSTR_BUF_OE}: low enables the port buffers
+constexpr std::uint8_t kBusSwEnNPin    = 9U;  // ~{BUS_SW_EN}: high keeps the GPIO isolation bus open
+constexpr std::uint8_t kHvEnPin          = 19U; // HV_EN: low keeps the 36 V switch off
+constexpr std::uint8_t kHvDiagEnPin     = 14U; // HV_DIAG_EN: must idle low
+constexpr std::uint8_t kTmcCsNPin       = 2U;  // ~{TMC_CS}: high = driver deselected
+constexpr std::uint8_t kTmcDrvEnNPin   = 3U;  // ~{TMC_DRV_EN}: high = driver outputs disabled
+#define BSP_HAS_TICK_PROBE 1
+
+// Drive a pin's level before making it an output so it never glitches through
+// the wrong state, then the same for the next pin.
+void driveOutput(std::uint8_t pin, PinStatus level) {
+    digitalWrite(pin, level);
+    pinMode(pin, OUTPUT);
+}
+
+// The board's safe state, mirrored from the joystick firmware's SafeState:
+// 36 V switch off, GPIO isolation bus open, driver deselected and disabled,
+// markers low. Nothing in this example ever leaves this state, so the fixture
+// is non-actuating by construction. Do this before touching anything else.
+void fixtureSafeState() {
+    driveOutput(kBusSwEnNPin, HIGH);
+    driveOutput(kHvEnPin, LOW);
+    driveOutput(kHvDiagEnPin, LOW);
+    driveOutput(kInstrBufOeNPin, HIGH);
+    driveOutput(kTmcCsNPin, HIGH);
+    driveOutput(kTmcDrvEnNPin, HIGH);
+    driveOutput(kLedPin, LOW);
+    driveOutput(kTickProbePin, LOW);
+}
+
+// Make the markers visible at the analyzer. The buffers are output-only and
+// cannot influence the board, so this is safe to leave on.
+void fixtureEnableInstrumentPort() {
+    digitalWrite(kInstrBufOeNPin, LOW);
+}
+
+#else // generic RP2040 board (e.g. a Pico)
+
+constexpr std::uint8_t kLedPin = LED_BUILTIN;
+#ifdef QP_ARDUINO_TICK_PROBE_PIN
+constexpr std::uint8_t kTickProbePin = QP_ARDUINO_TICK_PROBE_PIN;
+#define BSP_HAS_TICK_PROBE 1
+#else
+#define BSP_HAS_TICK_PROBE 0
+#endif
+
+#endif
+
+#if BSP_HAS_TICK_PROBE
+inline void tickProbe(PinStatus level) { digitalWrite(kTickProbePin, level); }
+#else
+inline void tickProbe(PinStatus) {}
+#endif
+
+//----------------------------------------------------------------------------
+// System clock tick
+//
+// The pico-sdk repeating timer runs its callback from the hardware timer alarm
+// IRQ on this core; a negative period means the callbacks are spaced from
+// start to start, so the tick does not drift with callback duration. SysTick
+// is deliberately left alone. QV needs no special ISR entry/exit: the callback
+// just posts time events and the QV loop runs them when it returns.
+QP::QSpyId const l_TICK_ID = { 0U }; // QS source of the tick
+repeating_timer_t l_tickTimer;
+
+bool tickCallback(repeating_timer_t *) {
+    tickProbe(HIGH);
+    QTimeEvt::tick(0U, &amp;l_TICK_ID); // process time events for tick rate 0
+    tickProbe(LOW);
+    return true; // keep repeating
+}
+
+//----------------------------------------------------------------------------
+// QS transport helpers
+//
+// The Arduino port always compiles the framework with Q_SPY, so the QS
+// callbacks below must exist even when QS_ON is not defined; QS_ON only
+// decides whether QS is started and serviced.
+
+/// QS transport helpers. USB CDC is drained by an interrupt on this core and
+// discards nothing once a host is attached, but it accepts only what fits in
+// its FIFO. Never take more out of the QS buffer than the port will accept
+// right now: QS::getBlock() advances the buffer, so bytes taken and not written
+// would be lost mid-record and the host would see checksum errors.
+void qsTransmitSome() {
+    int const room = QP_ARDUINO_QS_SERIAL.availableForWrite();
+    if (room &gt; 0) {
+        std::uint16_t len = (room &gt; 0xFFFF) ? 0xFFFFU : static_cast&lt;std::uint16_t&gt;(room);
+        std::uint8_t const * const buf = QS::getBlock(&amp;len);
+        if (buf != nullptr) {
+            static_cast&lt;void&gt;(QP_ARDUINO_QS_SERIAL.write(buf, len)); // fits by construction
+        }
+    }
+}
+
+// Drain the QS buffer until it is empty or the transport stops accepting data
+// for timeout_us. Whatever is left stays in the QS buffer.
+void qsFlushBounded(std::uint32_t timeout_us) {
+    std::uint32_t start = micros();
+    for (;;) {
+        int const room = QP_ARDUINO_QS_SERIAL.availableForWrite();
+        if (room &gt; 0) {
+            std::uint16_t len = (room &gt; 0xFFFF) ? 0xFFFFU : static_cast&lt;std::uint16_t&gt;(room);
+            std::uint8_t const * const buf = QS::getBlock(&amp;len);
+            if (buf == nullptr) {
+                return; // nothing left
+            }
+            static_cast&lt;void&gt;(QP_ARDUINO_QS_SERIAL.write(buf, len));
+            start = micros(); // progress was made
+        }
+        else if ((micros() - start) &gt; timeout_us) {
+            return; // transport is not draining
+        }
+    }
+}
+
+} // unnamed namespace
+
+//----------------------------------------------------------------------------
+// BSP functions
+void BSP::init() {
+#if defined(QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB) &amp;&amp; (QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB != 0)
+    fixtureSafeState();
+    fixtureEnableInstrumentPort();
+#else
+    pinMode(kLedPin, OUTPUT);
+    digitalWrite(kLedPin, LOW);
+#if BSP_HAS_TICK_PROBE
+    pinMode(kTickProbePin, OUTPUT);
+    digitalWrite(kTickProbePin, LOW);
+#endif
+#endif
+
+#ifdef QS_ON
+    // Give a trace host the chance to attach before the dictionaries go out.
+    // The safe state above is already applied, so waiting here is harmless.
+    {
+        std::uint32_t const start = millis();
+        while (!QP_ARDUINO_QS_SERIAL
+               &amp;&amp; ((millis() - start) &lt; QP_ARDUINO_QS_HOST_WAIT_MS))
+        {
+            delay(10);
+        }
+    }
+    QS_INIT(nullptr);
+    QS_OBJ_DICTIONARY(&amp;l_TICK_ID);
+    QS_GLB_FILTER(QP::QS_SM_RECORDS); // state machine records
+    QS_GLB_FILTER(QP::QS_AO_RECORDS); // active object records
+    QS_GLB_FILTER(QP::QS_UA_RECORDS); // all user records
+#endif
+}
+//............................................................................
+void BSP::ledOff() {
+    digitalWrite(kLedPin, LOW);
+}
+//............................................................................
+void BSP::ledOn() {
+    digitalWrite(kLedPin, HIGH);
+}
+
+//----------------------------------------------------------------------------
+// QF callbacks
+void QF::onStartup() {
+    // interrupts are configured and started here, after the AOs are started
+    bool const ok = add_repeating_timer_us(
+        -static_cast&lt;int64_t&gt;(1000000 / BSP::TICKS_PER_SEC),
+        tickCallback, nullptr, &amp;l_tickTimer);
+    Q_ASSERT_ID(100, ok);
+}
+//............................................................................
+void QF::onCleanup() {
+}
+//............................................................................
+void QV::onIdle() { // called with interrupts DISABLED, see NOTE in qv.hpp
+#ifdef QS_ON
+    QF_INT_ENABLE(); // re-enable interrupts before touching the transport
+
+    // QS transmit
+    qsTransmitSome();
+
+    // QS receive (bench profile: QSPY/QUTest can talk back over the same port)
+    int avail = QP_ARDUINO_QS_SERIAL.available();
+    if (avail &gt; 0) {
+        do {
+            QS::rxPut(static_cast&lt;std::uint8_t&gt;(QP_ARDUINO_QS_SERIAL.read()));
+        } while (--avail &gt; 0);
+        QS::rxParse();
+    }
+#else
+    // Sleep until the next interrupt; QV_CPU_SLEEP() re-enables interrupts
+    // atomically with WFI on ARMv6-M. USB is serviced from an interrupt on
+    // this core, so it keeps working.
+    QV_CPU_SLEEP();
+#endif
+}
+//............................................................................
+extern &quot;C&quot; Q_NORETURN Q_onError(char const * const module, int const id) {
+#ifdef QS_ON
+    // Try to get the assertion record out while interrupts may still be
+    // running; QS::onFlush() below is bounded so this cannot hang.
+    QS_ASSERTION(module, id, 0U);
+#else
+    Q_UNUSED_PAR(module);
+    Q_UNUSED_PAR(id);
+#endif
+    __asm volatile (&quot;cpsid i&quot; ::: &quot;memory&quot;); // disable interrupts directly
+
+    // Distinct analyzer signature: LED solid on for two seconds, tick probe
+    // silent, then a watchdog reset so the fixture recovers on its own (it has
+    // no reset button and no SWD).
+    digitalWrite(kLedPin, HIGH);
+    std::uint32_t const start = micros();
+    while ((micros() - start) &lt; 2000000U) {
+    }
+    watchdog_reboot(0U, 0U, 10U);
+    for (;;) {
+    }
+}
+
+//----------------------------------------------------------------------------
+// QS callbacks (always defined; see the note above)
+bool QS::onStartup(void const *arg) {
+    Q_UNUSED_PAR(arg);
+    static std::uint8_t qsTxBuf[2048]; // QS transmit buffer
+    static std::uint8_t qsRxBuf[128];  // QS receive buffer
+    initBuf(qsTxBuf, sizeof(qsTxBuf));
+    rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
+    QP_ARDUINO_QS_SERIAL.begin(115200); // baud rate is ignored by USB CDC
+    return true;
+}
+//............................................................................
+void QS::onCleanup() {
+}
+//............................................................................
+QSTimeCtr QS::onGetTime() {
+    return static_cast&lt;QSTimeCtr&gt;(micros()); // 1 us resolution, wraps at 32 bits
+}
+//............................................................................
+void QS::onFlush() {
+    qsFlushBounded(200000U); // wait at most 200 ms for the transport
+}
+//............................................................................
+void QS::onReset() {
+    watchdog_reboot(0U, 0U, 10U);
+    for (;;) {
+    }
+}
+//............................................................................
+void QS::onCommand(std::uint8_t cmdId, std::uint32_t param1,
+                   std::uint32_t param2, std::uint32_t param3)
+{
+    Q_UNUSED_PAR(cmdId);
+    Q_UNUSED_PAR(param1);
+    Q_UNUSED_PAR(param2);
+    Q_UNUSED_PAR(param3);
+}
+</text>
+  </file>
+  <file name="blinky.hpp">
+   <text>#ifndef BLINKY_HPP
+#define BLINKY_HPP
+
+enum BlinkySignals {
+    TIMEOUT_SIG = QP::Q_USER_SIG,
+    MAX_SIG
+};
+
+// genearate declarations of all opaque AO pointers
+$declare${AOs::AO_Blinky}
+//...
+
+#endif // BLINKY_HPP
+</text>
+  </file>
+  <file name="blinky_bsp-rp2040.ino">
+   <text>#include &quot;qpcpp.hpp&quot;   // QP/C++ framework
+#include &quot;blinky.hpp&quot;  // Blinky application interface
+#include &quot;bsp.hpp&quot;     // Board Support Package (BSP)
+
+using namespace QP;
+
+// Blinky for RP2040 boards on the Earle Philhower arduino-pico core, using the
+// QP/C++ v7.3.4 QV kernel. One active object toggles the &quot;LED&quot; every half
+// second from a periodic time event. Everything hardware-specific lives in
+// bsp.cpp; this file and blinky.hpp are board-independent.
+
+//............................................................................
+void setup() {
+    QF::init();  // initialize the framework
+    BSP::init(); // initialize the board (safe state, LED, QS)
+
+    static QEvt const *blinky_queueSto[10];
+    AO_Blinky-&gt;start(1U, // QP priority
+                     blinky_queueSto, Q_DIM(blinky_queueSto),
+                     nullptr, 0U); // no per-AO stack under QV
+}
+
+//............................................................................
+void loop() {
+    QF::run(); // QV kernel: runs the active objects and never returns
+}
+
+//============================================================================
+// generate declarations and definitions of all AO classes (state machines)...
+$declare${AOs::Blinky}
+$define${AOs::Blinky}
+//...
+
+//============================================================================
+// generate definitions of all AO opaque pointers...
+$define${AOs::AO_Blinky}
+//...
+</text>
+  </file>
+ </directory>
+</model>
