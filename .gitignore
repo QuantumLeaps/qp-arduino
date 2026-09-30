@@ -62,3 +62,4 @@ lint/MISRA_Exemplar_Suite_test/*.txt
 venv
 .pio
 .pio-core
+.pixi

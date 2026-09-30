@@ -1,0 +1,92 @@
+# Reproducible development environment for qp-arduino on Linux, macOS and
+# Windows: https://pixi.sh. `pixi install` creates it; `pixi run <task>` uses it.
+# People without Pixi can keep using a plain Python virtual environment with
+# PlatformIO installed (see README.org); every task below is a thin wrapper
+# around `pio` or a Python script, so nothing here is required.
+[workspace]
+name = "qp-arduino"
+version = "7.3.4"
+description = "QP/C++ v7.3.4 (QV kernel) for Arduino: build, check and flash the examples reproducibly."
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64", "win-64"]
+
+[dependencies]
+# PlatformIO Core CLI (noarch on conda-forge). Same range the joystick firmware uses.
+platformio = ">=6.1.19,<7"
+# The helper scripts in tools/ are plain Python 3.
+python = ">=3.12,<3.14"
+# The provenance check reads the upstream tag with `git show`, and PlatformIO
+# clones the pinned RP2040 platform with git.
+git = "*"
+
+[activation.env]
+PLATFORMIO_SETTING_ENABLE_TELEMETRY = "no"
+
+[tasks]
+pio-version = "pio --version"
+ports = "pio device list"
+
+[tasks.provenance]
+description = "Check the imported framework files against qpcpp tag v7.3.4 in ../qpcpp (override with QPCPP_DIR / QPCPP_TAG)."
+cmd = "python tools/check_upstream_provenance.py"
+
+[tasks.build]
+description = "Compile one example for one PlatformIO environment."
+args = [
+  { arg = "example", default = "examples/blinky_bsp-rp2040" },
+  { arg = "env", default = "rp2040_mouse_joystick" },
+]
+cmd = "python tools/pio_task.py build --example {{ example }} --env {{ env }}"
+
+[tasks.rebuild]
+description = "Clean, then compile one example."
+args = [
+  { arg = "example", default = "examples/blinky_bsp-rp2040" },
+  { arg = "env", default = "rp2040_mouse_joystick" },
+]
+cmd = "python tools/pio_task.py rebuild --example {{ example }} --env {{ env }}"
+
+[tasks.clean]
+args = [
+  { arg = "example", default = "examples/blinky_bsp-rp2040" },
+  { arg = "env", default = "rp2040_mouse_joystick" },
+]
+cmd = "python tools/pio_task.py clean --example {{ example }} --env {{ env }}"
+
+[tasks.upload]
+description = "Compile and upload one example. RP2040: board in BOOTSEL, or running firmware that honours the 1200 baud touch."
+args = [
+  { arg = "example", default = "examples/blinky_bsp-rp2040" },
+  { arg = "env", default = "rp2040_mouse_joystick" },
+  { arg = "port", default = "/dev/ttyACM0" },
+]
+cmd = "python tools/pio_task.py upload --example {{ example }} --env {{ env }} --port {{ port }}"
+
+[tasks.monitor]
+description = "Open the serial monitor (USB CDC on the RP2040 fixture)."
+args = [
+  { arg = "port", default = "/dev/ttyACM0" },
+  { arg = "baud", default = "115200" },
+]
+cmd = "python tools/pio_task.py monitor --port {{ port }} --baud {{ baud }}"
+
+# Fixed build sets used as regression gates. `pixi run check` runs everything.
+[tasks.build-rp2040-blinky]
+cmd = "python tools/pio_task.py build --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick"
+[tasks.build-rp2040]
+description = "Build every RP2040 example."
+depends-on = ["build-rp2040-blinky"]
+
+[tasks.build-teensy-blinky]
+cmd = "python tools/pio_task.py build --example examples/blinky_bsp-teensy4 --env teensy41"
+[tasks.build-teensy-dpp]
+cmd = "python tools/pio_task.py build --example examples/dpp_bsp-teensy4 --env teensy41"
+[tasks.build-teensy-port-validation]
+cmd = "python tools/pio_task.py build --example examples/port_validation-teensy4 --env teensy41"
+[tasks.build-teensy]
+description = "Build the Teensy 4.1 examples (retained regression set)."
+depends-on = ["build-teensy-blinky", "build-teensy-dpp", "build-teensy-port-validation"]
+
+[tasks.check]
+description = "Provenance check plus every example build."
+depends-on = ["provenance", "build-teensy", "build-rp2040"]
