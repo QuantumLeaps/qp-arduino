@@ -1050,6 +1050,24 @@ the board was energised.
   up, the UART0 path with a pyControl host, the v1.0 pin map, the `OBS-IF`
   marker overlay. STM32G0B1CEU6 and Teensy hardware gates are deferred by
   the user's decision of 2026-10-01, not by any finding.
+- **Two port-relevant findings from the firmware's 1 kHz run, 2026-10-01**
+  (`qp-arduino-example/evidence/2026-10-01-rp2040-joystick-ring-capture/`,
+  firmware 0109ca5 on this library at 978af08). The BSP-owned hardware-alarm
+  tick holds 1 kHz exactly (86,483 periods, stdev 10 µs, none lost) with the
+  tick posted to the AO as one coalesced static event rather than a QTimeEvt,
+  and the QV kernel, queue and pool behaved (queue minimum 14 of 16, no
+  drops, no asserts). The transmit-only trace at 115200 baud saturates when
+  an application queues 34 lines with one user record each in a few
+  milliseconds (QS high-water 2,048 of 2,048, 35 buffer-full events, records
+  lost but nothing on the protocol path): guidance for applications on this
+  transport is one record per burst, not per line, and the application's
+  own run-to-completion cost (here 0.5 ms per `snprintf("%.3f")` on the
+  M0+) is what sets the tick it can sustain, not the port. The same day the
+  firmware removed newlib from that path and reran
+  (`.../2026-10-01-rp2040-joystick-no-newlib/`): coalesced ticks 2.5 % →
+  0.28 %, trace buffer-full 35 → 4 with one record per burst; the remaining
+  per-line floor of about 450 µs on the M0+ is the application's, measured
+  with its own records, and nothing in it points at the port.
 - **Next, in this library.** Nothing blocks on the fixture: the remaining
   RP2040-scoped release items are the declared queue/pool budgets (now
   measured for Blinky and the pilot), on-target QUTest (deferred) and the
