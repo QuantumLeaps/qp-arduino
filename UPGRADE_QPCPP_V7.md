@@ -75,6 +75,8 @@ Intentional Arduino-local deltas are:
   Manager architecture selector that includes Teensy 4.1 because Teensyduino
   installs under Arduino's `avr` namespace. The field cannot express a single
   validated board and is not a classic-AVR or all-Teensy support claim.
+  (Superseded 2026-10-01 by `architectures=rp2040`; see "Package Metadata
+  Decision — 2026-10-01".)
 - Examples and `.qm` snippets are migrated from v6 APIs to v7 APIs without
   claiming QM regeneration unless the model is actually regenerated later.
 
@@ -316,12 +318,12 @@ Toolchain pinned to the set the joystick firmware qualified on this board:
       existing Teensy example build regressions. Re-run the recorded upstream
       host baseline when framework/test-tool changes warrant it; distinguish
       those host results from RP2040 target evidence.
-- [ ] Review Arduino package architecture metadata against the selected core
-      and actual build evidence before publishing RP2040 support. The current
-      `library.properties` still says `architectures=avr` for the historical
-      Teensy packaging decision. It is unchanged by this documentation update
-      and does not advertise or establish RP2040 support. Record any later
-      metadata change as an intentional delta; do not broaden it speculatively.
+- [x] Review Arduino package architecture metadata against the selected core
+      and actual build evidence before publishing RP2040 support.
+      **Decided 2026-10-01**: `architectures=rp2040`; `library.json`
+      `platforms` narrowed to `raspberrypi`; version policy fixed. See
+      "Package Metadata Decision — 2026-10-01". `avr` returns only with
+      Teensy hardware evidence; `sam` and `*` are not used.
 
 ## RP2040 Software Build Results — 2026-09-30
 
@@ -809,14 +811,29 @@ summary).
 - **Still open before an RP2040-scoped release:** on-target QUTest
   (deferred; `qv.cpp` is always compiled, see "On-target QUTest is
   deferred"); declared queue/pool budgets and RAM/flash margins recorded
-  against them; the `library.properties` architecture selector (still
-  `avr`; the cores with build evidence are Teensy under `avr`, `rp2040`
-  and, best effort, `sam`); reconciling package metadata with the imported
-  tag; the release/support statement itself.
-- **Recommended order:** decide the architecture selector, then apply the
-  transmit-only profile to the joystick application with a declared trace
-  budget (that closes the "budgets" item with a real load), then the
-  STM32G0B1CEU6 BSP. Teensy hardware gates stay deferred.
+  against them; the release/support statement itself. The architecture
+  selector, the PlatformIO manifest and the version policy were settled on
+  2026-10-01 ("Package Metadata Decision — 2026-10-01").
+- **Recommended order (revised 2026-10-01):** first a transmit-only QS
+  profile on a PIO UART driving GP21 (`FW_TRIG1`), measured on the fixture
+  through analyzer channel 17. Reason: the `mouse-joystick-pcb` v1.0 board
+  has no spare GPIO and no second hardware UART, GP21 and GP25 are both
+  UART1 RX in the RP2040 mux, and `FW_TRIG0`/`FW_TRIG1` are the only
+  MCU-driven nets besides the pyControl pair that reach its Digital-50 port
+  (`DIG0`/`DIG1`), so this is the only way to trace while UART0 serves
+  pyControl. The same GPIO is already on the rev 0 fixture's analyzer, so the
+  measurement transfers. arduino-pico 4.2.0 `SerialPIO` supports a TX-only
+  instance (`NOPIN` RX); its `availableForWrite()` is the free space of the
+  8-entry PIO FIFO and `write()` blocks only when that FIFO is full, so the
+  existing `qsTransmitSome()` discipline holds; the ceiling of eight bytes
+  per idle pass must be measured (a DMA-fed PIO transmitter is the
+  fallback). Using `FW_TRIG1` this way is an `OBS-IF` overlay decision
+  still to be recorded: it keeps `FW_TRIG0` as the SYNC marker, runs the
+  identity beacon before the PIO UART starts, and turns the FREEWHEEL level
+  marker into a QS record. Then the joystick slice (protocol board, UART
+  wrapper and simulated motion in one active object on the fixture) with a
+  declared trace budget, then the STM32G0B1CEU6 BSP. Teensy hardware gates
+  stay deferred.
 - **Fixture state at hand-off:** `mouse-joystick-pcb` rev 0 unit
   E4654C159F2C2534 on the LA5032 adapter, 36 V unplugged, flashed with the
   standard Blinky image F (`rp2040_mouse_joystick`, hash in
@@ -825,6 +842,59 @@ summary).
   verbatim in `qp-arduino-example/evidence/bench-scripts/`; the
   `pixi run` tasks `validate-rp2040` and `stress-rp2040` are the supported
   entry points.
+
+## Package Metadata Decision — 2026-10-01
+
+Decided before any RP2040-scoped release and applied to `library.properties`,
+`src/qp-arduino/library.json`, the README and this ledger. No framework or
+port file changed.
+
+- **`architectures=rp2040`.** The port compiles only for ARM Cortex-M:
+  `qp_port.hpp` and `qv_port.cpp` select ARMv6-M or ARMv7-M on `__ARM_ARCH`
+  with no other branch, so the previous `avr` value promised classic AVR
+  boards a build that fails in inline assembly. `avr` was only ever there for
+  Teensy: the PJRC package index declares every Teensy board under
+  `"architecture": "avr"` (checked 2026-10-01; the local install is
+  `~/.arduino15/packages/teensy/hardware/avr`). `rp2040` is the arduino-pico
+  core's string (`package_rp2040_index.json` for 4.2.0, checked the same
+  day). The field is advisory: a mismatch produces the Arduino IDE's "may be
+  incompatible" warning and stops neither installation nor compilation, so
+  the retained Teensy and Due examples still build. `avr` is added back, as a
+  recorded delta meaning Teensy 4.x, only when the deferred Teensy hardware
+  gates pass. `sam` stays out (Due is best effort, not a support claim); the
+  Arduino Mbed RP2040 core (`mbed_rp2040`) has no build evidence; upstream's
+  `*` is wrong for architecture-specific code.
+- **`library.json` `platforms` is `["raspberrypi"]`** (was `*`), the name of
+  the installed PlatformIO platform that carries arduino-pico. PlatformIO's
+  default `lib_compat_mode = soft` checks frameworks only, and this repository
+  links the library by `symlink://` with `lib_ldf_mode = off`, so the `teensy`
+  and `atmelsam` environments are unaffected; see the verification below.
+  The `description` and the Arduino `paragraph` now name the imported QP/C++
+  version and the qualified core.
+- **Version policy.** The library version is a semver `MAJOR.MINOR.PATCH`.
+  `MAJOR.MINOR` equals the imported qpcpp `MAJOR.MINOR`, because the API a
+  sketch programs against is QP's. `PATCH` starts at the imported qpcpp patch
+  level and advances by one for every qp-arduino release on that line,
+  whether the change is a port fix or an upstream patch import; an upstream
+  patch import takes the next free `PATCH`, which is never below the upstream
+  patch number. The exact imported qpcpp tag is recorded in this ledger, the
+  README and the `paragraph`, and is never derived from the version number or
+  from `QP_VERSION_STR`: upstream tag `v7.3.4` ships `include/qp.hpp` with
+  `QP_VERSION 733U` and `"7.3.3"`, and that file is kept byte-identical for
+  provenance. Rejected forms: a pre-release suffix (semver orders
+  `7.3.4-x.2` below `7.3.4`, so the IDE would offer a downgrade), build
+  metadata (ignored for precedence, so no update is ever seen) and four-part
+  versions (not semver; the Library Manager indexer rejects them).
+  `library.json` carries the same number. The first v7 release is 7.3.4 and
+  the next port-only release is 7.3.5. Release tags follow upstream
+  qp-arduino: `v` plus the library version.
+- **Verification (2026-10-01):** `pixi run provenance` passed against
+  qpcpp `v7.3.4`. With the new manifests, `blinky_bsp-teensy4` (`teensy41`,
+  rebuilt from clean), `blinky_bsp-sam` (`due`) and `blinky_bsp-rp2040`
+  (`rp2040_mouse_joystick`) all build; each dependency graph lists
+  `qp-arduino @ 7.3.4`, so the narrowed `platforms` list excludes nothing
+  under the default compatibility mode. Metadata only: no firmware was
+  uploaded and no target result changes.
 
 ## Deferred Teensy 4.1 Hardware Gates — Nonblocking For RP2040
 

@@ -58,10 +58,17 @@ Each `*_bsp-*` example keeps board specifics in `bsp.cpp` so the active
 objects stay portable; the `dpp_bsp-*` and Teensy examples are generated from
 their `.qm` models.
 
-`library.properties` still says `architectures=avr`, from the earlier Teensy
-packaging decision (Teensyduino installs under Arduino's `avr` namespace).
-That selector neither advertises RP2040 nor proves support for classic AVR,
-every Teensy or any other board; its review is an open RP2040 gate.
+`library.properties` says `architectures=rp2040`, the architecture string of
+the arduino-pico core, because RP2040 is the only configuration with target
+evidence. The Teensy 4.1 examples still build; on a Teensy the Arduino IDE
+prints its "may be incompatible" warning, which is expected. `avr` will be
+added back as a recorded delta when the deferred Teensy hardware gates pass,
+and will then mean Teensy 4.x, since Teensyduino installs under Arduino's
+`avr` namespace. Classic 8-bit AVR boards are not supported: the port
+compiles only for ARM Cortex-M. The library version keeps the imported
+QP/C++ `MAJOR.MINOR` and advances the patch digit with every qp-arduino
+release; the exact qpcpp tag behind each release is recorded in
+`UPGRADE_QPCPP_V7.md` ("Package Metadata Decision — 2026-10-01").
 
 ## Arduino IDE
 
