@@ -1,9 +1,0 @@
-timestamped records: 422247
-target time span (unwrapped): 137.6 s -> 8269.0 s (8131.4 s)
-largest gaps after the first 60 s (s, at target time): 1.360 @ 3895.7, 1.390 @ 300.0, 1.450 @ 4359.4
-largest gap inside the first 60 s: 29.140 s at 137.6 s (session-start boundary)
-Trg-RST (target resets seen): 0
-=ASSERT= records: 0
-<COMMS> lines: 2
-    <COMMS> ERROR    Bad checksum in Rec=QS_QEP_STATE_EXIT(?),Seq=50
-    <COMMS> ERROR    Discontinuity Seq=50->104

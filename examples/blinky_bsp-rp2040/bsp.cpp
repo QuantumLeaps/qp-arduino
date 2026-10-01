@@ -37,8 +37,9 @@
 //       Target the mouse-joystick-pcb rev 0 qualification fixture (PCB tags
 //       v0.1/v0.2). Applies that board's safe state first, enables its
 //       InstrumentPort-40 buffers, and uses FW_TRIG0 (GP25) as the LED and
-//       FW_TRIG1 (GP21) as the tick-ISR probe, i.e. LA5032 channels 16 and 17.
-//       Without it the LED is LED_BUILTIN and there is no tick probe unless
+//       FW_TRIG1 (GP21) as the tick-ISR probe, i.e. LA5032 channels 16 and 17,
+//       unless QP_ARDUINO_TICK_PROBE_PIN moves the probe. Without it the LED
+//       is LED_BUILTIN and there is no tick probe unless
 //       QP_ARDUINO_TICK_PROBE_PIN is defined.
 //   QS_ON
 //       Emit QS trace records over QP_ARDUINO_QS_SERIAL (default Serial, the
@@ -68,6 +69,22 @@
 //       high-water mark and the number of times it was found completely full
 //       (QS then overwrites its oldest bytes, which the host sees as a
 //       sequence discontinuity), so trace loss is reported from the target.
+//   QP_ARDUINO_QS_PIO_TX_PIN (default: not defined)
+//       Send QS over a transmit-only PIO UART on this GPIO instead of a
+//       hardware serial port (arduino-pico SerialPIO with no RX pin). Any
+//       GPIO works, so a marker line that reaches the InstrumentPort can
+//       carry the trace when every hardware UART is spoken for: on the
+//       fixture, 21 puts it on FW_TRIG1 = LA5032 channel 17, the same GPIO
+//       the v1.0 joystick board routes to its Digital-50 port (DIG1). The
+//       link has no receive side; combine with QP_ARDUINO_QS_TX_ONLY=1.
+//       Mutually exclusive with QP_ARDUINO_QS_SERIAL.
+//   QP_ARDUINO_QS_BAUD (default 115200)
+//       Baud rate of a UART or PIO UART transport; USB CDC ignores it.
+//   QP_ARDUINO_TICK_PROBE_PIN
+//       GPIO pulsed by the tick callback. On the fixture it defaults to
+//       FW_TRIG1 (GP21) and must move, e.g. to GP0 (the UART0 TX pad, unused
+//       by the PIO profile, = DIG8 = channel 8), when FW_TRIG1 carries the
+//       trace.
 //
 #include "qpcpp.hpp"   // QP/C++ framework
 #include "blinky.hpp"  // Blinky application interface
@@ -81,8 +98,16 @@ using namespace QP;
 
 Q_DEFINE_THIS_FILE
 
-#ifndef QP_ARDUINO_QS_SERIAL
+#if defined(QP_ARDUINO_QS_PIO_TX_PIN)
+#if defined(QP_ARDUINO_QS_SERIAL)
+#error "QP_ARDUINO_QS_PIO_TX_PIN and QP_ARDUINO_QS_SERIAL are mutually exclusive"
+#endif
+#define QP_ARDUINO_QS_SERIAL l_qsPioSerial // transmit-only PIO UART, defined below
+#elif !defined(QP_ARDUINO_QS_SERIAL)
 #define QP_ARDUINO_QS_SERIAL Serial
+#endif
+#ifndef QP_ARDUINO_QS_BAUD
+#define QP_ARDUINO_QS_BAUD 115200U
 #endif
 #ifndef QP_ARDUINO_QS_HOST_WAIT_MS
 #define QP_ARDUINO_QS_HOST_WAIT_MS 5000U
@@ -117,7 +142,12 @@ namespace {
 // mouse-joystick-pcb rev 0. Numbers from mouse-joystick-firm/src/BoardPins.hpp
 // and mouse-joystick-pcb/docs/interface-map.md at tag v0.2.
 constexpr std::uint8_t kLedPin            = 25U; // FW_TRIG0 -> J1501 pin 26 -> TRIG0 -> LA5032 ch 16
-constexpr std::uint8_t kTickProbePin     = 21U; // FW_TRIG1 -> J1501 pin 28 -> TRIG1 -> LA5032 ch 17
+constexpr std::uint8_t kFwTrig1Pin       = 21U; // FW_TRIG1 -> J1501 pin 28 -> TRIG1 -> LA5032 ch 17
+#ifdef QP_ARDUINO_TICK_PROBE_PIN
+constexpr std::uint8_t kTickProbePin     = QP_ARDUINO_TICK_PROBE_PIN; // 0 = UART0 TX pad -> DIG8 -> ch 8
+#else
+constexpr std::uint8_t kTickProbePin     = kFwTrig1Pin;
+#endif
 constexpr std::uint8_t kInstrBufOeNPin = 24U; // ~{INSTR_BUF_OE}: low enables the port buffers
 constexpr std::uint8_t kBusSwEnNPin    = 9U;  // ~{BUS_SW_EN}: high keeps the GPIO isolation bus open
 constexpr std::uint8_t kHvEnPin          = 19U; // HV_EN: low keeps the 36 V switch off
@@ -145,7 +175,10 @@ void fixtureSafeState() {
     driveOutput(kTmcCsNPin, HIGH);
     driveOutput(kTmcDrvEnNPin, HIGH);
     driveOutput(kLedPin, LOW);
-    driveOutput(kTickProbePin, LOW);
+    driveOutput(kFwTrig1Pin, LOW);
+    if (kTickProbePin != kFwTrig1Pin) {
+        driveOutput(kTickProbePin, LOW);
+    }
 }
 
 // Make the markers visible at the analyzer. The buffers are output-only and
@@ -170,6 +203,21 @@ constexpr std::uint8_t kTickProbePin = QP_ARDUINO_TICK_PROBE_PIN;
 inline void tickProbe(PinStatus level) { digitalWrite(kTickProbePin, level); }
 #else
 inline void tickProbe(PinStatus) {}
+#endif
+
+#if defined(QP_ARDUINO_QS_PIO_TX_PIN)
+// Transmit-only PIO UART for the QS trace. SerialPIO reports the free space of
+// its 8-entry PIO FIFO through availableForWrite() and blocks in write() only
+// when that FIFO is full, which qsTransmitSome() below never lets happen, so
+// the transport discipline is the same as for a hardware port: the idle loop
+// hands over at most eight bytes per service pass.
+SerialPIO l_qsPioSerial(QP_ARDUINO_QS_PIO_TX_PIN, SerialPIO::NOPIN);
+static_assert(QP_ARDUINO_QS_PIO_TX_PIN != kLedPin,
+              "the PIO trace pin is the LED pin");
+#if BSP_HAS_TICK_PROBE
+static_assert(QP_ARDUINO_QS_PIO_TX_PIN != kTickProbePin,
+              "the PIO trace pin is the tick probe; move it with QP_ARDUINO_TICK_PROBE_PIN");
+#endif
 #endif
 
 QP::QSpyId const l_TICK_ID = { 0U }; // QS source of the tick
@@ -459,7 +507,7 @@ bool QS::onStartup(void const *arg) {
     static std::uint8_t qsRxBuf[128];  // QS receive buffer
     initBuf(qsTxBuf, sizeof(qsTxBuf));
     rxInitBuf(qsRxBuf, sizeof(qsRxBuf));
-    QP_ARDUINO_QS_SERIAL.begin(115200); // baud rate is ignored by USB CDC
+    QP_ARDUINO_QS_SERIAL.begin(QP_ARDUINO_QS_BAUD); // ignored by USB CDC
     return true;
 }
 //............................................................................

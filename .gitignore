@@ -71,12 +71,12 @@ __pycache__/
 # Local tool installs (QM/QTools downloads)
 .tools/
 
-# Raw bench evidence (analyzer captures, trace dumps) lives in
-# ../qp-arduino-example/evidence/, not in this library repository.
-docs/evidence/**/*.sr
-docs/evidence/**/*.vcd
-docs/evidence/**/*.gz
-docs/evidence/**/*.bin
-# The short bench logs the evidence READMEs cite are evidence, not build
-# output; exempt them from the upstream *.log rule above.
-!docs/evidence/**/*.log
+# Bench evidence of every kind (analyzer captures, VCDs, trace dumps, QSPY
+# logs, analysis outputs and the READMEs that explain them) lives in
+# ../qp-arduino-example/evidence/, never in this library repository, so that
+# it stays quick to clone. Keep captures and logs out of here.
+*.sr
+*.vcd
+*.bin
+*.gz
+*.tar

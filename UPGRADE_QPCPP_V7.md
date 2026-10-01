@@ -433,15 +433,14 @@ Post-merge software checks, all from the repository `.venv` (PlatformIO
 ## RP2040 Target Results — 2026-09-30
 
 First target run, performed automatically from this branch with the fixture
-and analyzer path recorded above. The evidence directories under
-`docs/evidence/` hold READMEs, analysis scripts, `result_*.json` outputs,
-summaries and short logs; the raw analyzer captures (`.sr`), exported VCDs,
-compressed trace dumps and logs over 100 KB live in the sibling repository
-`qp-arduino-example` under `evidence/<same directory name>/` so this library
-stays small to clone. (The upstream `*.log` ignore rule had kept the short
-bench logs these READMEs cite out of the first two evidence commits;
-`.gitignore` exempts `docs/evidence/**/*.log` since the stress-results
-commit, which adds them.) Blinky: `docs/evidence/2026-09-30-rp2040-blinky/`. The
+and analyzer path recorded above. All evidence of every run (READMEs,
+analysis scripts, `result_*.json` outputs, logs, raw analyzer captures,
+exported VCDs and trace dumps) lives in the sibling repository
+`qp-arduino-example` under `evidence/<run directory>/`; until 2026-10-01 the
+READMEs, scripts, results and short logs were kept here under
+`docs/evidence/` with the large files mirrored there, and on 2026-10-01 the
+whole tree moved out so this library holds no evidence files and stays small
+to clone. Blinky: `qp-arduino-example/evidence/2026-09-30-rp2040-blinky/`. The
 application under test is `examples/blinky_bsp-rp2040`, not the
 port-validation firmware, so these numbers are a Blinky baseline under the
 stated conditions and do not by themselves close the coverage gates.
@@ -583,7 +582,7 @@ Changes made after the first Blinky target run, all on this branch:
 `examples/port_validation-rp2040` on the fixture, driven by
 `tools/port_validation_rp2040.py` through QSPY's UDP front-end (no QUTest
 build), with all six QS record groups streaming over USB CDC. Evidence:
-`docs/evidence/2026-09-30-rp2040-port-validation/`.
+`qp-arduino-example/evidence/2026-09-30-rp2040-port-validation/`.
 
 - **Host-driven procedures: 8 of 8 pass** (`port_validation_results.json`):
   QS-RX round trip (`QS_RX_INFO` answered), tick rate 100.0 ticks/s from the
@@ -639,7 +638,7 @@ The single stall recorded above was reproduced deliberately and root-caused.
   reader instead). Run 1 stalled at 141 s, cycle 13: from then on every cycle
   still attached, still answered `QS_RX_INFO` and still returned the counters,
   but the tick counter stayed at 17,841
-  (`docs/evidence/2026-09-30-rp2040-port-validation/stress/stress-run1.*`).
+  (`qp-arduino-example/evidence/2026-09-30-rp2040-port-validation/stress/stress-run1.*`).
 - **Diagnosis** (`stall-diagnosis-transcript.txt`): with the target stalled,
   no `Tick<0>` records arrived in 3 s, yet three host-injected `QS_RX_TICK`
   commands each drove the complete chain (time-event post, publish, pool
@@ -666,7 +665,7 @@ The single stall recorded above was reproduced deliberately and root-caused.
   `QP_ARDUINO_QS_STAT_PERIOD_MS` with the QS fill high-water mark, buffer-full
   count and tick count).
 - **Measurements with the hardware-alarm tick and the throttled service**
-  (Blinky, 1 MSa/s, `docs/evidence/2026-09-30-rp2040-blinky/`, images F to
+  (Blinky, 1 MSa/s, `qp-arduino-example/evidence/2026-09-30-rp2040-blinky/`, images F to
   I): the typical tick ISR is 4 µs (was 2; the callback now re-arms its own
   alarm). The posting tick fell from 35 to 20 µs without QS and the tick→LED
   latency from 93–150 to 24–25 µs, so the "open" post-path cost of the
@@ -740,7 +739,7 @@ The single stall recorded above was reproduced deliberately and root-caused.
       9,999.998 µs (−0.00002 %), min 9,981, max 10,015.5, stdev 4.6 µs, no
       missed or doubled tick; and the 2 h soak capture at 100 kSa/s,
       720,001 ticks, mean 9,999.995 µs, min 9,980, max 10,020, none missed
-      or doubled; `docs/evidence/2026-09-30-rp2040-dpp/`.
+      or doubled; `qp-arduino-example/evidence/2026-09-30-rp2040-dpp/`.
 - [x] Record ISR-to-active-object dispatch p99 and maximum latency under
       documented validation load; maximum must remain below one 100 Hz tick.
       **Met 2026-09-30 under the port-validation load**: p99 121 µs,
@@ -757,7 +756,7 @@ The single stall recorded above was reproduced deliberately and root-caused.
       9,999.995 µs, min 9,980, max 10,020, none missed or doubled) and
       19,074 LED edges with at least 151 per minute. Load: five Philo and one
       Table active object, pool events, QS at about 55 records/s.
-      `docs/evidence/2026-09-30-rp2040-dpp/`.
+      `qp-arduino-example/evidence/2026-09-30-rp2040-dpp/`.
 - [ ] Demonstrate bounded application response and continued local control
       with the trace reader absent, slow or disconnected and under declared
       trace/queue pressure. **Reader absent and disconnected shown 2026-09-30**
@@ -816,7 +815,8 @@ summary).
   2026-10-01 ("Package Metadata Decision — 2026-10-01").
 - **Recommended order (revised 2026-10-01):** first a transmit-only QS
   profile on a PIO UART driving GP21 (`FW_TRIG1`), measured on the fixture
-  through analyzer channel 17. Reason: the `mouse-joystick-pcb` v1.0 board
+  through analyzer channel 17 (**done the same day**, see "PIO UART Trace On
+  FW_TRIG1 — 2026-10-01"). Reason: the `mouse-joystick-pcb` v1.0 board
   has no spare GPIO and no second hardware UART, GP21 and GP25 are both
   UART1 RX in the RP2040 mux, and `FW_TRIG0`/`FW_TRIG1` are the only
   MCU-driven nets besides the pyControl pair that reach its Digital-50 port
@@ -834,11 +834,16 @@ summary).
   wrapper and simulated motion in one active object on the fixture) with a
   declared trace budget, then the STM32G0B1CEU6 BSP. Teensy hardware gates
   stay deferred.
-- **Fixture state at hand-off:** `mouse-joystick-pcb` rev 0 unit
-  E4654C159F2C2534 on the LA5032 adapter, 36 V unplugged, flashed with the
-  standard Blinky image F (`rp2040_mouse_joystick`, hash in
-  `docs/evidence/2026-09-30-rp2040-blinky/firmware-hashes.txt`); no host
-  process attached. The bench scripts that produced the evidence are kept
+- **Evidence location (2026-10-01):** every evidence file of every run now
+  lives in `qp-arduino-example/evidence/`; this repository holds none, by
+  the user's rule that it must stay quick to clone (`AGENTS.md`,
+  "Completion Discipline"). `.gitignore` refuses `.sr`, `.vcd`, `.bin`,
+  `.gz` and `.tar` files here.
+- **Fixture state at hand-off (updated 2026-10-01):** `mouse-joystick-pcb`
+  rev 0 unit E4654C159F2C2534 on the LA5032 adapter, 36 V unplugged, flashed
+  with the standard Blinky `rp2040_mouse_joystick` built from the tree of
+  2026-10-01 (sha256 `591ef70246e0d885`, 180,224 bytes; it differs from image
+  F only by the BSP's new transport macros); no host process attached. The bench scripts that produced the evidence are kept
   verbatim in `qp-arduino-example/evidence/bench-scripts/`; the
   `pixi run` tasks `validate-rp2040` and `stress-rp2040` are the supported
   entry points.
@@ -895,6 +900,67 @@ port file changed.
   `qp-arduino @ 7.3.4`, so the narrowed `platforms` list excludes nothing
   under the default compatibility mode. Metadata only: no firmware was
   uploaded and no target result changes.
+
+## PIO UART Trace On FW_TRIG1 — 2026-10-01
+
+The transmit-only observation profile of 2026-09-30 was moved from UART0 to
+a **PIO UART driving GP21 (`FW_TRIG1`)** and measured on the fixture.
+Evidence and procedure: `qp-arduino-example/evidence/2026-10-01-rp2040-trig1-trace/`
+(README, analysis, decodes, captures); bench script
+`qp-arduino-example/evidence/bench-scripts/trig1_run.sh`.
+
+- **Why.** The `mouse-joystick-pcb` v1.0 board has no spare GPIO, one
+  hardware UART (UART0 is pyControl), GP21 and GP25 are both UART1 RX in the
+  RP2040 mux, and `FW_TRIG0`/`FW_TRIG1` are its only MCU-driven nets besides
+  the pyControl pair that reach the Digital-50 port (`DIG0`/`DIG1`). A trace
+  the analyzer can see while pyControl owns UART0 therefore has to leave on a
+  marker line, which only a PIO state machine can drive as a UART. The rev 0
+  fixture exposes the same GPIO on channel 17.
+- **Change (Blinky only).** `examples/blinky_bsp-rp2040/bsp.cpp` gains
+  `QP_ARDUINO_QS_PIO_TX_PIN` (an arduino-pico `SerialPIO` with `NOPIN` RX
+  becomes `QP_ARDUINO_QS_SERIAL`), `QP_ARDUINO_QS_BAUD` (default 115200) and
+  honours `QP_ARDUINO_TICK_PROBE_PIN` on the fixture, whose safe state now
+  drives `FW_TRIG1` low explicitly. The edit was made in the model
+  (`blinky_bsp-rp2040.qm`) and `qmc` regenerates the identical file. New
+  environment `rp2040_mouse_joystick_trig1`: PIO trace on GP21, tick probe on
+  GP0 (the unused UART0 TX pad, `DIG8`, channel 8), otherwise the `txonly`
+  settings. `SerialPIO::availableForWrite()` is the free space of the joined
+  8-entry PIO FIFO and `write()` blocks only when it is full, so
+  `qsTransmitSome()` keeps its never-block discipline; the hardware
+  `SerialUART::availableForWrite()` reports 1 or 0, so the UART0 profiles
+  moved one byte per idle pass. The `rp2040_mouse_joystick`, `_txonly` and
+  `_trig1` Blinky builds pass; the DPP and port-validation BSPs do not carry
+  the option yet.
+- **Results (trig1 image sha256 `7a05ce783d3b7d15`, 1 MSa/s, CH8/CH16/CH17).**
+  30 s: 6,702 trace bytes decoded by the analyzer, 60 transitions, 30
+  `TRACE_STAT` records with high-water 90–91 of 2,048 bytes and zero
+  buffer-full events, dictionaries at 10, 20 and 30 s, no checksum error.
+  600 s: 134,042 bytes, 1,200 transitions, 600 `TRACE_STAT` records
+  (high-water 90–95 bytes, zero buffer-full), dictionaries 60 times, no
+  `TICK_LOST`, no decode error; 60,000 tick periods mean 9999.99 µs,
+  stdev 0.81, min 9977, max 10021, 0 missed, 0 doubled, histogram
+  −20: 22, −10: 95, 0: 59,768, +10: 91, +20: 24 (no second lobe); ISR width
+  p99 12 / max 17 µs; tick→LED latency min 47, p50 53, p99 73, max 75 µs
+  over 1,200 edges; LED interval within ±26 µs of 500 ms. Against the UART0
+  transmit-only run of 2026-09-30 the tick is identical and the latency is
+  20–25 µs higher at every percentile (28/30/62/67 µs there), consistent with
+  the idle pass pushing up to eight bytes through the driver's mutex-protected
+  byte writes instead of one; not root-caused, and under one percent of a
+  tick.
+- **What it does not establish.** Blinky's load only (about 220 bytes/s plus
+  1.1 kB of dictionaries every 10 s); no higher baud rate; nothing about the
+  v1.0 board's Digital-50 buffers, biases or the v2.0 analyzer adapter. The
+  "declared queue/pool budgets" item stays open: Blinky's 95-byte high-water
+  is a measurement, not the joystick application's budget.
+- **Decision owed elsewhere.** Carrying the trace on `FW_TRIG1` is an
+  `OBS-IF` overlay decision for the joystick board: `FW_TRIG0` stays the SYNC
+  marker, the identity beacon must run before the PIO UART starts, and the
+  FREEWHEEL level marker becomes a trace record. This branch records the
+  transport, not that contract.
+- **Next.** The joystick slice as a qp-arduino example on the fixture
+  (`ProtocolBoard`, `PycUart` and `SimulatedMotion` inside one active object,
+  36 V unplugged) on this transport, with a declared trace budget; then the
+  STM32G0B1CEU6 BSP.
 
 ## Deferred Teensy 4.1 Hardware Gates — Nonblocking For RP2040
 

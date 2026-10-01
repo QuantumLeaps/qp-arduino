@@ -26,6 +26,7 @@ alone powers the MCU domain.
 | LED / `FW_TRIG0` | GP25 | pin 26, `TRIG0` | ch 16 | toggles every 500 ms |
 | tick probe / `FW_TRIG1` | GP21 | pin 28, `TRIG1` | ch 17 | short pulse every 10 ms (100 Hz tick callback) |
 | QS trace | USB CDC | — | — | QSPY at 115200 |
+| QS trace, `trig1` profile | GP21 (`FW_TRIG1`, PIO UART) | pin 28, `TRIG1` | ch 17 | 115200 8N1, transmit only; the tick probe then moves to GP0 (`PYC_UART_TX` pad, `DIG8`, ch 8) |
 
 An assertion shows as the LED held on for two seconds with the tick probe
 silent, followed by a watchdog reset.
@@ -39,6 +40,9 @@ PlatformIO environments in `platformio.ini`:
 - `rp2040_mouse_joystick_fastflash`: quad-lane boot2 matched to the fixture's flash
 - `rp2040_mouse_joystick_uart`: QS on UART0 (GP0/GP1), no host wait
 - `rp2040_mouse_joystick_txonly`: transmit-only observation profile on UART0
+- `rp2040_mouse_joystick_trig1`: the same profile on a transmit-only PIO UART
+  driving `FW_TRIG1` (GP21), the trace path a board with no free hardware UART
+  has to its instrument port; tick probe on GP0
 
 Build flags used by the BSP:
 
@@ -107,4 +111,4 @@ sigrok-cli --driver kingst-la2016 --config samplerate=1m --samples 6000000 \
 ```
 
 Measured results for this example are in
-`docs/evidence/2026-09-30-rp2040-blinky/`.
+`qp-arduino-example/evidence/2026-09-30-rp2040-blinky/`.

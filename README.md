@@ -239,8 +239,9 @@ under a simple
   deltas, fixture and toolchain record, qualification gates and results.
 - [`docs/observability-plan.md`](docs/observability-plan.md): the trace and
   observability work that uses this port.
-- [`docs/evidence/`](docs/evidence): raw captures, trace logs and analysis for
-  the recorded target runs.
+- Bench evidence (captures, trace logs, analysis and the README of each
+  target run) lives in the sibling repository `qp-arduino-example` under
+  `evidence/`, so this repository stays quick to clone.
 - Each example directory has a `README.md`.
 - Upstream: <https://QuantumLeaps.github.io/qp-arduino/>,
   [QP/C++ documentation](https://www.state-machine.com/qpcpp),
