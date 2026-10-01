@@ -1037,10 +1037,23 @@ the board was energised.
 - **Fixture state.** Standard Blinky `rp2040_mouse_joystick` from the fixed
   tree (sha256 `822164b9c019bff1`) is flashed; 36 V unplugged; no host
   attached.
-- **Next.** Decide with `OBS-IF` the `FW_TRIG1` trace overlay for the v1.0
-  board; then either the STM32G0B1CEU6 BSP or, if the joystick firmware
-  adopts this structure, its real `TmcMotion` backend behind the same AO on
-  the delivery board with UART0 as the protocol port.
+- **Carried into the firmware the same day.** The user chose the firmware
+  over the STM32G0B1CEU6 and Teensy work. `mouse-joystick-firm/examples/
+  PyControlLinkQp` is the pilot's structure with the firmware's real
+  `TmcMotion` behind the active object, UART0 as the pyControl port, the
+  boot signature and identity beacon before the trace claims `FW_TRIG1`, and
+  `SafeState` under `Q_onError`; a simulated-motion USB bench build of it
+  ran the pilot's full sequence on the fixture and the delivery build booted
+  into the safe state with the trace alive (evidence
+  `qp-arduino-example/evidence/2026-10-01-rp2040-joystick-firm-qp/`). The
+  firmware's own plan now owns what remains there: `TmcMotion` with the rail
+  up, the UART0 path with a pyControl host, the v1.0 pin map, the `OBS-IF`
+  marker overlay. STM32G0B1CEU6 and Teensy hardware gates are deferred by
+  the user's decision of 2026-10-01, not by any finding.
+- **Next, in this library.** Nothing blocks on the fixture: the remaining
+  RP2040-scoped release items are the declared queue/pool budgets (now
+  measured for Blinky and the pilot), on-target QUTest (deferred) and the
+  release statement.
 
 ## Deferred Teensy 4.1 Hardware Gates — Nonblocking For RP2040
 
