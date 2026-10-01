@@ -832,18 +832,19 @@ summary).
   identity beacon before the PIO UART starts, and turns the FREEWHEEL level
   marker into a QS record. Then the joystick slice (protocol board, UART
   wrapper and simulated motion in one active object on the fixture) with a
-  declared trace budget, then the STM32G0B1CEU6 BSP. Teensy hardware gates
-  stay deferred.
+  declared trace budget (**done the same day**, see "Joystick Link Pilot
+  And Two BSP Defects — 2026-10-01"), then the STM32G0B1CEU6 BSP. Teensy
+  hardware gates stay deferred.
 - **Evidence location (2026-10-01):** every evidence file of every run now
   lives in `qp-arduino-example/evidence/`; this repository holds none, by
   the user's rule that it must stay quick to clone (`AGENTS.md`,
   "Completion Discipline"). `.gitignore` refuses `.sr`, `.vcd`, `.bin`,
   `.gz` and `.tar` files here.
-- **Fixture state at hand-off (updated 2026-10-01):** `mouse-joystick-pcb`
-  rev 0 unit E4654C159F2C2534 on the LA5032 adapter, 36 V unplugged, flashed
-  with the standard Blinky `rp2040_mouse_joystick` built from the tree of
-  2026-10-01 (sha256 `591ef70246e0d885`, 180,224 bytes; it differs from image
-  F only by the BSP's new transport macros); no host process attached. The bench scripts that produced the evidence are kept
+- **Fixture state at hand-off (updated 2026-10-01, evening):**
+  `mouse-joystick-pcb` rev 0 unit E4654C159F2C2534 on the LA5032 adapter,
+  36 V unplugged, flashed with the standard Blinky `rp2040_mouse_joystick`
+  built from the tree with the drain and flush fixes (sha256
+  `822164b9c019bff1`, 180,224 bytes); no host process attached. The bench scripts that produced the evidence are kept
   verbatim in `qp-arduino-example/evidence/bench-scripts/`; the
   `pixi run` tasks `validate-rp2040` and `stress-rp2040` are the supported
   entry points.
@@ -961,6 +962,85 @@ Evidence and procedure: `qp-arduino-example/evidence/2026-10-01-rp2040-trig1-tra
   (`ProtocolBoard`, `PycUart` and `SimulatedMotion` inside one active object,
   36 V unplugged) on this transport, with a declared trace budget; then the
   STM32G0B1CEU6 BSP.
+
+## Joystick Link Pilot And Two BSP Defects — 2026-10-01
+
+The trace pilot of `docs/observability-plan.md` (`OBS-QP-3`/`OBS-QP-4`) ran
+on the fixture the same afternoon as the first application-shaped load on
+this port: the joystick firmware's protocol state machine (`ProtocolBoard`)
+and its simulated motion backend, unchanged and compiled straight from
+`mouse-joystick-firm/src` (commit 2f243d4), inside one active object, with
+the protocol over USB CDC from a host script and the QS trace on the PIO UART
+at GP21. It lives in `qp-arduino-example/rp2040/joystick_link_bsp-rp2040/`
+(this library holds no application code); evidence, procedure and the
+per-pass analysis are in
+`qp-arduino-example/evidence/2026-10-01-rp2040-joystick-link/`. Nothing on
+the board was energised.
+
+- **Result.** Every declared budget was met on the observation trace set
+  (user records, transitions, entry/exit, assertions; the per-event
+  dispatch/post/get records off): 971 protocol lines dispatched and 1,174
+  replies and events sent over 20 s with no line or reply dropped; QS
+  high-water 505 of 2,048 bytes and zero buffer-full; event queue minimum
+  free 15 of 16, line pool minimum free 6 of 8; tick exact with no lost
+  tick; the host-loss fault 108 ms after the last heartbeat; 200 simulated
+  18° moves completing in 102–104 ms (100 ms simulated plus one tick) with
+  the operation marker on `FW_TRIG0` matching every `OP_START`/`OP_DONE`
+  pair; host round trip p50 2.3 ms for a heartbeat and 3.7 ms for a command,
+  p99 under 6 ms. Per dispatched line the protocol code itself costs
+  0.4–2 ms on this Cortex-M0+ (reply formatting with `double`), the USB CDC
+  write 0.2–1 ms, and QP's records a few microseconds; the full record set
+  saturates 115200 baud at a 100 Hz tick exactly as declared (599
+  buffer-full seconds, 35 % of lines lost from the trace) while the
+  application runs unaffected.
+- **Defect 1, example BSPs: the trace drain raced interrupt-written
+  records.** `qsTransmitSome()`/`qsFlushBounded()` called `QS::getBlock()`
+  with interrupts enabled. Every upstream Cortex-M BSP calls it under
+  `QF_INT_DISABLE()`, because it changes the ring buffer's shared state and
+  interrupts write records too. With the full record set (the tick's
+  `AO-Post` comes from the interrupt) the pilot corrupted records and reset
+  within seconds on two passes; the observation set, which writes nothing
+  from interrupts, never showed it, and neither did yesterday's Blinky and
+  DPP runs, whose default filters do include `AO-Post`, in two hours of soak
+  (a narrow window, not a safe one). Fixed in all three RP2040 BSPs
+  (`qsTakeBlock()`), models regenerated identically by `qmc`; the pilot's
+  full set then ran its whole sequence twice without a reset.
+- **Defect 2, example BSPs: periodic dictionary re-emission stalled the
+  idle loop.** Every QS dictionary function ends with `QS::onFlush()`, which
+  this BSP implements as a bounded synchronous drain; at 115200 baud the
+  10 s re-emission therefore held the idle loop, and with it every active
+  object, for about 30 ms (late completions and 60 ms heartbeat gaps every
+  10 s in the first pass). Fixed by suppressing the flush during the
+  re-emission so the copies drain through the normal idle-loop service
+  (Blinky BSP and model, pilot BSP). Yesterday's transmit-only measurements
+  were taken with this stall present; it does not touch the tick or the
+  decoded trace and only could have added an LED-latency outlier that did
+  not occur in those samples.
+- **Found and avoided, library (upstream).** `QActive::getQueueMin()` is
+  declared in `qp.hpp` at `v7.3.4` but defined nowhere in `src/`, so
+  `QF::getQueueMin()` is a link error; the pilot reads its queue's
+  `getNMin()` through the AO instead. Also: a QF query with its own critical
+  section (`QF::getPoolMin()`) must not be called inside `QS_BEGIN`/`QS_END`,
+  since this port's critical sections do not nest; the first pilot attempt
+  asserted there on every boot.
+- **Observations for the joystick decision.** The trace answers "did the
+  real protocol code do what it should" with request identity: arrival
+  (`LINK_RX` seq/verb), state change, simulated start and completion with a
+  marker edge the analyzer sees, reply hand-over, host-loss fault; the
+  non-QP delivery firmware would need an equivalent record set and transport
+  to offer the same. Cost on the board is dominated by `ProtocolBoard`'s own
+  work and the USB CDC port, not by QP. The tick jitter rises from ±20 µs
+  (Blinky) to ±180 µs with USB CDC traffic because the USB interrupt shares
+  the alarm interrupt's priority; raising the tick alarm's priority is a BSP
+  refinement for later. The hardware UART the real board uses for pyControl
+  would replace the CDC cost.
+- **Fixture state.** Standard Blinky `rp2040_mouse_joystick` from the fixed
+  tree (sha256 `822164b9c019bff1`) is flashed; 36 V unplugged; no host
+  attached.
+- **Next.** Decide with `OBS-IF` the `FW_TRIG1` trace overlay for the v1.0
+  board; then either the STM32G0B1CEU6 BSP or, if the joystick firmware
+  adopts this structure, its real `TmcMotion` backend behind the same AO on
+  the delivery board with UART0 as the protocol port.
 
 ## Deferred Teensy 4.1 Hardware Gates — Nonblocking For RP2040
 

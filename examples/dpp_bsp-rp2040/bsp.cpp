@@ -225,11 +225,24 @@ bool qsServiceDue() {
     return true;
 }
 
+// QS::getBlock() changes the ring buffer's shared state and must run with
+// interrupts disabled, as every upstream Cortex-M BSP does: a record written
+// from an interrupt (the tick's AO-Post with the full record set) otherwise
+// races with the drain. Found 2026-10-01 on the joystick-link pilot as corrupt
+// records and resets; the profiles that emit nothing from interrupts never
+// showed it.
+std::uint8_t const *qsTakeBlock(std::uint16_t *len) {
+    QF_INT_DISABLE();
+    std::uint8_t const * const buf = QS::getBlock(len);
+    QF_INT_ENABLE();
+    return buf;
+}
+
 void qsTransmitSome() {
     int const room = QP_ARDUINO_QS_SERIAL.availableForWrite();
     if (room > 0) {
         std::uint16_t len = (room > 0xFFFF) ? 0xFFFFU : static_cast<std::uint16_t>(room);
-        std::uint8_t const * const buf = QS::getBlock(&len);
+        std::uint8_t const * const buf = qsTakeBlock(&len);
         if (buf != nullptr) {
             static_cast<void>(QP_ARDUINO_QS_SERIAL.write(buf, len)); // fits by construction
         }
@@ -244,7 +257,7 @@ void qsFlushBounded(std::uint32_t timeout_us) {
         int const room = QP_ARDUINO_QS_SERIAL.availableForWrite();
         if (room > 0) {
             std::uint16_t len = (room > 0xFFFF) ? 0xFFFFU : static_cast<std::uint16_t>(room);
-            std::uint8_t const * const buf = QS::getBlock(&len);
+            std::uint8_t const * const buf = qsTakeBlock(&len);
             if (buf == nullptr) {
                 return; // nothing left
             }

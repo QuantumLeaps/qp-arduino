@@ -475,9 +475,9 @@ public:
   </file>
   <!--${.::bsp.cpp}-->
   <file name="bsp.cpp">
-   <text>#include &quot;qpcpp.hpp&quot;   // QP/C++ framework
-#include &quot;dpp.hpp&quot;     // DPP application
-#include &quot;bsp.hpp&quot;     // Board Support Package
+   <text>#include "qpcpp.hpp"   // QP/C++ framework
+#include "dpp.hpp"     // DPP application
+#include "bsp.hpp"     // Board Support Package
 
 #include &lt;pico/time.h&gt;          // time_us_64(), from_us_since_boot()
 #include &lt;hardware/timer.h&gt;     // hardware_alarm_*()
@@ -503,7 +503,7 @@ public:
 //       USB CDC discards everything written before a host opens the port, so
 //       the BSP waits up to this long for a host (DTR) before starting QS.
 //
-// QS commands (QSPY/QUTest &quot;command&quot; or QView): 1 publish PAUSE_SIG,
+// QS commands (QSPY/QUTest "command" or QView): 1 publish PAUSE_SIG,
 // 2 publish SERVE_SIG, 3 publish TEST_SIG, 4 provoke an assertion.
 
 using namespace QP;
@@ -636,7 +636,7 @@ void startTick() {
 void tickWatchdog() { // idle loop: if the alarm ever stops, report it and re-arm
     // Read the tick's timestamp BEFORE the clock: the tick interrupt can land
     // between the two reads, and reading the clock first would then see a
-    // &quot;last tick&quot; from the future and wrap to a huge elapsed time. That race
+    // "last tick" from the future and wrap to a huge elapsed time. That race
     // produced 20,098 spurious re-arms in the first hour-long run.
     std::uint32_t const last = l_lastTick_us;
     std::int32_t const elapsed = static_cast&lt;std::int32_t&gt;(micros() - last);
@@ -672,11 +672,24 @@ bool qsServiceDue() {
     return true;
 }
 
+// QS::getBlock() changes the ring buffer's shared state and must run with
+// interrupts disabled, as every upstream Cortex-M BSP does: a record written
+// from an interrupt (the tick's AO-Post with the full record set) otherwise
+// races with the drain. Found 2026-10-01 on the joystick-link pilot as corrupt
+// records and resets; the profiles that emit nothing from interrupts never
+// showed it.
+std::uint8_t const *qsTakeBlock(std::uint16_t *len) {
+    QF_INT_DISABLE();
+    std::uint8_t const * const buf = QS::getBlock(len);
+    QF_INT_ENABLE();
+    return buf;
+}
+
 void qsTransmitSome() {
     int const room = QP_ARDUINO_QS_SERIAL.availableForWrite();
     if (room &gt; 0) {
         std::uint16_t len = (room &gt; 0xFFFF) ? 0xFFFFU : static_cast&lt;std::uint16_t&gt;(room);
-        std::uint8_t const * const buf = QS::getBlock(&amp;len);
+        std::uint8_t const * const buf = qsTakeBlock(&amp;len);
         if (buf != nullptr) {
             static_cast&lt;void&gt;(QP_ARDUINO_QS_SERIAL.write(buf, len)); // fits by construction
         }
@@ -691,7 +704,7 @@ void qsFlushBounded(std::uint32_t timeout_us) {
         int const room = QP_ARDUINO_QS_SERIAL.availableForWrite();
         if (room &gt; 0) {
             std::uint16_t len = (room &gt; 0xFFFF) ? 0xFFFFU : static_cast&lt;std::uint16_t&gt;(room);
-            std::uint8_t const * const buf = QS::getBlock(&amp;len);
+            std::uint8_t const * const buf = qsTakeBlock(&amp;len);
             if (buf == nullptr) {
                 return; // nothing left
             }
@@ -781,7 +794,7 @@ void BSP::randomSeed(std::uint32_t const seed) {
 }
 //............................................................................
 std::uint32_t BSP::random() { // a very cheap pseudo-random-number generator
-    // &quot;Super-Duper&quot; Linear Congruential Generator (LCG)
+    // "Super-Duper" Linear Congruential Generator (LCG)
     // LCG(2^32, 3*7*11*13*23, 0, seed)
     std::uint32_t const rnd = l_rnd * (3U*7U*11U*13U*23U);
     l_rnd = rnd; // set for the next time
@@ -831,14 +844,14 @@ void QV::onIdle() { // called with interrupts DISABLED
 #endif
 }
 //............................................................................
-extern &quot;C&quot; Q_NORETURN Q_onError(char const * const module, int const id) {
+extern "C" Q_NORETURN Q_onError(char const * const module, int const id) {
 #ifdef QS_ON
     QS_ASSERTION(module, id, 0U); // bounded flush inside QS::onFlush()
 #else
     Q_UNUSED_PAR(module);
     Q_UNUSED_PAR(id);
 #endif
-    __asm volatile (&quot;cpsid i&quot; ::: &quot;memory&quot;);
+    __asm volatile ("cpsid i" ::: "memory");
 
     // Analyzer signature: LED solid on for two seconds, tick probe silent,
     // then a watchdog reset so the fixture recovers on its own.

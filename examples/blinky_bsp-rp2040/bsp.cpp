@@ -300,6 +300,7 @@ void tickWatchdog() { // idle loop: if the alarm ever stops, report it and re-ar
 void (*l_dictionaryHook)() = nullptr;
 std::uint32_t l_qsHighWater = 0U;   // max QS bytes pending since the last TRACE_STAT
 std::uint32_t l_qsSaturations = 0U; // times the QS buffer was found completely full
+bool l_qsNoFlush = false;           // set while re-emitting dictionaries from the idle loop
 
 // True when the transport should be touched on this idle pass. Every call
 // into the USB CDC port runs TinyUSB's task, which inflated the tick and
@@ -321,11 +322,24 @@ bool qsServiceDue() {
     return true;
 }
 
+// QS::getBlock() changes the ring buffer's shared state and must run with
+// interrupts disabled, as every upstream Cortex-M BSP does: a record written
+// from an interrupt (the tick's AO-Post with the full record set) otherwise
+// races with the drain. Found 2026-10-01 on the joystick-link pilot as corrupt
+// records and resets; the profiles that emit nothing from interrupts never
+// showed it.
+std::uint8_t const *qsTakeBlock(std::uint16_t *len) {
+    QF_INT_DISABLE();
+    std::uint8_t const * const buf = QS::getBlock(len);
+    QF_INT_ENABLE();
+    return buf;
+}
+
 void qsTransmitSome() {
     int const room = QP_ARDUINO_QS_SERIAL.availableForWrite();
     if (room > 0) {
         std::uint16_t len = (room > 0xFFFF) ? 0xFFFFU : static_cast<std::uint16_t>(room);
-        std::uint8_t const * const buf = QS::getBlock(&len);
+        std::uint8_t const * const buf = qsTakeBlock(&len);
         if (buf != nullptr) {
             static_cast<void>(QP_ARDUINO_QS_SERIAL.write(buf, len)); // fits by construction
         }
@@ -340,7 +354,7 @@ void qsFlushBounded(std::uint32_t timeout_us) {
         int const room = QP_ARDUINO_QS_SERIAL.availableForWrite();
         if (room > 0) {
             std::uint16_t len = (room > 0xFFFF) ? 0xFFFFU : static_cast<std::uint16_t>(room);
-            std::uint8_t const * const buf = QS::getBlock(&len);
+            std::uint8_t const * const buf = qsTakeBlock(&len);
             if (buf == nullptr) {
                 return; // nothing left
             }
@@ -365,10 +379,17 @@ void qsPeriodic() {
     static std::uint32_t lastDict_ms = 0U;
     if ((millis() - lastDict_ms) >= QP_ARDUINO_QS_DICT_PERIOD_MS) {
         lastDict_ms = millis();
+        // Every QS dictionary function ends with QS::onFlush(), which drains
+        // the buffer synchronously: at 115200 baud that held the idle loop,
+        // and every active object with it, for about 30 ms per period (found
+        // 2026-10-01 on the joystick-link pilot as late completions every
+        // 10 s). Let the periodic copies drain through the normal service.
+        l_qsNoFlush = true;
         bspDictionaries();
         if (l_dictionaryHook != nullptr) {
             l_dictionaryHook();
         }
+        l_qsNoFlush = false;
     }
 #endif
 #if (QP_ARDUINO_QS_STAT_PERIOD_MS > 0U)
@@ -519,7 +540,9 @@ QSTimeCtr QS::onGetTime() {
 }
 //............................................................................
 void QS::onFlush() {
-    qsFlushBounded(200000U); // wait at most 200 ms for the transport
+    if (!l_qsNoFlush) {
+        qsFlushBounded(200000U); // wait at most 200 ms for the transport
+    }
 }
 //............................................................................
 void QS::onReset() {
