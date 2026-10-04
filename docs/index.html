@@ -1,31 +1,99 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
- "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>qp-arduino Documentation</title>
-    <link rel="stylesheet" href="css/simple.css" />
-  </head>
-  <body>
-    <div id="content" class="content">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>qp-arduino documentation</title>
+<style>
+  :root { --fg: #1d1d1f; --muted: #555; --bg: #fff; --line: #ddd; --link: #0b57d0; --accent: #f4f6f9; }
+  @media (prefers-color-scheme: dark) { :root { --fg: #e8e8e8; --muted: #b0b0b0; --bg: #121212; --line: #333; --link: #8ab4f8; --accent: #1c1f24; } }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 56rem; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+  header { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  header img { height: 48px; width: auto; }
+  h1 { font-size: 1.6rem; margin: 0; }
+  h2 { font-size: 1.25rem; margin: 2rem 0 .5rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  p.lead { color: var(--muted); margin-top: .25rem; }
+  table { border-collapse: collapse; width: 100%; margin: .5rem 0 1rem; }
+  th, td { text-align: left; vertical-align: top; padding: .5rem .6rem; border-bottom: 1px solid var(--line); }
+  th { background: var(--accent); font-weight: 600; }
+  td:first-child { white-space: nowrap; }
+  a { color: var(--link); }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92em; background: var(--accent); padding: .05rem .3rem; border-radius: 3px; }
+  pre { background: var(--accent); padding: .75rem; border-radius: 4px; overflow-x: auto; }
+  pre code { background: none; padding: 0; }
+  .note { color: var(--muted); font-size: .95em; }
+  footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .9em; }
+</style>
+</head>
+<body>
+<main>
+<header>
+  <a href="https://github.com/QuantumLeaps/qp-arduino"><img src="img/logo_qp-arduino.png" alt="qp-arduino"></a>
+  <div>
+    <h1>qp-arduino documentation</h1>
+    <p class="lead">The manuals that match each release of the library.</p>
+  </div>
+</header>
 
-      <div id="outline-container-org69628b3" class="outline-2">
-        <h2 id="org69628b3">qp-arduino Documentation</h2>
-        <div class="outline-text-2" id="text-org69628b3">
+<p>qp-arduino packages one specific version of the <a href="https://www.state-machine.com/qpcpp">QP/C++</a>
+real-time embedded framework for Arduino boards. The QP/C++ API, the <a href="https://www.state-machine.com/qm">QM</a>
+modeling tool and the <a href="https://www.state-machine.com/qtools">QTools</a> host tools all change between
+QP versions, and the upstream sites document only the newest one. This page keeps the manuals that match
+each qp-arduino release, so a sketch written against the library can be checked against the right text.</p>
 
-          <div id="org8f783d4" class="figure">
-            <p><a href="https://www.state-machine.com/" align="center"><img src="img/logo_ql_400.png" align="center" /></a>
-            </p>
-          </div>
+<h2 id="7-3-4">qp-arduino 7.3.4</h2>
+<p class="lead">Released 2026-10-04. QP/C++ 7.3.4 with the QV kernel and QS tracing; qualified on RP2040 with the arduino-pico core.</p>
+<table>
+  <tr><th>Component</th><th>Version</th><th>Manual</th></tr>
+  <tr><td>QP/C++ framework</td><td>7.3.4</td>
+      <td><a href="qpcpp-7.3.4/index.html">QP/C++ 7.3.4 reference manual</a><br>
+          <span class="note">the offline manual shipped in the <a href="https://github.com/QuantumLeaps/qpcpp/releases/tag/v7.3.4">qpcpp 7.3.4 release</a></span></td></tr>
+  <tr><td>QM modeling tool</td><td>6.1.1</td>
+      <td><a href="qm-6.1.1/index.html">QM 6.1.1 manual</a><br>
+          <span class="note">the manual bundled with the <a href="https://github.com/QuantumLeaps/qm/releases/tag/v6.1.1">QM 6.1.1 release</a>; QM 6.1.1 generates QP/C++ 7.3 code</span></td></tr>
+  <tr><td>QTools (QSPY, QUTest, QView)</td><td>7.3.4</td>
+      <td><a href="qtools-7.4.1/index.html">QTools 7.4.1 manual</a><br>
+          <span class="note">QTools 7.3.4 published no manual, so this is the nearest one, from the
+          <a href="https://github.com/QuantumLeaps/qtools/releases/tag/v7.4.1">QTools 7.4.1 release</a>; the
+          <a href="https://web.archive.org/web/20240520005513/https://www.state-machine.com/qtools/index.html">upstream QTools pages as archived in May 2024</a>
+          describe the 7.3 tools as they were</span></td></tr>
+  <tr><td>qp-arduino itself</td><td>7.3.4</td>
+      <td><a href="https://github.com/QuantumLeaps/qp-arduino/blob/v7.3.4/README.md">README</a> ·
+          <a href="https://github.com/QuantumLeaps/qp-arduino/blob/v7.3.4/CHANGELOG.md">changelog</a> ·
+          <a href="https://github.com/QuantumLeaps/qp-arduino/blob/v7.3.4/docs/port-notes.md">how the port works and what a BSP must do</a> ·
+          <a href="https://github.com/QuantumLeaps/qp-arduino/blob/v7.3.4/docs/migration-6-to-7.md">migrating from 6.9.x</a> ·
+          <a href="https://github.com/QuantumLeaps/qp-arduino/blob/v7.3.4/docs/provenance.md">provenance of the framework files</a></td></tr>
+</table>
+<p>Install it from the Arduino Library Manager (search for <code>qp-arduino</code>), or in PlatformIO:</p>
+<pre><code>lib_deps =
+    https://github.com/QuantumLeaps/qp-arduino.git#v7.3.4</code></pre>
 
-          <p><a href="./qpcpp/index.html">qpcpp documentation v6.9.3</a></p>
-          <p><a href="./qm/index.html">qm documentation v5.2.3</a></p>
-          <p><a href="./qtools/index.html">qtools documentation v6.9.3</a></p>
+<h2 id="6-9-6">qp-arduino 6.9.6</h2>
+<p class="lead">The previous release line, built from QP/C++ 6.9.3. Its API differs from 7.x; see the
+<a href="https://github.com/QuantumLeaps/qp-arduino/blob/v7.3.4/docs/migration-6-to-7.md">migration notes</a>.</p>
+<table>
+  <tr><th>Component</th><th>Version</th><th>Manual</th></tr>
+  <tr><td>QP/C++ framework</td><td>6.9.3</td><td><a href="qpcpp-6.9.3/index.html">QP/C++ 6.9.3 reference manual</a></td></tr>
+  <tr><td>QM modeling tool</td><td>5.2.3</td><td><a href="qm-5.2.3/index.html">QM 5.2.3 manual</a></td></tr>
+  <tr><td>QTools</td><td>6.9.3</td><td><a href="qtools-6.9.3/index.html">QTools 6.9.3 manual</a></td></tr>
+  <tr><td>qp-arduino itself</td><td>6.9.6</td><td><a href="https://github.com/QuantumLeaps/qp-arduino/blob/v6.9.6/README.md">README</a></td></tr>
+</table>
 
-        </div>
-      </div>
-    </div>
-  </body>
+<h2 id="upstream">Upstream, newest versions</h2>
+<p>These document the current QP release, which is newer than the version qp-arduino packages:
+<a href="https://www.state-machine.com/qpcpp">QP/C++</a> ·
+<a href="https://www.state-machine.com/qpcpp/history.html">QP/C++ revision history</a> ·
+<a href="https://www.state-machine.com/qm">QM</a> ·
+<a href="https://www.state-machine.com/qtools">QTools</a> ·
+<a href="https://sourceforge.net/p/qpc/discussion/668726">QP support forum</a>.</p>
+
+<footer>
+<p>The manuals hosted here are Quantum Leaps' documentation, redistributed unchanged from the release packages named
+above. The QP/C++ framework for Arduino is licensed under the GPLv3 with the QP-Arduino Exception; see
+<a href="LICENSE">LICENSE</a> and the <a href="https://www.state-machine.com/licensing">Quantum Leaps licensing page</a>.
+Site source: the <a href="https://github.com/QuantumLeaps/qp-arduino/tree/docs/docs">docs branch</a> of the repository.</p>
+</footer>
+</main>
+</body>
 </html>

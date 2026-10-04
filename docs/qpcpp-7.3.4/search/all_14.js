@@ -1,0 +1,7 @@
+var searchData=
+[
+  ['kernel_0',['Kernel',['../srs_qv.html',1,'Non-Preemptive Kernel'],['../arm-cm_qv.html',1,'Non-preemptive QV Kernel'],['../arm-cm_qxk.html',1,'Preemptive &quot;Dual-Mode&quot; QXK Kernel'],['../srs_qxk.html',1,'Preemptive Dual-Mode Kernel'],['../srs_qk.html',1,'Preemptive Non-Blocking Kernel'],['../arm-cm_qk.html',1,'Preemptive Non-Blocking QK Kernel'],['../api.html#api_qk',1,'QK (Preemptive Run-to-Completion Kernel)'],['../srs_qk.html#srs_qk-def',1,'QK Preemptive Non-Blocking Kernel'],['../api.html#api_qv',1,'QV (Non-preemptive Kernel)'],['../srs_qv.html#srs_qv-def',1,'QV Non-Preemptive Kernel'],['../api.html#api_qxk',1,'QXK (Preemptive Dual-Mode Run-to-Completion/Blocking RTOS Kernel)'],['../srs_qxk.html#srs_qxk-def',1,'QXK Dual-Mode Kernel'],['../srs_qk.html#srs_qk-stack',1,'Single-Stack Kernel']]],
+  ['kernel_20initialization_20and_20control_1',['Kernel Initialization and Control',['../api.html#api_qv_init',1,'Kernel Initialization and Control'],['../api.html#api_qk_ctrl',1,'Kernel Initialization and Control'],['../api.html#api_qxk_ctrl',1,'Kernel Initialization and Control']]],
+  ['kernels_2',['Kernels',['../index.html#over_kernels',1,'Built-in Kernels'],['../ports_native.html',1,'Native Ports (Built-in Kernels)']]],
+  ['kit_3',['Kit',['../cert.html#cert_doc',1,'Documents Comprising the QP/C++ Certification Kit'],['../cert.html',1,'QP/C++ Certification Kit']]]
+];

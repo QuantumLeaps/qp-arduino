@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['machine_20example_0',['Hierarchical State Machine Example',['../qutest_qhsm.html',1,'qutest_tut']]],
+  ['macos_1',['Installing QTools&amp;trade; on POSIX (Linux/MacOS)',['../gs.html#install_posix',1,'']]],
+  ['macos_20hosts_2',['Linux/macOS Hosts',['../qutest_use.html#qutest_exa_posiz',1,'']]],
+  ['macros_2eh_3',['macros.h',['../macros_8h.html',1,'']]],
+  ['main_4',['main',['../classqview_1_1_q_view.html#a1c6526769baefa544c34a5b26dac5d60',1,'qview.QView.main()'],['../namespaceqview.html#a0b0b4971fef26583e857dfe76ade0e5f',1,'qview.main()']]],
+  ['main_2edox_5',['main.dox',['../main_8dox.html',1,'']]],
+  ['make_20executable_20for_20windows_6',['The GNU make executable for Windows',['../index.html#qtools_make',1,'']]],
+  ['matlab_20output_20to_20a_20file_20in_20qspy_20qspy_5fmatlab_5fout_7',['MATLAB Output to a File in QSPY (QSPY_MATLAB_OUT)',['../qspy_udp.html#udp_MATLAB_OUT',1,'']]],
+  ['matlab_20support_8',['QSPY MATLAB Support',['../qspy_matlab.html',1,'qspy']]],
+  ['matrix_9',['Matrix',['../qspy_matlab.html#MATLAB_Q_ACTIVE',1,'Q_ACTIVE Matrix'],['../qspy_matlab.html#MATLAB_Q_EQUEUE',1,'Q_EQUEUE Matrix'],['../qspy_matlab.html#MATLAB_Q_INT',1,'Q_INT Matrix'],['../qspy_matlab.html#MATLAB_Q_ISR',1,'Q_ISR Matrix'],['../qspy_matlab.html#MATLAB_Q_MPOOL',1,'Q_MPOOL Matrix'],['../qspy_matlab.html#MATLAB_Q_MUTEX',1,'Q_MUTEX Matrix'],['../qspy_matlab.html#MATLAB_Q_NEW',1,'Q_NEW Matrix'],['../qspy_matlab.html#MATLAB_Q_PUB',1,'Q_PUB Matrix'],['../qspy_matlab.html#MATLAB_Q_SCHED',1,'Q_SCHED Matrix'],['../qspy_matlab.html#MATLAB_Q_STATE',1,'Q_STATE Matrix'],['../qspy_matlab.html#MATLAB_Q_TIME',1,'Q_TIME Matrix']]],
+  ['max_5fobj_10',['MAX_OBJ',['../qpc__qs_8h.html#aaef5125efa7f283e18175d5e736f28c0',1,'qpc_qs.h']]],
+  ['memory_20peek_11',['Peek Target Memory (PEEK)',['../qspy_udp.html#udp_PEEK',1,'']]],
+  ['memory_20poke_12',['Poke Target Memory (POKE)',['../qspy_udp.html#udp_POKE',1,'']]],
+  ['menu_13',['Menu',['../qview_ui.html#qview_commands',1,'Commands Menu'],['../qview_ui.html#qview_curr',1,'Current-Obj Menu'],['../qview_ui.html#qview_custom',1,'Custom Menu'],['../qview_cust.html#qview_cust_menu',1,'Custom Menu'],['../qview_ui.html#qview_events',1,'Events Menu'],['../qview_ui.html#qview_file',1,'File Menu'],['../qview_ui.html#qview_glob',1,'Global Filters Menu'],['../qview_ui.html#qview_help',1,'Help Menu'],['../qview_ui.html#qview_loc',1,'Local Filters Menu'],['../qview_ui.html#qview_view',1,'View Menu']]],
+  ['message_14',['message',['../classqview_1_1_q_view_1_1___message_dialog.html#a253c95b375bd3803912dd2e170139f13',1,'qview::QView::_MessageDialog']]],
+  ['messages_20in_20qspy_15',['Displaying Tag Messages in QSPY',['../qview_ui.html#qview_tag',1,'']]],
+  ['mingw_20c_20and_20c_20compilers_20for_20windows_16',['The MinGW C and C++ compilers for Windows',['../index.html#qtools_mingw',1,'']]],
+  ['mock_20example_17',['Unity Mock Example',['../qutest_mock.html',1,'qutest_tut']]],
+  ['mock_20replacement_18',['Spy Object (Mock Replacement)',['../qutest_mock.html#qutest_mock-spy',1,'']]],
+  ['mode_19',['Mode',['../qcalc.html#qcalc_batch',1,'Batch Mode'],['../qutest_use.html#qutest_inter',1,'Interactive Mode'],['../qcalc.html#qcalc_interact',1,'Interactive Mode']]],
+  ['mode_20toggle_20',['Dark Mode Toggle',['../help.html#help_dark_mode',1,'']]],
+  ['monitoring_21',['QView&amp;trade; Visualization &amp;amp; Monitoring',['../qview.html',1,'']]],
+  ['more_20involved_20example_22',['More Involved Example',['../qspy_seq.html#qspy_seq_exa',1,'']]],
+  ['mp_5fobj_23',['MP_OBJ',['../qpc__qs_8h.html#af790ae1a8fbb442f8ec743d6c5926384',1,'qpc_qs.h']]]
+];
