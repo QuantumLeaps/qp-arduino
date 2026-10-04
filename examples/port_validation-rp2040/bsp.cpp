@@ -13,6 +13,14 @@ using namespace QP;
 
 Q_DEFINE_THIS_FILE
 
+// QS tracing is compiled in unless the build defines QP_ARDUINO_QS_OFF. The
+// Arduino IDE has no build flags, so the traced build has to be the default;
+// PlatformIO's pico_noqs environment defines QP_ARDUINO_QS_OFF for the
+// untraced baseline.
+#if !defined(QS_ON) && !defined(QP_ARDUINO_QS_OFF)
+#define QS_ON 1
+#endif
+
 #ifndef QP_ARDUINO_QS_SERIAL
 #define QP_ARDUINO_QS_SERIAL Serial
 #endif

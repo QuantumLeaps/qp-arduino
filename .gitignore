@@ -79,3 +79,6 @@ __pycache__/
 *.bin
 *.gz
 *.tar
+
+# QM session files, written next to a model when it is opened in QM
+examples/*/.*

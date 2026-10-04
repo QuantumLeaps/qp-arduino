@@ -30,8 +30,9 @@ name. Setting it lower is not supported by this package.
 
 ## Tracing
 
-`Q_SPY` is always compiled in, as in 6.9.x. A sketch enables tracing with
-`QS_ON`, and every BSP provides `QS::onStartup()`, `QS::onCleanup()`,
+`Q_SPY` is always compiled in, as in 6.9.x. The examples trace by default
+(the RP2040 BSPs define `QS_ON` unless `QP_ARDUINO_QS_OFF` is set, the Teensy
+and SAM BSPs define it outright), and every BSP provides `QS::onStartup()`, `QS::onCleanup()`,
 `QS::onFlush()`, `QS::onGetTime()` and `QS::onCommand()`. Note that this
 port's critical sections do not nest: do not call a QF query that takes its
 own critical section inside `QS_BEGIN`/`QS_END`.

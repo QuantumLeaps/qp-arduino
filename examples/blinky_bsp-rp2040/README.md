@@ -39,12 +39,15 @@ Build flags read by the BSP:
 
 - `QP_ARDUINO_LED_PIN` (default `LED_BUILTIN`): the GPIO the active object
   toggles. Set it for a board whose core defines no `LED_BUILTIN` or whose LED
-  is somewhere else.
+  is somewhere else. On a Pico W, `LED_BUILTIN` is driven through the wireless
+  chip, which pulls the CYW43 driver into the build (about 330 kB of flash) and
+  has not been tested with this port; point the flag at a plain GPIO instead.
 - `QP_ARDUINO_TICK_PROBE_PIN` (default: none): a GPIO pulsed by the tick
   callback, for a logic analyzer or oscilloscope. The pulse width is the
   callback's duration and the pulse period is the tick.
-- `QS_ON`: QS output on `QP_ARDUINO_QS_SERIAL` (default `Serial`, the USB CDC
-  port). `-DQP_ARDUINO_QS_SERIAL=Serial1` moves it to UART0 on GP0/GP1.
+- `QP_ARDUINO_QS_OFF`: compile the trace out. Tracing is on by default, with
+  QS output on `QP_ARDUINO_QS_SERIAL` (default `Serial`, the USB CDC port);
+  `-DQP_ARDUINO_QS_SERIAL=Serial1` moves it to UART0 on GP0/GP1.
 - `QP_ARDUINO_QS_HOST_WAIT_MS` (default 5000): how long the BSP waits for a USB
   CDC host before starting QS, so a QSPY started right after flashing receives
   the dictionaries; USB CDC discards output written before a host opens the
@@ -96,9 +99,8 @@ Or with any PlatformIO installation:
 python tools/pio_task.py upload --example examples/blinky_bsp-rp2040 --env pico --port /dev/ttyACM0
 ```
 
-In the Arduino IDE, open the example from *File | Examples*, select a board of
-the arduino-pico core, and add `QS_ON` to the build (for example through a
-`build_opt.h` file next to the sketch); without it the BSP runs untraced.
+In the Arduino IDE, open the example from *File | Examples* and select a board
+of the arduino-pico core; tracing is on by default, so nothing else is needed.
 
 Upload uses `picotool` after the 1200 baud touch; a board not running firmware
 that honours the touch must be put into BOOTSEL by hand. Start QSPY within

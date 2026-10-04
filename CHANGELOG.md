@@ -6,7 +6,7 @@ line, whether the change is a port fix or an upstream patch import. The exact
 upstream tag behind each release is named here, never derived from the
 version number. Release tags are `v` plus the library version.
 
-## 7.3.4 — release candidate
+## 7.3.4 — 2026-10-04
 
 The QP/C++ v7 line of qp-arduino, built from upstream qpcpp tag `v7.3.4`
 (`10441f7a03fa956b9e4772a073a05a96487983e2`). The previous indexed release,
@@ -25,7 +25,9 @@ The QP/C++ v7 line of qp-arduino, built from upstream qpcpp tag `v7.3.4`
 - Only the QV cooperative kernel is included. QK, QXK and the QUTest runtime
   are not part of the Arduino library build.
 - `Q_SPY` is always compiled in, as before; every BSP provides the QS
-  callbacks and a sketch enables tracing with `QS_ON`.
+  callbacks. Tracing is on by default in every example, because the Arduino
+  IDE offers no build flags; the RP2040 BSPs compile it out when
+  `QP_ARDUINO_QS_OFF` is defined.
 - The upstream `v7.3.4` tag ships generated headers that still say
   `QP_VERSION_STR "7.3.3"` and `QP_VERSION 733U`; they are kept unchanged.
 
@@ -54,9 +56,9 @@ analyzer on the tick and LED pins and QSPY on USB CDC:
   dictionaries and a `TRACE_STAT` record that reports trace loss from the
   target.
 
-Sizes at the release candidate, built for the Raspberry Pi Pico (PlatformIO
-figures; the Pico has 2 MiB of flash and 256 KiB of RAM): Blinky 77,808 B
-flash / 12,024 B RAM; DPP 81,060 / 12,588; port validation 78,952 / 14,372.
+Sizes at release, built for the Raspberry Pi Pico (PlatformIO
+figures; the Pico has 2 MiB of flash and 256 KiB of RAM): Blinky 77,584 B
+flash / 12,024 B RAM; DPP 80,324 / 12,588; port validation 78,952 / 14,372.
 An application-shaped load on the same port, a line protocol inside one
 active object with a 1 kHz tick, ran at about 125 kB of flash and 35 kB of
 RAM.
@@ -80,7 +82,7 @@ RAM.
 - Teensy 4.1 examples (`blinky_bsp-teensy4`, `dpp_bsp-teensy4`,
   `port_validation-teensy4`) are retained as a build regression set on the
   pinned Teensy platform 5.1.0; the SAM examples build for the Due as best
-  effort. `QS_ON` is enabled in every BSP example.
+  effort. Tracing is enabled in every BSP example.
 
 ### Tooling
 

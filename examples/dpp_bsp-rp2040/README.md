@@ -35,7 +35,7 @@ BSP waits that long for a USB host before it starts QS
 ## Configuration
 
 The same build flags as `blinky_bsp-rp2040`: `QP_ARDUINO_LED_PIN`,
-`QP_ARDUINO_TICK_PROBE_PIN`, `QS_ON`, `QP_ARDUINO_QS_SERIAL`,
+`QP_ARDUINO_TICK_PROBE_PIN`, `QP_ARDUINO_QS_OFF`, `QP_ARDUINO_QS_SERIAL`,
 `QP_ARDUINO_QS_HOST_WAIT_MS`, `QP_ARDUINO_QS_SERVICE_BYTES`,
 `QP_ARDUINO_QS_SERVICE_US`. The `pico` environment is the default; `pico_uart`
 moves the trace to UART0.

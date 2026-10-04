@@ -17,7 +17,7 @@ cooperative QV kernel and QP/Spy software tracing built in. Framework author:
 | QM version | 6.1.1 |
 | QTools version | 7.3.4 |
 | Qualified configuration | RP2040 with the Earle Philhower arduino-pico core 4.2.0 |
-| Status | 7.3.4 release candidate; tag not cut |
+| Status | released 2026-10-04, tag `v7.3.4` |
 
 7.3.4 is the QP/C++ v7 line of qp-arduino. It uses the strict v7 API
 (`QP_API_VERSION 9999`), keeps the imported framework files byte-identical to
@@ -70,7 +70,7 @@ framework with the QV kernel (`#include <qpcpp.hpp>`).
 | `blinky_bsp-rp2040` | RP2040, Raspberry Pi Pico by default | one active object and a time event; the QS transport profiles |
 | `dpp_bsp-rp2040` | RP2040 | Dining Philosophers: six active objects, publish/subscribe, event pool, QView scripts |
 | `port_validation-rp2040` | RP2040 | host-driven load generator and probes used to qualify the port; a template for checking a new board or core version |
-| `blinky_bsp-teensy4`, `dpp_bsp-teensy4`, `port_validation-teensy4` | Teensy 4.1 | retained regression set |
+| `blinky_bsp-teensy4`, `dpp_bsp-teensy4`, `port_validation-teensy4` | Teensy 4.1 | retained regression set; they need the TimerOne library |
 | `blinky-sam`, `blinky2-sam`, `blinky_bsp-sam`, `dpp_bsp-sam` | Arduino Due | best effort |
 
 Each `*_bsp-*` example keeps board specifics in `bsp.cpp` so the active
@@ -93,8 +93,9 @@ Set *Use external editor* in the IDE preferences so the IDE reloads code that
 QM regenerates.
 
 > **NOTE:** The Arduino port always compiles with `Q_SPY`, so every BSP must
-> provide the QS callbacks. The examples enable the trace with `QS_ON`; the
+> provide the QS callbacks. Tracing is on by default in every example; the
 > output is binary and is read with QSPY from QTools, not a serial monitor.
+> The RP2040 BSPs compile it out when `QP_ARDUINO_QS_OFF` is defined.
 
 ## PlatformIO via Pixi (recommended)
 
@@ -255,8 +256,7 @@ under a simple
   to the upstream qpcpp tag, the documented Arduino deltas, and the check that
   verifies them.
 - Each example directory has a `README.md`.
-- Upstream: <https://QuantumLeaps.github.io/qp-arduino/>,
-  [QP/C++ documentation](https://www.state-machine.com/qpcpp),
+- Upstream: [QP/C++ documentation](https://www.state-machine.com/qpcpp),
   [QTools](https://www.state-machine.com/qtools).
 
 # How to Get Help?

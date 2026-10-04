@@ -151,7 +151,7 @@ QSPY on USB CDC, between 2026-09-30 and 2026-10-01.
 | the same, host detached | max 66 µs |
 | assertion-free soak, DPP | 2 h 15 min, 420,595 records, no assertion, no reset |
 | transmit-only profile, Blinky, 600 s on a PIO UART | 134,042 bytes decoded offline, no checksum error, QS high-water 95 of 2,048 bytes |
-| flash / RAM, Blinky, DPP, port validation, built for the Pico | 77,808 / 12,024 B; 81,060 / 12,588 B; 78,952 / 14,372 B |
+| flash / RAM, Blinky, DPP, port validation, built for the Pico | 77,584 / 12,024 B; 80,324 / 12,588 B; 78,952 / 14,372 B |
 
 An application-shaped load on this port, a line protocol inside one active
 object with a 1 kHz tick, met the budgets it declared beforehand (QS

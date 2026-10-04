@@ -46,7 +46,7 @@
 //   QP_ARDUINO_TICK_PROBE_PIN (default: not defined)
 //       Optional GPIO held high during the tick callback, for a logic
 //       analyzer or oscilloscope.
-//   QS_ON
+//   QS_ON (defined by default; QP_ARDUINO_QS_OFF=1 compiles the trace out)
 //       Emit QS trace records over QP_ARDUINO_QS_SERIAL (default Serial, the
 //       USB CDC port; Serial1 is UART0 on GP0/GP1). QSPY:
 //       qspy -c /dev/ttyACM0 -b 115200
@@ -60,6 +60,14 @@
 using namespace QP;
 
 Q_DEFINE_THIS_FILE
+
+// QS tracing is compiled in unless the build defines QP_ARDUINO_QS_OFF. The
+// Arduino IDE has no build flags, so the traced build has to be the default;
+// PlatformIO's pico_noqs environment defines QP_ARDUINO_QS_OFF for the
+// untraced baseline.
+#if !defined(QS_ON) && !defined(QP_ARDUINO_QS_OFF)
+#define QS_ON 1
+#endif
 
 #ifndef QP_ARDUINO_QS_SERIAL
 #define QP_ARDUINO_QS_SERIAL Serial
