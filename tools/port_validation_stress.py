@@ -59,7 +59,7 @@ def slow_read(port: str, seconds: float, bytes_per_read: int, interval_s: float)
 
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--port", required=True, help="/dev/serial/by-id/... path of the fixture")
+    ap.add_argument("--port", required=True, help="/dev/serial/by-id/... path of the board")
     ap.add_argument("--qspy", default=".tools/quantum-leaps/qtools-7.3.4/bin/qspy")
     ap.add_argument("--udp-port", type=int, default=7701)
     ap.add_argument("--duration", type=float, default=3600.0, help="seconds to run")

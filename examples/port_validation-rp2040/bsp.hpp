@@ -7,7 +7,7 @@ class BSP {
 public:
     enum { TICKS_PER_SEC = 100 };
 
-    // role of the second analyzer probe (GP25 on the fixture), QS command 5
+    // role of the second analyzer probe (the LED pin), QS command 5
     enum Role : std::uint8_t {
         ROLE_MARKER = 0U,   // marker pulses: entry of `running`, QS command 3
         ROLE_DISPATCH = 1U, // high while the Validator dispatches an event (default)

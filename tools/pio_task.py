@@ -17,8 +17,8 @@ Why this exists:
 
 Typical use::
 
-    python tools/pio_task.py build  --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick
-    python tools/pio_task.py upload --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick --port /dev/ttyACM0
+    python tools/pio_task.py build  --example examples/blinky_bsp-rp2040 --env pico
+    python tools/pio_task.py upload --example examples/blinky_bsp-rp2040 --env pico --port /dev/ttyACM0
     python tools/pio_task.py monitor --port /dev/ttyACM0
 
 Extra arguments after the known options are passed through to ``pio``.

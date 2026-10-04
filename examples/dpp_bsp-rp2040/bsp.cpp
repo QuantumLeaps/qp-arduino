@@ -41,17 +41,15 @@
 //
 // Compile-time configuration (build_flags in platformio.ini):
 //
-//   QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB=1
-//       Target the mouse-joystick-pcb rev 0 qualification fixture (PCB tags
-//       v0.1/v0.2). Applies that board's safe state first, enables its
-//       InstrumentPort-40 buffers, and uses FW_TRIG0 (GP25) as the LED and
-//       FW_TRIG1 (GP21) as the tick-ISR probe, i.e. LA5032 channels 16 and 17.
-//       Without it the LED is LED_BUILTIN and there is no tick probe unless
-//       QP_ARDUINO_TICK_PROBE_PIN is defined.
+//   QP_ARDUINO_LED_PIN (default LED_BUILTIN, GP25 on a Raspberry Pi Pico)
+//       The GPIO that shows whether the last reported philosopher is eating.
+//   QP_ARDUINO_TICK_PROBE_PIN (default: not defined)
+//       Optional GPIO held high during the tick callback, for a logic
+//       analyzer or oscilloscope.
 //   QS_ON
 //       Emit QS trace records over QP_ARDUINO_QS_SERIAL (default Serial, the
-//       USB CDC port; Serial1 is UART0 on GP0/GP1, which the fixture exposes
-//       on LA5032 channels 8/7). QSPY: qspy -c /dev/ttyACM0 -b 115200
+//       USB CDC port; Serial1 is UART0 on GP0/GP1). QSPY:
+//       qspy -c /dev/ttyACM0 -b 115200
 //   QP_ARDUINO_QS_HOST_WAIT_MS (default 5000)
 //       USB CDC discards everything written before a host opens the port, so
 //       the BSP waits up to this long for a host (DTR) before starting QS.
@@ -86,52 +84,16 @@ namespace {
 
 //----------------------------------------------------------------------------
 // Pins
-#if defined(QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB) && (QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB != 0)
-
-// mouse-joystick-pcb rev 0. Numbers from mouse-joystick-firm/src/BoardPins.hpp.
-constexpr std::uint8_t kLedPin          = 25U; // FW_TRIG0 -> J1501 pin 26 -> TRIG0 -> LA5032 ch 16
-constexpr std::uint8_t kTickProbePin    = 21U; // FW_TRIG1 -> J1501 pin 28 -> TRIG1 -> LA5032 ch 17
-constexpr std::uint8_t kInstrBufOeNPin  = 24U; // ~{INSTR_BUF_OE}: low enables the port buffers
-constexpr std::uint8_t kBusSwEnNPin     = 9U;  // ~{BUS_SW_EN}: high keeps the GPIO isolation bus open
-constexpr std::uint8_t kHvEnPin         = 19U; // HV_EN: low keeps the 36 V switch off
-constexpr std::uint8_t kHvDiagEnPin     = 14U; // HV_DIAG_EN: must idle low
-constexpr std::uint8_t kTmcCsNPin       = 2U;  // ~{TMC_CS}: high = driver deselected
-constexpr std::uint8_t kTmcDrvEnNPin    = 3U;  // ~{TMC_DRV_EN}: high = driver outputs disabled
-#define BSP_HAS_TICK_PROBE 1
-
-void driveOutput(std::uint8_t pin, PinStatus level) {
-    digitalWrite(pin, level);
-    pinMode(pin, OUTPUT);
-}
-
-// The board's safe state, mirrored from the joystick firmware's SafeState:
-// 36 V switch off, GPIO isolation bus open, driver deselected and disabled,
-// markers low. Nothing in this example ever leaves this state.
-void fixtureSafeState() {
-    driveOutput(kBusSwEnNPin, HIGH);
-    driveOutput(kHvEnPin, LOW);
-    driveOutput(kHvDiagEnPin, LOW);
-    driveOutput(kInstrBufOeNPin, HIGH);
-    driveOutput(kTmcCsNPin, HIGH);
-    driveOutput(kTmcDrvEnNPin, HIGH);
-    driveOutput(kLedPin, LOW);
-    driveOutput(kTickProbePin, LOW);
-}
-
-void fixtureEnableInstrumentPort() {
-    digitalWrite(kInstrBufOeNPin, LOW);
-}
-
-#else // generic RP2040 board (e.g. a Pico)
-
-constexpr std::uint8_t kLedPin = LED_BUILTIN;
+#ifdef QP_ARDUINO_LED_PIN
+constexpr std::uint8_t kLedPin = QP_ARDUINO_LED_PIN;
+#else
+constexpr std::uint8_t kLedPin = LED_BUILTIN; // GP25 on a Raspberry Pi Pico
+#endif
 #ifdef QP_ARDUINO_TICK_PROBE_PIN
 constexpr std::uint8_t kTickProbePin = QP_ARDUINO_TICK_PROBE_PIN;
 #define BSP_HAS_TICK_PROBE 1
 #else
 #define BSP_HAS_TICK_PROBE 0
-#endif
-
 #endif
 
 #if BSP_HAS_TICK_PROBE
@@ -228,7 +190,7 @@ bool qsServiceDue() {
 // QS::getBlock() changes the ring buffer's shared state and must run with
 // interrupts disabled, as every upstream Cortex-M BSP does: a record written
 // from an interrupt (the tick's AO-Post with the full record set) otherwise
-// races with the drain. Found 2026-10-01 on the joystick-link pilot as corrupt
+// races with the drain. Found 2026-10-01 under an application-shaped load as corrupt
 // records and resets; the profiles that emit nothing from interrupts never
 // showed it.
 std::uint8_t const *qsTakeBlock(std::uint16_t *len) {
@@ -277,16 +239,11 @@ std::uint32_t l_rnd; // random seed
 //----------------------------------------------------------------------------
 // BSP functions
 void BSP::init() {
-#if defined(QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB) && (QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB != 0)
-    fixtureSafeState();
-    fixtureEnableInstrumentPort();
-#else
     pinMode(kLedPin, OUTPUT);
     digitalWrite(kLedPin, LOW);
 #if BSP_HAS_TICK_PROBE
     pinMode(kTickProbePin, OUTPUT);
     digitalWrite(kTickProbePin, LOW);
-#endif
 #endif
 
     BSP::randomSeed(1234U); // seed the pseudo-random number generator
@@ -314,7 +271,7 @@ void BSP::init() {
 }
 //............................................................................
 void BSP::displayPhilStat(std::uint8_t const n, char const *stat) {
-    // the LED (FW_TRIG0 on the fixture) shows whether the reported
+    // the LED shows whether the reported
     // philosopher is eating, so an analyzer sees the eat/think rhythm
     digitalWrite(kLedPin, (stat[0] == 'e') ? HIGH : LOW);
 
@@ -407,7 +364,7 @@ extern "C" Q_NORETURN Q_onError(char const * const module, int const id) {
     __asm volatile ("cpsid i" ::: "memory");
 
     // Analyzer signature: LED solid on for two seconds, tick probe silent,
-    // then a watchdog reset so the fixture recovers on its own.
+    // then a watchdog reset so a board with no reset button recovers on its own.
     digitalWrite(kLedPin, HIGH);
     std::uint32_t const start = micros();
     while ((micros() - start) < 2000000U) {

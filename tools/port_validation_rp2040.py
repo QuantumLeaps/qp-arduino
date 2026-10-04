@@ -5,7 +5,7 @@ Drives the target through QSPY's UDP front-end (the same protocol QUTest and
 QView use) and checks the QS records that come back. It needs no QUTest build
 on the target: the real QV kernel, tick and transport are what is under test.
 
-Usage (fixture on /dev/ttyACM0, qspy built by tools/quantum_leaps_tools.py):
+Usage (board on /dev/ttyACM0, qspy built by tools/quantum_leaps_tools.py):
 
     python tools/port_validation_rp2040.py --port /dev/ttyACM0 \
         --qspy .tools/quantum-leaps/qtools-7.3.4/bin/qspy --out results.json

@@ -16,7 +16,7 @@ What it checks, in this order:
    blank line;
 4. ``qv_port.cpp`` differs from upstream only by ``#ifndef`` guards around the
    ``SCB_CPACR``/``FPU_FPCCR`` register aliases plus that same EOF cleanup;
-5. the Arduino-local port settings that ``UPGRADE_QPCPP_V7.md`` documents are
+5. the Arduino-local port settings that ``docs/provenance.md`` documents are
    still present.
 
 Exit codes: 0 pass, 1 mismatch, 2 upstream tag not found.

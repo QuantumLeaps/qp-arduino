@@ -41,36 +41,36 @@ description = "Check the imported framework files against qpcpp tag v7.3.4 in ..
 cmd = "python tools/check_upstream_provenance.py"
 
 # Generic tasks: positional arguments, e.g.
-#   pixi run build examples/dpp_bsp-rp2040 rp2040_mouse_joystick
-#   pixi run upload examples/dpp_bsp-rp2040 rp2040_mouse_joystick /dev/ttyACM0
+#   pixi run build examples/dpp_bsp-rp2040 pico
+#   pixi run upload examples/dpp_bsp-rp2040 pico /dev/ttyACM0
 [tasks.build]
 description = "Compile one example for one PlatformIO environment."
 args = [
-  { arg = "example", default = "examples/dpp_bsp-teensy4" },
-  { arg = "env", default = "teensy41" },
+  { arg = "example", default = "examples/blinky_bsp-rp2040" },
+  { arg = "env", default = "pico" },
 ]
 cmd = "python tools/pio_task.py build --example {{ example }} --env {{ env }}"
 
 [tasks.rebuild]
 description = "Clean, then compile one example."
 args = [
-  { arg = "example", default = "examples/dpp_bsp-teensy4" },
-  { arg = "env", default = "teensy41" },
+  { arg = "example", default = "examples/blinky_bsp-rp2040" },
+  { arg = "env", default = "pico" },
 ]
 cmd = "python tools/pio_task.py rebuild --example {{ example }} --env {{ env }}"
 
 [tasks.clean]
 args = [
-  { arg = "example", default = "examples/dpp_bsp-teensy4" },
-  { arg = "env", default = "teensy41" },
+  { arg = "example", default = "examples/blinky_bsp-rp2040" },
+  { arg = "env", default = "pico" },
 ]
 cmd = "python tools/pio_task.py clean --example {{ example }} --env {{ env }}"
 
 [tasks.upload]
 description = "Compile and upload one example. RP2040: board in BOOTSEL, or running firmware that honours the 1200 baud touch."
 args = [
-  { arg = "example", default = "examples/dpp_bsp-teensy4" },
-  { arg = "env", default = "teensy41" },
+  { arg = "example", default = "examples/blinky_bsp-rp2040" },
+  { arg = "env", default = "pico" },
   { arg = "port", default = "/dev/ttyACM0" },
 ]
 cmd = "python tools/pio_task.py upload --example {{ example }} --env {{ env }} --port {{ port }}"
@@ -105,12 +105,12 @@ cmd = "python tools/pio_task.py build --example examples/port_validation-teensy4
 args = [{ arg = "port", default = "/dev/ttyACM0" }]
 cmd = "python tools/pio_task.py upload --example examples/port_validation-teensy4 --env teensy41 --port {{ port }}"
 
-# RP2040 qualification fixture: mouse-joystick-pcb rev 0 (see UPGRADE_QPCPP_V7.md)
+# RP2040 (Raspberry Pi Pico by default; see platformio.ini for the other envs)
 [tasks.build-blinky-bsp-rp2040]
-cmd = "python tools/pio_task.py build --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick"
+cmd = "python tools/pio_task.py build --example examples/blinky_bsp-rp2040 --env pico"
 [tasks.upload-blinky-bsp-rp2040]
 args = [{ arg = "port", default = "/dev/ttyACM0" }]
-cmd = "python tools/pio_task.py upload --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick --port {{ port }}"
+cmd = "python tools/pio_task.py upload --example examples/blinky_bsp-rp2040 --env pico --port {{ port }}"
 
 # Arduino Due / ATSAM3X8E (retained SAM examples, best effort, not a support claim)
 [tasks.build-blinky-sam]
@@ -143,19 +143,19 @@ description = "Build the Teensy 4.1 examples (retained regression set)."
 depends-on = ["build-blinky-bsp-teensy4", "build-dpp-bsp-teensy4", "build-port-validation-teensy4"]
 
 [tasks.build-dpp-bsp-rp2040]
-cmd = "python tools/pio_task.py build --example examples/dpp_bsp-rp2040 --env rp2040_mouse_joystick"
+cmd = "python tools/pio_task.py build --example examples/dpp_bsp-rp2040 --env pico"
 [tasks.upload-dpp-bsp-rp2040]
 args = [{ arg = "port", default = "/dev/ttyACM0" }]
-cmd = "python tools/pio_task.py upload --example examples/dpp_bsp-rp2040 --env rp2040_mouse_joystick --port {{ port }}"
+cmd = "python tools/pio_task.py upload --example examples/dpp_bsp-rp2040 --env pico --port {{ port }}"
 
 [tasks.build-port-validation-rp2040]
-cmd = "python tools/pio_task.py build --example examples/port_validation-rp2040 --env rp2040_mouse_joystick"
+cmd = "python tools/pio_task.py build --example examples/port_validation-rp2040 --env pico"
 [tasks.upload-port-validation-rp2040]
 args = [{ arg = "port", default = "/dev/ttyACM0" }]
-cmd = "python tools/pio_task.py upload --example examples/port_validation-rp2040 --env rp2040_mouse_joystick --port {{ port }}"
+cmd = "python tools/pio_task.py upload --example examples/port_validation-rp2040 --env pico --port {{ port }}"
 
 [tasks.validate-rp2040]
-description = "Run the host-driven port-validation procedures against the fixture (needs port_validation-rp2040 flashed)."
+description = "Run the host-driven port-validation procedures against a board running port_validation-rp2040."
 args = [{ arg = "port", default = "/dev/ttyACM0" }]
 cmd = "python tools/port_validation_rp2040.py --port {{ port }} --qspy .tools/quantum-leaps/qtools-7.3.4/bin/qspy --out .tools/port_validation_results.json"
 

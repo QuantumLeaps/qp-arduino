@@ -33,18 +33,17 @@
 //
 // Compile-time configuration (build_flags in platformio.ini):
 //
-//   QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB=1
-//       Target the mouse-joystick-pcb rev 0 qualification fixture (PCB tags
-//       v0.1/v0.2). Applies that board's safe state first, enables its
-//       InstrumentPort-40 buffers, and uses FW_TRIG0 (GP25) as the LED and
-//       FW_TRIG1 (GP21) as the tick-ISR probe, i.e. LA5032 channels 16 and 17,
-//       unless QP_ARDUINO_TICK_PROBE_PIN moves the probe. Without it the LED
-//       is LED_BUILTIN and there is no tick probe unless
-//       QP_ARDUINO_TICK_PROBE_PIN is defined.
+//   QP_ARDUINO_LED_PIN (default LED_BUILTIN, GP25 on a Raspberry Pi Pico)
+//       The GPIO the Blinky active object toggles. Set it for a board whose
+//       core defines no LED_BUILTIN or whose LED is somewhere else.
+//   QP_ARDUINO_TICK_PROBE_PIN (default: not defined)
+//       Optional GPIO pulsed by the tick callback for a logic analyzer or
+//       oscilloscope: the pulse is the callback's duration and the pulse
+//       period is the tick. Must differ from the LED and trace pins.
 //   QS_ON
 //       Emit QS trace records over QP_ARDUINO_QS_SERIAL (default Serial, the
-//       USB CDC port; Serial1 is UART0 on GP0/GP1, which the fixture exposes
-//       on LA5032 channels 8/7). QSPY: qspy -c /dev/ttyACM0 -b 115200
+//       USB CDC port; Serial1 is UART0 on GP0/GP1). QSPY:
+//       qspy -c /dev/ttyACM0 -b 115200
 //   QP_ARDUINO_QS_HOST_WAIT_MS (default 5000)
 //       USB CDC discards everything written before a host opens the port, so
 //       the QS dictionaries emitted at start-up would be lost. The BSP waits
@@ -72,19 +71,12 @@
 //   QP_ARDUINO_QS_PIO_TX_PIN (default: not defined)
 //       Send QS over a transmit-only PIO UART on this GPIO instead of a
 //       hardware serial port (arduino-pico SerialPIO with no RX pin). Any
-//       GPIO works, so a marker line that reaches the InstrumentPort can
-//       carry the trace when every hardware UART is spoken for: on the
-//       fixture, 21 puts it on FW_TRIG1 = LA5032 channel 17, the same GPIO
-//       the v1.0 joystick board routes to its Digital-50 port (DIG1). The
-//       link has no receive side; combine with QP_ARDUINO_QS_TX_ONLY=1.
+//       free GPIO works, so a board whose hardware UARTs are all spoken for
+//       can still carry the trace to a logic analyzer or a USB-UART adapter.
+//       The link has no receive side; combine with QP_ARDUINO_QS_TX_ONLY=1.
 //       Mutually exclusive with QP_ARDUINO_QS_SERIAL.
 //   QP_ARDUINO_QS_BAUD (default 115200)
 //       Baud rate of a UART or PIO UART transport; USB CDC ignores it.
-//   QP_ARDUINO_TICK_PROBE_PIN
-//       GPIO pulsed by the tick callback. On the fixture it defaults to
-//       FW_TRIG1 (GP21) and must move, e.g. to GP0 (the UART0 TX pad, unused
-//       by the PIO profile, = DIG8 = channel 8), when FW_TRIG1 carries the
-//       trace.
 //
 #include "qpcpp.hpp"   // QP/C++ framework
 #include "blinky.hpp"  // Blinky application interface
@@ -137,66 +129,16 @@ namespace {
 
 //----------------------------------------------------------------------------
 // Pins
-#if defined(QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB) && (QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB != 0)
-
-// mouse-joystick-pcb rev 0. Numbers from mouse-joystick-firm/src/BoardPins.hpp
-// and mouse-joystick-pcb/docs/interface-map.md at tag v0.2.
-constexpr std::uint8_t kLedPin            = 25U; // FW_TRIG0 -> J1501 pin 26 -> TRIG0 -> LA5032 ch 16
-constexpr std::uint8_t kFwTrig1Pin       = 21U; // FW_TRIG1 -> J1501 pin 28 -> TRIG1 -> LA5032 ch 17
-#ifdef QP_ARDUINO_TICK_PROBE_PIN
-constexpr std::uint8_t kTickProbePin     = QP_ARDUINO_TICK_PROBE_PIN; // 0 = UART0 TX pad -> DIG8 -> ch 8
+#ifdef QP_ARDUINO_LED_PIN
+constexpr std::uint8_t kLedPin = QP_ARDUINO_LED_PIN;
 #else
-constexpr std::uint8_t kTickProbePin     = kFwTrig1Pin;
+constexpr std::uint8_t kLedPin = LED_BUILTIN; // GP25 on a Raspberry Pi Pico
 #endif
-constexpr std::uint8_t kInstrBufOeNPin = 24U; // ~{INSTR_BUF_OE}: low enables the port buffers
-constexpr std::uint8_t kBusSwEnNPin    = 9U;  // ~{BUS_SW_EN}: high keeps the GPIO isolation bus open
-constexpr std::uint8_t kHvEnPin          = 19U; // HV_EN: low keeps the 36 V switch off
-constexpr std::uint8_t kHvDiagEnPin     = 14U; // HV_DIAG_EN: must idle low
-constexpr std::uint8_t kTmcCsNPin       = 2U;  // ~{TMC_CS}: high = driver deselected
-constexpr std::uint8_t kTmcDrvEnNPin   = 3U;  // ~{TMC_DRV_EN}: high = driver outputs disabled
-#define BSP_HAS_TICK_PROBE 1
-
-// Drive a pin's level before making it an output so it never glitches through
-// the wrong state, then the same for the next pin.
-void driveOutput(std::uint8_t pin, PinStatus level) {
-    digitalWrite(pin, level);
-    pinMode(pin, OUTPUT);
-}
-
-// The board's safe state, mirrored from the joystick firmware's SafeState:
-// 36 V switch off, GPIO isolation bus open, driver deselected and disabled,
-// markers low. Nothing in this example ever leaves this state, so the fixture
-// is non-actuating by construction. Do this before touching anything else.
-void fixtureSafeState() {
-    driveOutput(kBusSwEnNPin, HIGH);
-    driveOutput(kHvEnPin, LOW);
-    driveOutput(kHvDiagEnPin, LOW);
-    driveOutput(kInstrBufOeNPin, HIGH);
-    driveOutput(kTmcCsNPin, HIGH);
-    driveOutput(kTmcDrvEnNPin, HIGH);
-    driveOutput(kLedPin, LOW);
-    driveOutput(kFwTrig1Pin, LOW);
-    if (kTickProbePin != kFwTrig1Pin) {
-        driveOutput(kTickProbePin, LOW);
-    }
-}
-
-// Make the markers visible at the analyzer. The buffers are output-only and
-// cannot influence the board, so this is safe to leave on.
-void fixtureEnableInstrumentPort() {
-    digitalWrite(kInstrBufOeNPin, LOW);
-}
-
-#else // generic RP2040 board (e.g. a Pico)
-
-constexpr std::uint8_t kLedPin = LED_BUILTIN;
 #ifdef QP_ARDUINO_TICK_PROBE_PIN
 constexpr std::uint8_t kTickProbePin = QP_ARDUINO_TICK_PROBE_PIN;
 #define BSP_HAS_TICK_PROBE 1
 #else
 #define BSP_HAS_TICK_PROBE 0
-#endif
-
 #endif
 
 #if BSP_HAS_TICK_PROBE
@@ -325,7 +267,7 @@ bool qsServiceDue() {
 // QS::getBlock() changes the ring buffer's shared state and must run with
 // interrupts disabled, as every upstream Cortex-M BSP does: a record written
 // from an interrupt (the tick's AO-Post with the full record set) otherwise
-// races with the drain. Found 2026-10-01 on the joystick-link pilot as corrupt
+// races with the drain. Found 2026-10-01 under an application-shaped load as corrupt
 // records and resets; the profiles that emit nothing from interrupts never
 // showed it.
 std::uint8_t const *qsTakeBlock(std::uint16_t *len) {
@@ -382,7 +324,7 @@ void qsPeriodic() {
         // Every QS dictionary function ends with QS::onFlush(), which drains
         // the buffer synchronously: at 115200 baud that held the idle loop,
         // and every active object with it, for about 30 ms per period (found
-        // 2026-10-01 on the joystick-link pilot as late completions every
+        // 2026-10-01 under an application-shaped load as late completions every
         // 10 s). Let the periodic copies drain through the normal service.
         l_qsNoFlush = true;
         bspDictionaries();
@@ -413,22 +355,17 @@ void qsPeriodic() {
 //----------------------------------------------------------------------------
 // BSP functions
 void BSP::init() {
-#if defined(QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB) && (QP_ARDUINO_FIXTURE_MOUSE_JOYSTICK_PCB != 0)
-    fixtureSafeState();
-    fixtureEnableInstrumentPort();
-#else
     pinMode(kLedPin, OUTPUT);
     digitalWrite(kLedPin, LOW);
 #if BSP_HAS_TICK_PROBE
     pinMode(kTickProbePin, OUTPUT);
     digitalWrite(kTickProbePin, LOW);
 #endif
-#endif
 
 #ifdef QS_ON
 #if !QP_ARDUINO_QS_TX_ONLY
     // Give a trace host the chance to attach before the dictionaries go out.
-    // The safe state above is already applied, so waiting here is harmless.
+    // Nothing has started yet, so waiting here is harmless.
     {
         std::uint32_t const start = millis();
         while (!QP_ARDUINO_QS_SERIAL
@@ -509,8 +446,8 @@ extern "C" Q_NORETURN Q_onError(char const * const module, int const id) {
     __asm volatile ("cpsid i" ::: "memory"); // disable interrupts directly
 
     // Distinct analyzer signature: LED solid on for two seconds, tick probe
-    // silent, then a watchdog reset so the fixture recovers on its own (it has
-    // no reset button and no SWD).
+    // silent, then a watchdog reset so a board with no reset button recovers
+    // on its own.
     digitalWrite(kLedPin, HIGH);
     std::uint32_t const start = micros();
     while ((micros() - start) < 2000000U) {

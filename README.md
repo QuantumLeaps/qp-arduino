@@ -4,10 +4,9 @@
 
 [QP/C++](https://www.state-machine.com/qpcpp) real-time embedded framework for
 Arduino boards based on ARM Cortex-M, packaged as one Arduino library with the
-cooperative QV kernel and QP/Spy software tracing built in.
-
-Repository maintainer: Peter Polidoro. Framework author: Quantum Leaps.
-Companion website: <https://www.state-machine.com/arduino>.
+cooperative QV kernel and QP/Spy software tracing built in. Framework author:
+[Quantum Leaps](https://www.state-machine.com). Companion website:
+<https://www.state-machine.com/arduino>.
 
 # What's New?
 
@@ -17,58 +16,69 @@ Companion website: <https://www.state-machine.com/arduino>.
 | qpcpp source tag | `v7.3.4` (`10441f7a03fa956b9e4772a073a05a96487983e2`) |
 | QM version | 6.1.1 |
 | QTools version | 7.3.4 |
-| Status | unreleased; RP2040 qualification open |
+| Qualified configuration | RP2040 with the Earle Philhower arduino-pico core 4.2.0 |
+| Status | 7.3.4 release candidate; tag not cut |
 
-This is the qpcpp v7 migration of qp-arduino. It uses the strict v7 API
+7.3.4 is the QP/C++ v7 line of qp-arduino. It uses the strict v7 API
 (`QP_API_VERSION 9999`), keeps the imported framework files byte-identical to
-the upstream tag except for documented Arduino deltas, and targets RP2040 first
-on a recorded qualification fixture. Port provenance, intentional deltas,
-qualification gates and every measured result live in
-[`UPGRADE_QPCPP_V7.md`](UPGRADE_QPCPP_V7.md); the
-[observability development plan](docs/observability-plan.md) tracks the
-related trace work. None of this establishes new target support or a release.
+the upstream tag except for a few documented Arduino deltas, and was qualified
+on RP2040 with a logic analyzer and the QP/Spy tooling: 100 Hz tick within
+±1 % with no missed or doubled tick over two hours, interrupt-to-dispatch
+latency well under one tick, host-driven coverage of queues, publish/subscribe,
+dynamic events, time events, idle and assertions, and bounded behaviour with
+the trace reader absent, slow or disconnected. [`CHANGELOG.md`](CHANGELOG.md)
+has the release notes; [`docs/port-notes.md`](docs/port-notes.md) explains how
+the port works and what a board support package must do.
 
 > **NOTE:** The qpcpp `v7.3.4` tag contains generated framework headers that
 > still report `QP_VERSION_STR "7.3.3"` and `QP_VERSION 733U`. This package
 > preserves those upstream files unchanged and identifies the imported source
 > by the `v7.3.4` tag.
 
+## Supported configurations
+
+| Target | Core and toolchain | Status |
+|---|---|---|
+| RP2040 (Raspberry Pi Pico and other boards of the core) | arduino-pico 4.2.0 (Earle Philhower), GCC 14.2.0 | **qualified**: the configuration behind the measurements above |
+| Teensy 4.1 | Teensyduino (PlatformIO `teensy@5.1.0`) | builds; the retained regression set, not measured on hardware in this release |
+| Arduino Due (ATSAM3X8E) | Atmel SAM platform | builds, best effort |
+
+The port compiles only for ARM Cortex-M (ARMv6-M with PRIMASK critical
+sections, ARMv7-M with BASEPRI). Only the QV cooperative kernel is included,
+and QP/Spy (`Q_SPY`) is always compiled in. `library.properties` says
+`architectures=rp2040`, the arduino-pico core's architecture string, because
+RP2040 is the only configuration with target evidence; the Arduino IDE shows
+its "may be incompatible" warning on other boards, and the Teensy and Due
+examples still build. Classic 8-bit AVR boards are not supported.
+
 # Getting Started with qp-arduino
 
 The library works with the [Arduino IDE](https://www.arduino.cc/en/software)
 or with [PlatformIO](https://platformio.org/install/cli). The intended workflow
-is to edit the models (`.qm` files) with the
+is to draw the active objects and state machines in the
 [QM modeling tool](https://www.state-machine.com/products/qm/), generate code,
-and use the Arduino IDE or PlatformIO only to build and upload.
+and use the IDE or PlatformIO only to build and upload. Handwritten QP/C++
+works just as well; the `port_validation-rp2040` example is handwritten.
 
-## Provided library and examples
+## The library and the examples
 
 One library for ARM Cortex-M based Arduinos: `qp-arduino`, the QP/C++
 framework with the QV kernel (`#include <qpcpp.hpp>`).
 
-Examples under `examples/`:
-
 | Example | Board | Notes |
 |---|---|---|
-| `blinky_bsp-teensy4`, `dpp_bsp-teensy4`, `port_validation-teensy4` | Teensy 4.1 | retained regression set; hardware checks deferred |
-| `blinky_bsp-rp2040`, `dpp_bsp-rp2040`, `port_validation-rp2040` | RP2040 (Earle Philhower `arduino-pico` core) | built for the recorded qualification fixture, a spare `mouse-joystick-pcb` rev 0 board watched by a Kingst LA5032 |
-| `blinky-sam`, `blinky2-sam`, `blinky_bsp-sam`, `dpp_bsp-sam` | Arduino Due (ATSAM3X8E) | best effort, not a support claim |
+| `blinky_bsp-rp2040` | RP2040, Raspberry Pi Pico by default | one active object and a time event; the QS transport profiles |
+| `dpp_bsp-rp2040` | RP2040 | Dining Philosophers: six active objects, publish/subscribe, event pool, QView scripts |
+| `port_validation-rp2040` | RP2040 | host-driven load generator and probes used to qualify the port; a template for checking a new board or core version |
+| `blinky_bsp-teensy4`, `dpp_bsp-teensy4`, `port_validation-teensy4` | Teensy 4.1 | retained regression set |
+| `blinky-sam`, `blinky2-sam`, `blinky_bsp-sam`, `dpp_bsp-sam` | Arduino Due | best effort |
 
 Each `*_bsp-*` example keeps board specifics in `bsp.cpp` so the active
-objects stay portable; the `dpp_bsp-*` and Teensy examples are generated from
-their `.qm` models.
-
-`library.properties` says `architectures=rp2040`, the architecture string of
-the arduino-pico core, because RP2040 is the only configuration with target
-evidence. The Teensy 4.1 examples still build; on a Teensy the Arduino IDE
-prints its "may be incompatible" warning, which is expected. `avr` will be
-added back as a recorded delta when the deferred Teensy hardware gates pass,
-and will then mean Teensy 4.x, since Teensyduino installs under Arduino's
-`avr` namespace. Classic 8-bit AVR boards are not supported: the port
-compiles only for ARM Cortex-M. The library version keeps the imported
-QP/C++ `MAJOR.MINOR` and advances the patch digit with every qp-arduino
-release; the exact qpcpp tag behind each release is recorded in
-`UPGRADE_QPCPP_V7.md` ("Package Metadata Decision — 2026-10-01").
+objects stay portable; the `blinky_bsp-*` and `dpp_bsp-*` examples are
+generated from their `.qm` models. The RP2040 examples assume only
+`LED_BUILTIN` (GP25 on a Pico) and USB CDC; two build flags,
+`QP_ARDUINO_LED_PIN` and `QP_ARDUINO_TICK_PROBE_PIN`, adapt them to any other
+board of the core. Every example directory has a README.
 
 ## Arduino IDE
 
@@ -82,9 +92,9 @@ examples then appear under *File | Examples | Examples from Custom Libraries*.
 Set *Use external editor* in the IDE preferences so the IDE reloads code that
 QM regenerates.
 
-> **NOTE:** QS tracing (`QS_ON`) is enabled in all BSP-based examples because
-> the Arduino port always compiles with `Q_SPY`. The trace output is binary;
-> read it with QSPY from QTools, not a serial monitor.
+> **NOTE:** The Arduino port always compiles with `Q_SPY`, so every BSP must
+> provide the QS callbacks. The examples enable the trace with `QS_ON`; the
+> output is binary and is read with QSPY from QTools, not a serial monitor.
 
 ## PlatformIO via Pixi (recommended)
 
@@ -96,31 +106,31 @@ nothing requires Pixi; see the next section for plain PlatformIO.
 ```sh
 pixi install                        # PlatformIO, Python, git, build tools
 pixi run ports                      # list serial ports
-pixi run build                      # default: examples/dpp_bsp-teensy4 on teensy41
+pixi run build                      # default: examples/blinky_bsp-rp2040 for the Pico
 pixi run upload                     # default port /dev/ttyACM0
-pixi run build  examples/blinky_bsp-rp2040 rp2040_mouse_joystick
-pixi run upload examples/blinky_bsp-rp2040 rp2040_mouse_joystick /dev/ttyACM0
+pixi run build  examples/dpp_bsp-rp2040 pico
+pixi run upload examples/dpp_bsp-rp2040 pico /dev/ttyACM0
 pixi run monitor /dev/ttyACM0
 ```
 
 Task arguments are positional: example directory, PlatformIO environment
-(`teensy41`, `rp2040_mouse_joystick`, `due`), then the port for uploads.
-Per-example tasks exist too:
+(`pico`, `pico_uart`, `pico_txonly`, `pico_pio_trace`, `pico_noqs`,
+`teensy41`, `due`), then the port for uploads. Per-example tasks exist too:
 
 ```sh
-# Teensy 4.1
-pixi run build-blinky-bsp-teensy4          pixi run upload-blinky-bsp-teensy4 /dev/ttyACM0
-pixi run build-dpp-bsp-teensy4             pixi run build-port-validation-teensy4
-# RP2040 qualification fixture
+# RP2040 (Raspberry Pi Pico)
 pixi run build-blinky-bsp-rp2040           pixi run upload-blinky-bsp-rp2040 /dev/ttyACM0
 pixi run build-dpp-bsp-rp2040              pixi run upload-dpp-bsp-rp2040 /dev/ttyACM0
 pixi run build-port-validation-rp2040      pixi run upload-port-validation-rp2040 /dev/ttyACM0
 pixi run validate-rp2040 /dev/ttyACM0      # host-driven QS-RX procedures
-pixi run stress-rp2040 /dev/serial/by-id/usb-Orb_Weaver_qp-arduino-rp2040_XXXX-if00 3600   # hour-long reader-cycling stress
+pixi run stress-rp2040 /dev/serial/by-id/... 3600   # an hour of trace-host cycling
+# Teensy 4.1
+pixi run build-blinky-bsp-teensy4          pixi run upload-blinky-bsp-teensy4 /dev/ttyACM0
+pixi run build-dpp-bsp-teensy4             pixi run build-port-validation-teensy4
 # Arduino Due (best effort)
 pixi run build-blinky-sam   pixi run build-blinky2-sam   pixi run build-blinky-bsp-sam   pixi run build-dpp-bsp-sam
 # checks
-pixi run provenance    # imported files against qpcpp v7.3.4 in ../qpcpp (QPCPP_DIR/QPCPP_TAG)
+pixi run provenance    # imported files against qpcpp v7.3.4 (QPCPP_DIR / QPCPP_TAG)
 pixi run build-teensy  pixi run build-rp2040  pixi run build-sam
 pixi run check         # provenance plus the Teensy and RP2040 sets
 pixi task list
@@ -133,24 +143,30 @@ example builds in its own directory under `.pio/build-examples`. Use one
 PlatformIO installation per checkout; alternating installations invalidates
 the build directories.
 
+The RP2040 environments pin the community PlatformIO platform for the
+arduino-pico core to the commit the port was qualified with (platform 1.14.0,
+arduino-pico 4.2.0, GCC 14.2.0). Upload uses `picotool` after the 1200 baud
+touch; a board not yet running firmware that honours the touch is put into
+BOOTSEL by hand.
+
 ## PlatformIO without Pixi
 
 Any PlatformIO installation works, for example a Python virtual environment
 with `pip install platformio`. With `pio` on your `PATH`:
 
 ```sh
-python tools/pio_task.py build  --example examples/blinky_bsp-teensy4 --env teensy41
-python tools/pio_task.py upload --example examples/blinky_bsp-rp2040 --env rp2040_mouse_joystick --port /dev/ttyACM0
+python tools/pio_task.py build  --example examples/blinky_bsp-rp2040 --env pico
+python tools/pio_task.py upload --example examples/blinky_bsp-rp2040 --env pico --port /dev/ttyACM0
 python tools/pio_task.py monitor --port /dev/ttyACM0
 ```
 
-Plain `pio run -e teensy41` also works if you set `PLATFORMIO_SRC_DIR` to the
+Plain `pio run -e pico` also works if you set `PLATFORMIO_SRC_DIR` to the
 example directory; `platformio.ini` deliberately sets no `src_dir`. To use the
-library from your own PlatformIO project:
+library from your own PlatformIO project, pin the release tag:
 
 ```ini
 lib_deps =
-    https://github.com/QuantumLeaps/qp-arduino.git
+    https://github.com/QuantumLeaps/qp-arduino.git#v7.3.4
 ```
 
 ## QM and QTools (QM 6.1.1 / QTools 7.3.4)
@@ -175,44 +191,37 @@ pixi run qspy -- -h                     # qspy's own help
 ```
 
 `qmc`, QM's console code generator, is in the same install and regenerates an
-example from its model: `.tools/quantum-leaps/qm-6.1.1/bin/qmc.sh examples/dpp_bsp-rp2040/dpp_bsp-rp2040.qm`.
+example from its model, for example
+`.tools/quantum-leaps/qm-6.1.1/bin/qmc examples/dpp_bsp-rp2040/dpp_bsp-rp2040.qm`.
 
 # QP/Spy Software Tracing
 
 The library supports
 [QP/Spy software tracing](https://www.state-machine.com/software-tracing), and
-the BSP-based examples demonstrate it. The Arduino port is always compiled with
-`Q_SPY` because an Arduino build cannot switch it per sketch, so every BSP must
-provide the QS callbacks. `QS_ON` is enabled in the BSP-based examples: the
-Teensy and SAM BSPs define it at the top of `bsp.cpp`, and the RP2040
-environments pass `-DQS_ON`.
-
-The output is binary; watch it with the
+the BSP-based examples demonstrate it. The output is binary; watch it with the
 [QSPY host utility](https://www.state-machine.com/qtools/qspy.html). On the
-RP2040 examples, which trace over USB CDC, start QSPY within five seconds of
-the upload to receive the dictionaries; the BSPs wait that long for a host
-before starting QS (`QP_ARDUINO_QS_HOST_WAIT_MS`) because USB CDC discards
-output written before a host opens the port.
+RP2040 examples, which trace over USB CDC by default, start QSPY within five
+seconds of the upload to receive the dictionaries; the BSPs wait that long for
+a host before starting QS (`QP_ARDUINO_QS_HOST_WAIT_MS`) because USB CDC
+discards output written before a host opens the port.
 
 With QSPY running, the same link serves
 [QView visualization and monitoring](https://www.state-machine.com/qtools/qview.html);
 the `dpp_bsp-*` examples include QView scripts under `qview/`.
 
-The `rp2040_mouse_joystick_uart` environment sends the trace out UART0
-(GP0/GP1) instead, which the fixture exposes to the analyzer on channels 8 and
-7, so a capture can carry the trace alongside the probe signals independently
-of USB. `rp2040_mouse_joystick_txonly` is the transmit-only observation
-profile on that UART: QS-RX is never read, the dictionaries are re-emitted
-periodically so a capture that misses boot is still decodable, and a
-`TRACE_STAT` record reports the QS buffer's fill and overwrite count.
-`rp2040_mouse_joystick_noqs` compiles the trace out for baseline timing, and
-`rp2040_mouse_joystick_fastflash` uses the quad-lane boot2.
-
-The RP2040 BSPs drive the QP tick from a hardware timer alarm they claim
-themselves, not from the core's shared alarm pool, and watch it from the idle
-loop (`TICK_LOST` record). They touch the USB CDC port only when trace bytes
-are pending or once per millisecond (`QP_ARDUINO_QS_SERVICE_BYTES`,
-`QP_ARDUINO_QS_SERVICE_US`).
+Three further profiles exist for observing a running system rather than
+debugging it on the bench. `pico_uart` sends the trace out UART0 (GP0/GP1) for
+a USB-UART adapter or a logic analyzer's UART decoder. `pico_txonly` is the
+transmit-only observation profile on that UART: QS-RX is never read, so
+nothing on the trace link can reset, command or poke the target; the
+dictionaries are re-emitted periodically so a capture that misses boot is
+still decodable; and a `TRACE_STAT` record reports the QS buffer's fill and
+overwrite count, so trace loss is reported from the target. `pico_pio_trace`
+carries the same profile on a PIO UART driving any free GPIO, for a board
+whose hardware UARTs are all spoken for. The RP2040 BSPs drive the QP tick
+from a hardware timer alarm they claim themselves and touch the USB CDC port
+only when trace bytes are pending or once per millisecond;
+[`docs/port-notes.md`](docs/port-notes.md) explains why.
 
 # QP Licensing
 
@@ -235,13 +244,16 @@ under a simple
 
 # qp-arduino Documentation
 
-- [`UPGRADE_QPCPP_V7.md`](UPGRADE_QPCPP_V7.md): port provenance, intentional
-  deltas, fixture and toolchain record, qualification gates and results.
-- [`docs/observability-plan.md`](docs/observability-plan.md): the trace and
-  observability work that uses this port.
-- Bench evidence (captures, trace logs, analysis and the README of each
-  target run) lives in the sibling repository `qp-arduino-example` under
-  `evidence/`, so this repository stays quick to clone.
+- [`CHANGELOG.md`](CHANGELOG.md): what changed in each release, what is
+  supported, what is known.
+- [`docs/port-notes.md`](docs/port-notes.md): how the Arduino port works, what
+  a board support package must provide, the RP2040 lessons, and the measured
+  figures behind the support claim.
+- [`docs/migration-6-to-7.md`](docs/migration-6-to-7.md): moving a sketch or
+  QM model from the 6.9.x line to 7.3.4.
+- [`docs/provenance.md`](docs/provenance.md): how the framework files relate
+  to the upstream qpcpp tag, the documented Arduino deltas, and the check that
+  verifies them.
 - Each example directory has a `README.md`.
 - Upstream: <https://QuantumLeaps.github.io/qp-arduino/>,
   [QP/C++ documentation](https://www.state-machine.com/qpcpp),
